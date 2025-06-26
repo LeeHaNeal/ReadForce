@@ -15,6 +15,7 @@ const MyPage = () => {
   const [wrongQuestions, setWrongQuestions] = useState([]);
   const [summary, setSummary] = useState({ total: 0, monthlyRate: 0, streak: 0 });
   const [recentSolved, setRecentSolved] = useState([]);
+  const [correctRate, setCorrectRate] = useState(0);
 
   const navigate = useNavigate();
 
@@ -111,21 +112,37 @@ const MyPage = () => {
     navigate(`/question/${quiz.quiz_no}`, { state: { article: { news_no: quiz.quiz_no } } });
   };
 
+  useEffect(() => {
+    fetchWithAuth('/quiz/get-correct-rate')
+      .then(res => res.json())
+      .then(data => {
+        if (typeof data === 'number') {
+          setCorrectRate(data);
+        }
+      })
+      .catch(err => {
+        console.error('정답률 불러오기 실패:', err);
+      });
+  }, []);
+
+  const getBadgeLabel = (rate) => {
+    if (rate >= 100) return '초고수';
+    if (rate >= 75) return '고급';
+    if (rate >= 50) return '중급';
+    if (rate >= 25) return '초심자';
+    return '입문자';
+  };
+
+  const badgeLabel = getBadgeLabel(correctRate);
+
   return (
     <div className="mypage-container">
       <div className="top-section">
         <div className="left-top">
           <img src={profileImageUrl} alt="프로필" className="profile-img" />
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div><h3>{nickname} 님</h3></div>
-            <div><span className="badge">중급</span></div>
-          </div>
-          {/* <button className='settings-button' onClick={() => setShowModal(true)}>⚙️</button>
-          {showModal && <EditProfileModal onClose={() => setShowModal(false)} />} */}
+          <h3 className="nickname">{nickname} 님</h3>
+          <span className="badge">{badgeLabel}</span>
         </div>
-      </div>
-
-      <div className="mypage-main">
         <div className="calendar-section">
           <h4>출석 현황</h4>
           <div className="calendar-summary">
@@ -161,6 +178,43 @@ const MyPage = () => {
           </div>
         </div>
       </div>
+
+      {/* <div className="mypage-main">
+        <div className="calendar-section">
+          <h4>출석 현황</h4>
+          <div className="calendar-summary">
+            <div className="summary-row">
+              <div className="summary-title">총 출석일</div>
+              <div className="summary-title">이번 달 출석률</div>
+              <div className="summary-title">연속 출석</div>
+            </div>
+            <div className="summary-row">
+              <div className="summary-value">{summary.total}일</div>
+              <div className="summary-value">{summary.monthlyRate}%</div>
+              <div className="summary-value">{summary.streak}일</div>
+            </div>
+          </div>
+          <div className="calendar-wrapper">
+            <Calendar
+              calendarType="gregory"
+              next2Label={null}
+              prev2Label={null}
+              minDetail="month"
+              maxDetail="month"
+              tileClassName={({ date, view }) => {
+                if (view === 'month') {
+                  const isAttendance = attendanceDates.some(att => att.toDateString() === date.toDateString());
+                  const day = date.getDay();
+                  if (isAttendance) return 'attended-day';
+                  if (day === 0) return 'sunday';
+                  if (day === 6) return 'saturday';
+                }
+                return null;
+              }}
+            />
+          </div>
+        </div>
+      </div> */}
 
       <div className="history-section">
         <h4>최근 문제 풀이 기록</h4>

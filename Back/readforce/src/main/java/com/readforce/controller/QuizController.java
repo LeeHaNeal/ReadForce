@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,14 @@ public class QuizController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(get_quiz_list);
 	
+	}
+	
+	// 사용자 전체 문제 정답률 구하기
+	@GetMapping("/get-correct-rate")
+	public ResponseEntity<Integer> getCorrectRate(@AuthenticationPrincipal UserDetails userDetails) {
+	    String email = userDetails.getUsername();
+	    int rate = quiz_service.calculateUserCorrectRate(email);
+	    return ResponseEntity.ok(rate);
 	}
 	
 }

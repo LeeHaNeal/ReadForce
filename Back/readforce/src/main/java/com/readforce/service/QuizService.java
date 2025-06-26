@@ -363,5 +363,30 @@ public class QuizService {
 		
 	}
 
+	// 사용자 전체 문제 정답률 구하
+	@Transactional(readOnly = true)
+	public int calculateUserCorrectRate(String email) {
+
+	    // 뉴스 응시 이력 조회
+	    List<NewsQuizAttempt> newsList = news_quiz_attempt_repository.findByEmailWithNewQuizList(email);
+	    // 문학 응시 이력 조회
+	    List<LiteratureQuizAttempt> literatureList = literature_quiz_attempt_repository.getMemberSolvedLiteratureQuizList(email);
+
+	    long totalAttemptCount = newsList.size() + literatureList.size();
+	    long correctCount = 0;
+
+	    for (NewsQuizAttempt n : newsList) {
+	    	if (Boolean.TRUE.equals(n.getIs_correct())) correctCount++;
+	    }
+
+	    for (LiteratureQuizAttempt l : literatureList) {
+	    	if (Boolean.TRUE.equals(l.getIs_correct())) correctCount++;
+	    }
+
+	    if (totalAttemptCount == 0) return 0;
+
+	    // 정답률 (0 ~ 100 사이 정수)
+	    return (int) ((double) correctCount / totalAttemptCount * 100);
+	}
 
 }
