@@ -13,34 +13,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Level {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long levelNo;
-	
-	@Column(nullable = false)
-	private Integer paragraphCount;
-	
-	@Column(nullable = false)
-	private String vocabularyLevel;
-	
-	@Column(nullable = false)
-	private String sentenceStructure;
-	
-	@Column(nullable = false)
-	private String questionType;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
