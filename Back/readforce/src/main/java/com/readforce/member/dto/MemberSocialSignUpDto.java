@@ -16,6 +16,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
+
 public class MemberSocialSignUpDto {
 	
 	@NotBlank(message = MessageCode.TEMPORAL_TOKEN_NOT_BLANK)
