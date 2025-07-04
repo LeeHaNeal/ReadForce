@@ -12,6 +12,7 @@ import com.readforce.common.exception.DuplicationException;
 import com.readforce.member.entity.Attendance;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.AttendanceRepository;
+import com.readforce.result.entity.Result;
 import com.readforce.result.service.ResultService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,21 @@ public class AttendanceService {
 		
 		attendanceRepository.save(attendance);
 		
+		updateLearningStreak(email);
+		
+	}
+
+	private void updateLearningStreak(String email) {
+		
+		Result result = resultService.getActiveMemberResult(email);
+		
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+		
+		boolean attendedYesterday = attendanceRepository
+				.findByMember_EmailAndAttendanceDate(email, yesterday)
+				.isPresent();
+		
+		result.updateLearningStreak(attendedYesterday);
 		
 	}
 
@@ -55,5 +71,6 @@ public class AttendanceService {
 				.collect(Collectors.toList());
 
 	}
+	
 
 }

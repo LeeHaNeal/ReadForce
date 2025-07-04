@@ -8,5 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.readforce.result.entity.Result;
 @Repository
 public interface ResultRepository extends JpaRepository<Result, Long> {
-	 Optional<Result> findByMember_MemberNo(Long memberNo);
+
+	Optional<Result> findByMember_Email(String email);
+
 }

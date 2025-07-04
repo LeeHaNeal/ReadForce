@@ -14,6 +14,7 @@ public final class MessageCode {
 	public static final String FILE_NOT_NULL = "NOT0005";
 	public static final String VERIFICATION_CODE_NOT_BLANK = "NOT0006";
 	public static final String TEMPORAL_TOKEN_NOT_BLANK = "NOT0007";
+	public static final String REFRESH_TOKEN_NOT_BLANK = "NOT0008";
 	
 	
 	
@@ -49,6 +50,8 @@ public final class MessageCode {
 	public static final String PASSWORD_RESET_SUCCESS = "SUC0010";
 	public static final String PROFILE_IMAGE_UPLOAD_SUCCESS = "SUC0011";
 	public static final String PROFILE_IMAGE_DELETE_SUCCESS = "SUC0012";
+	public static final String REISSUE_ACCESS_TOKEN_SUCCESS = "SUC0013";
+	public static final String GET_TOKENS_SUCCESS = "SUC0014";
 	
 	
 	
@@ -61,12 +64,14 @@ public final class MessageCode {
 	public static final String FILE_DELETE_FAIL = "FAI0006";
 	public static final String FILE_DELETE_IO_FAIL = "FAI0007";
 	public static final String VERIFY_VERIFICATION_CODE_FAIL = "FAI0008";
+	public static final String JSON_MAPPING_FAIL = "FAI0009";
 	
 	
 	
 	public static final String MEMBER_NOT_FOUND = "NOF0001";
 	public static final String FILE_NOT_FOUND = "NOF0002";
 	public static final String PROFILE_IMAGE_NOT_FOUND = "NOF0003";
+	public static final String MEMBER_RESULT_NOT_FOUND = "NOF0004";
 	
 	
 	
