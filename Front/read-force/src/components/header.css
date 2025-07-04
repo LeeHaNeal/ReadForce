@@ -9,8 +9,7 @@
 .header-left {
   display: flex;
   align-items: center;
-  height: 100%; 
-  margin-top: 30px;
+  height: 100%;
 }
 
 .logo-link {
@@ -57,7 +56,7 @@
 
 .nav {
   display: flex;
-  gap: 5rem;
+  gap: 3.5rem;
 }
 
 .nav a {
@@ -164,8 +163,7 @@
   background-color: #f0f0f0;
 }
 
-
-/* 드롭다운 가능한 nav 항목 공통 */
+/* 공통 네비게이션 메뉴 항목 */
 .nav-item {
   position: relative;
   padding: 0 10px;
@@ -179,104 +177,6 @@
 
 .nav-item:hover {
   color: #439395;
-}
-
-/* 드롭다운 메뉴 스타일 */
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 8px;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  min-width: 140px;
-  padding: 8px 0;
-}
-
-.dropdown-menu a {
-  padding: 10px 16px;
-  font-size: 15px;
-  color: #374151;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.dropdown-menu a:hover {
-  background-color: #f0f0f0;
-  color: #0f766e;
-}
-
-.dropdown-grid {
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 10px 30px;
-  background: white;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 20;
-  white-space: nowrap;
-}
-
-.menu-wrapper {
-  position: relative;
-}
-
-.mega-menu {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: white;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  z-index: 999;
-  gap: 2rem;    
-}
-
-.menu-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.menu-section h4 {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #0f766e;
-}
-
-.menu-section a {
-  margin: 4px 0;
-  color: #374151;
-  text-decoration: none;
-  font-size: 15px;
-}
-
-.menu-section a:hover {
-  color: #0d9488;
-}
-
-.mega-menu a {
-  color: #374151;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 0.5rem 0;
-  white-space: nowrap;
-}
-
-.mega-menu a:hover {
-  color: #0d9488;
-  font-weight: 600;
 }
 
 .hamburger {
@@ -311,7 +211,7 @@
   font-weight: bold;
 }
 
-/* 반응형 */
+/* 모바일 */
 @media (max-width: 768px) {
   .header-center,
   .auth-buttons {

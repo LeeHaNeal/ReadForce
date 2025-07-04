@@ -1,4 +1,3 @@
-// ✅ 공통 레이아웃 .page-container 반영됨
 import './header.css';
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -8,7 +7,6 @@ const Header = () => {
   const [selectedLang, setSelectedLang] = useState('한국어');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [nickname, setNickname] = useState('');
-  const [hoveredMenu, setHoveredMenu] = useState(null);
   const navigate = useNavigate();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -65,40 +63,15 @@ const Header = () => {
           </h1>
         </div>
 
-        <div className="header-center">
-          <nav className="nav">
-            <div
-              className="menu-wrapper"
-              onMouseEnter={() => setHoveredMenu('article')}
-              onMouseLeave={() => setHoveredMenu(null)}
-            >
-              <div className="nav-item">기사 콘텐츠</div>
-              {hoveredMenu === 'article' && (
-                <div className="mega-menu">
-                  <Link to="/korea">한국어</Link>
-                  <Link to="/japan">일어</Link>
-                  <Link to="/usa">영어</Link>
-                </div>
-              )}
-            </div>
-
-            <div
-              className="menu-wrapper"
-              onMouseEnter={() => setHoveredMenu('literature')}
-              onMouseLeave={() => setHoveredMenu(null)}
-            >
-              <div className="nav-item">문학 작품</div>
-              {hoveredMenu === 'literature' && (
-                <div className="mega-menu">
-                  <Link to="/literature/novel">소설</Link>
-                  <Link to="/literature/fairytale">동화</Link>
-                </div>
-              )}
-            </div>
-
-            <Link to="/challenge" className="nav-item">문해력 도전</Link>
-          </nav>
-        </div>
+      <div className="header-center">
+        <nav className="nav">
+          <Link to="/article" className="nav-item">기사</Link>
+          <Link to="/literature/novel" className="nav-item">소설</Link>
+          <Link to="/literature/fairytale" className="nav-item">동화</Link>
+          <Link to="/challenge" className="nav-item">문해력 도전</Link>
+          <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+        </nav>
+      </div>
 
       <div className="hamburger" onClick={() => setShowMobileMenu(prev => !prev)}>☰</div>
         <div className="header-right auth-buttons">
@@ -156,36 +129,13 @@ const Header = () => {
 
       {showMobileMenu && (
       <div className="mobile-menu">
-        <div className="mobile-menu-section">
-          <div className="mobile-menu-title">기사 콘텐츠</div>
-          <Link to="/korea">한국어</Link>
-          <Link to="/japan">일어</Link>
-          <Link to="/usa">영어</Link>
-        </div>
-
-        <div className="mobile-menu-section">
-          <div className="mobile-menu-title">문학 작품</div>
-          <Link to="/literature/novel">소설</Link>
-          <Link to="/literature/fairytale">동화</Link>
-        </div>
-
-        <div className="mobile-menu-section">
-          <Link to="/challenge">문해력 도전</Link>
-        </div>
-
-        <div className="mobile-menu-section">
-          {isLoggedIn ? (
-            <>
-              <Link to="/mypage">마이페이지</Link>
-              <div onClick={handleLogout}>로그아웃</div>
-            </>
-          ) : (
-            <>
-              <Link to="/login">로그인</Link>
-              <Link to="/signup/signupchoice">회원가입</Link>
-            </>
-          )}
-        </div>
+        <nav className='nav'>
+          <Link to="/article" className="nav-item">기사</Link>
+          <Link to="literature/novel" className="nav-item">소설</Link>
+          <Link to="literature/fairytale" className="nav-item">동화</Link>
+          <Link to="challenge" className="nav-item">문해력 도전</Link>
+          <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+        </nav>
       </div>
     )}
 

@@ -1,0 +1,23 @@
+package com.readforce.email.dto;
+
+import com.readforce.common.MessageCode;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+@AllArgsConstructor
+public class EmailVerificationVerifyDto {
+
+	@NotBlank(message = MessageCode.EMAIL_NOT_BLANK)
+	@Email(message = MessageCode.EMAIL_PATTERN_INVALID)
+	private String email;
+	
+	@NotBlank(message = MessageCode.VERIFICATION_CODE_NOT_BLANK)
+	private String verificationCode;
+	
+}

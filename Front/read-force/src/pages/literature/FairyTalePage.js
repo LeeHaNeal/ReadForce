@@ -7,13 +7,24 @@ import { fetchLiteratureParagraphList } from '../../api/literatureApi';
 import { fairytaleCategoryOptions } from '../../components/LiteratureCategory';
 
 const reverseLevelMap = {
-  '초급': 'BEGINNER',
-  '중급': 'INTERMEDIATE',
-  '고급': 'ADVANCED',
+  '1': 'LEVEL_1',
+  '2': 'LEVEL_2',
+  '3': 'LEVEL_3',
+  '4': 'LEVEL_4',
+  '5': 'LEVEL_5',
+  '6': 'LEVEL_6',
+  '7': 'LEVEL_7',
+  '8': 'LEVEL_8',
+  '9': 'LEVEL_9',
+  '10': 'LEVEL_10',
 };
 
 const reverseCategoryMap = {
-  '동화': 'CHILDREN',
+  '전래': 'TRADITIONAL',
+  '환상': 'FANTASY',
+  '생활': 'LIFE',
+  '정보': 'INFORMATION',
+  '기타': 'ETC',
 };
 
 const FairyTalePage = () => {

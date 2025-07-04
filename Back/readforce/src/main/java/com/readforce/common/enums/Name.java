@@ -1,0 +1,15 @@
+package com.readforce.common.enums;
+
+public enum Name {
+
+	TEMPORAL_TOKEN,
+	ACCESS_TOKEN,
+	REFESH_TOKEN,
+	NICKNAME,
+	SOCIAL_PROVIDER,
+	KAKAO_SIGN_OUT_URL,
+	UPLOAD_DIR,
+	MAX_FILE_SIZE,
+	FILE_TYPE_LIST
+	
+}

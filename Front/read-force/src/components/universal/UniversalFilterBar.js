@@ -3,15 +3,13 @@ import './css/UniversalFilterBar.css';
 import Select from 'react-select';
 
 const UniversalFilterBar = ({ level, setLevel, category, setCategory, order_by, setOrderBy, categoryOptions }) => {
-  const handleLevelClick = (value) => {
-    setLevel(level === value ? '' : value);
-  };
 
   const levelOptions = [
-    { value: '', label: '전체' },
-    { value: 'BEGINNER', label: '초급' },
-    { value: 'INTERMEDIATE', label: '중급' },
-    { value: 'ADVANCED', label: '고급' },
+    { value: '', label: '모두'},
+    ...Array.from({ length: 10 }, (_, i) => ({
+      value: (i + 1).toString(),
+      label: `${i + 1} 단계`,
+    })),
   ];
 
   return (
@@ -21,43 +19,78 @@ const UniversalFilterBar = ({ level, setLevel, category, setCategory, order_by, 
           className={`UniversalFilterBar-sort-button ${order_by === 'latest' ? 'active' : ''}`}
           onClick={() => setOrderBy('latest')}
         >
-          최신순
+          · 최신순
         </button>
         <button
           className={`UniversalFilterBar-sort-button ${order_by === 'oldest' ? 'active' : ''}`}
           onClick={() => setOrderBy('oldest')}
         >
-          오래된순
+          · 오래된순
         </button>
       </div>
 
       <div className="UniversalFilterBar-center">
-        {levelOptions.slice(1).map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => handleLevelClick(opt.value)}
-            className={`UniversalFilterBar-level-button ${
-              opt.value === 'BEGINNER'
-                ? 'beginner'
-                : opt.value === 'INTERMEDIATE'
-                ? 'intermediate'
-                : 'advanced'
-            } ${level === opt.value ? 'selected' : ''}`}
-          >
-            {opt.label}
-          </button>
-        ))}
+        <div className="category-hashtags">
+          {categoryOptions.slice(1).map((opt) => (
+            <span
+              key={opt.value}
+              className={`category-tag ${category === opt.value ? 'active' : ''}`}
+              onClick={() => setCategory(category === opt.value ? '' : opt.value)}
+            >
+              #{opt.label}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="UniversalFilterBar-right">
+        <div className="level-select-dropdown">
         <Select
-          className="UniversalFilterBar-select"
           classNamePrefix="react-select"
-          options={categoryOptions}
-          value={categoryOptions.find((o) => o.value === category) || categoryOptions[0]}
-          onChange={(selected) => setCategory(selected.value)}
+          options={levelOptions}
+          value={levelOptions.find((opt) => opt.value === level)}
+          onChange={(selected) => setLevel(selected.value)}
           isSearchable={false}
-        />
+          placeholder="단계"
+            styles={{
+                      control: (base) => ({
+                        ...base,
+                        minWidth: '100px',
+                        height: '32px',
+                        fontSize: '14px',
+                        border: '1px solid #ccc',
+                        boxShadow: 'none',
+                        borderRadius: '12px',
+                        outline: 'none', 
+                        '&:hover': {
+                          borderColor: '#999',
+                        },
+                      }),
+                      menu: (base) => ({
+                        ...base,
+                        borderRadius: '12px',
+                        marginTop: '4px',
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                        overflow: 'hidden',
+                      }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isFocused ? '#f0f0f0' : 'white',
+                        color: '#333',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                      }),
+                      singleValue: (base) => ({
+                        ...base,
+                        color: '#333',
+                      }),
+                      placeholder: (base) => ({
+                        ...base,
+                        color: '#999',
+                      }),
+                    }}
+                  />
+        </div>
       </div>
     </div>
   );

@@ -8,12 +8,18 @@
   gap: 12px;
 }
 
+/* 공통 영역 설정 */
+.UniversalFilterBar-left,
+.UniversalFilterBar-center,
+.UniversalFilterBar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* 왼쪽: 정렬 버튼 */
 .UniversalFilterBar-left {
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;
-  gap: 10px;
+  flex: 0.8;
 }
 
 .UniversalFilterBar-sort-button {
@@ -30,83 +36,40 @@
   color: #333;
 }
 
-/* 가운데: 난이도 버튼 */
+/* 가운데: 카테고리 해시태그 */
 .UniversalFilterBar-center {
-  flex: 1;
-  display: flex;
+  flex: 2.6;
   justify-content: center;
-  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.UniversalFilterBar-level-button {
-  border: none;
-  padding: 8px 14px;
-  border-radius: 12px;
-  font-weight: bold;
+.category-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+.category-tag {
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  color: #999;
+  font-size: 17px;
 }
 
-.UniversalFilterBar-level-button.beginner {
-  background-color: #d1eceb;
-  color: #222;
+.category-tag.active {
+  font-weight: bold;
+  color: #439395;
 }
 
-.UniversalFilterBar-level-button.intermediate {
-  background-color: #73bfb8;
-  color: #fff;
-}
-
-.UniversalFilterBar-level-button.advanced {
-  background-color: #3e8e8c;
-  color: #fff;
-}
-
-.UniversalFilterBar-level-button.selected {
-  filter: brightness(0.9);
-}
-
-/* 오른쪽: 카테고리 */
+/* 오른쪽: 레벨 선택 영역 */
 .UniversalFilterBar-right {
-  flex: 1;
+  flex: 0.6;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 
-.UniversalFilterBar-select {
-  width: 120px;
-  font-size: 14px;
-}
-
-.UniversalFilterBar-select .react-select__control {
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  box-shadow: none;
-  min-height: 38px;
-  cursor: pointer;
-}
-
-.UniversalFilterBar-select .react-select__control--is-focused {
-  border-color: #aaa;
-  box-shadow: none;
-}
-
-.UniversalFilterBar-select .react-select__menu {
-  border-radius: 12px;
-  font-size: 14px;
-  z-index: 10;
-}
-
-.UniversalFilterBar-select .react-select__option--is-selected {
-  background-color: #3e8e8c;
-  color: white;
-}
-
-.UniversalFilterBar-select .react-select__option--is-focused {
-  background-color: #d1eceb;
-  color: #222;
-}
-
+/* 모바일 대응 */
 @media (max-width: 600px) {
   .UniversalFilterBar-layout {
     flex-direction: column;
@@ -117,9 +80,8 @@
   .UniversalFilterBar-left,
   .UniversalFilterBar-center,
   .UniversalFilterBar-right {
-    flex: none;
     width: 100%;
-    justify-content: center;
+    justify-content: center; /* ← 가운데 정렬로 통일 */
   }
 
   .UniversalFilterBar-sort-button {
@@ -127,21 +89,17 @@
     padding: 6px 8px;
   }
 
-  .UniversalFilterBar-level-button {
-    font-size: 14px;
-    padding: 6px 12px;
+  .category-hashtags {
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
-  .UniversalFilterBar-select {
-    width: 100%;
+  .category-tag {
+    font-size: 15px;
   }
 
-  .UniversalFilterBar-select .react-select__control {
-    min-height: 36px;
-    font-size: 14px;
-  }
-
-  .UniversalFilterBar-select .react-select__menu {
-    font-size: 14px;
+  .level-select-dropdown {
+    width: 100%; /* ← 부모 div 너비 고정 */
   }
 }
+

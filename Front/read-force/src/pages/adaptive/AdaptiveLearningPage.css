@@ -1,0 +1,71 @@
+.adaptive-learning-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 90px 20px;
+  min-height: 60vh;
+}
+
+.adaptive-content-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  max-width: 1000px;
+  width: 100%;
+  position: relative;
+}
+
+.robot-section {
+  position: relative;
+  top: 150px;     
+  left: -40px;   
+}
+
+.robot-animation {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.adaptive-intro {
+  text-align: left;
+  position: relative;
+  top: 10px; 
+  margin-left: 40px;
+}
+
+.adaptive-intro p {
+  font-size: 1.8rem;
+  color: #868686;
+  line-height: 1.5;
+  margin: 1px 0;
+  font-weight: bold;
+}
+
+.nickname {
+  color: #439395;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+.start-button {
+  margin-top: 82px;
+  margin-left: 90px;
+}
+
+.start-button a {
+  display: inline-block;
+  padding: 12px 34px;
+  background-color: #888;
+  color: white;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  font-weight: bold;
+}
+
+.start-button a:hover {
+  background-color: #666;
+}
