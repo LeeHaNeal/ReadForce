@@ -39,7 +39,7 @@ import com.readforce.member.dto.MemberSocialSignUpDto;
 import com.readforce.member.dto.MemberSummaryDto;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.MemberRepository;
-import com.readforce.result.service.ScoreService;
+import com.readforce.result.service.ResultService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final StringRedisTemplate redisTemplate;
 	private final PasswordEncoder passwordEncoder;
-	private final ScoreService scoreService;
+	private final ResultService resultService;
 	private final FileService fileService;
 	private final FileDeleteFailLogService fileDeleteFailLogService;
 	private final EmailService emailService;
@@ -213,7 +213,7 @@ public class MemberService {
 		
 		memberRepository.save(member);
 		
-		scoreService.createScore(member);
+		resultService.create(member);
 		
 		redisTemplate.delete(Prefix.EMAIL_VERIFICATION + memberSignUpDto.getEmail());
 		

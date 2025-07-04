@@ -1,7 +1,6 @@
 package com.readforce.adaptivelearning.dto;
 
-import com.readforce.adaptivelearning.entity.Question;
-
+import com.readforce.question.entity.Question;
 import lombok.Builder;
 import lombok.Data;
 

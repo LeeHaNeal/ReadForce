@@ -1,6 +1,8 @@
 package com.readforce.member.service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,7 @@ import com.readforce.common.exception.DuplicationException;
 import com.readforce.member.entity.Attendance;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.AttendanceRepository;
+import com.readforce.result.service.ResultService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceService {
 	
 	private final AttendanceRepository attendanceRepository;
-	
+	private final ResultService resultService;
 	private final MemberService memberService;
 	
 	@Transactional
@@ -37,8 +40,20 @@ public class AttendanceService {
 				.attendanceDate(LocalDate.now())
 				.build();
 		
-		attendanceRepository.save(attendance);		
+		attendanceRepository.save(attendance);
 		
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<LocalDate> getAttendanceDateList(String email) {
+
+		return attendanceRepository
+				.findAllByMember_Email(email)
+				.stream()
+				.map(attendance -> attendance.getAttendanceDate())
+				.collect(Collectors.toList());
+
 	}
 
 }

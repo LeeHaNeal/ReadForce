@@ -52,10 +52,17 @@ public class SecurityConfig {
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
 			.authorizeHttpRequests(
 					auth -> auth.requestMatchers(
-								"/oauth2/**"				
-							
-							
-							)
+							"/authentication/sign-in",
+				            "/member/sign-up",
+				            "/member/social-sign-up",
+				            "/member/email-check",
+				            "/member/nickname-check",
+				            "/member/password-reset-from-link",
+				            "/email/send-verification-code-for-sign-up",
+				            "/email/verify-verification-code-for-sign-up",
+				            "/email/send-password-reset-link",
+				            "/oauth2/**"							
+					)
 					.permitAll()
 					.anyRequest()
 					.authenticated()
