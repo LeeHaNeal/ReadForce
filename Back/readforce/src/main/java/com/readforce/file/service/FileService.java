@@ -58,7 +58,7 @@ public class FileService {
 		
 		try {
 			
-			Files.createDirectories(path);
+			Files.createDirectories(normalizedPath);
 			return path;
 			
 		} catch(Exception exception) {
