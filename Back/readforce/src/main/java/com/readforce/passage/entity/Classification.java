@@ -2,10 +2,9 @@ package com.readforce.passage.entity;
 
 import java.time.LocalDateTime;
 
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.readforce.passage.enums.ClassificationType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,10 +32,9 @@ public class Classification {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long classificationNo;
 	
-	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private ClassificationType type = ClassificationType.NORMAL;
+	private com.readforce.common.enums.Classification classification;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

@@ -84,28 +84,7 @@ public class RateLimitingService {
 		String messageCode = null;
 		 
 		switch(category) {
-		
-			case NEWS:
-				switch(language) {
-				
-					case KOREAN:
-						messageCode = MessageCode.NEWS_KOREAN_CHALLENGE_ALREDY_ATTEMPTED_TODAY;
-						break;
-						
-					case ENGLISH:
-						messageCode = MessageCode.NEWS_ENGLISH_CHALLENGE_ALREDY_ATTEMPTED_TODAY;
-						break;
-						
-					case JAPANESE:
-						messageCode = MessageCode.NEWS_JAPANESE_CHALLENGE_ALREDY_ATTEMPTED_TODAY;
-						break;
-						
-					default:
-						throw new IllegalArgumentException(MessageCode.NEWS_LANGUAGE_INVALID);
-						
-				}
-				break;
-				
+
 			case NOVEL:
 				switch(language) {
 				
@@ -147,6 +126,27 @@ public class RateLimitingService {
 				
 				}
 				break;
+				
+			default:
+				switch(language) {
+				
+				case KOREAN:
+					messageCode = MessageCode.NEWS_KOREAN_CHALLENGE_ALREDY_ATTEMPTED_TODAY;
+					break;
+					
+				case ENGLISH:
+					messageCode = MessageCode.NEWS_ENGLISH_CHALLENGE_ALREDY_ATTEMPTED_TODAY;
+					break;
+					
+				case JAPANESE:
+					messageCode = MessageCode.NEWS_JAPANESE_CHALLENGE_ALREDY_ATTEMPTED_TODAY;
+					break;
+					
+				default:
+					throw new IllegalArgumentException(MessageCode.NEWS_LANGUAGE_INVALID);
+					
+			}
+			break;
 		
 		}
 		
