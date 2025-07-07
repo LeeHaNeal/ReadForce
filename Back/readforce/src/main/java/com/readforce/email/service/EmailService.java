@@ -146,7 +146,7 @@ public class EmailService {
 	public void markEmailAsVerified(String email) {
 		
 		redisTemplate.opsForValue().set(
-				Prefix.EMAIL_VERIFICATION + email,
+				Prefix.EMAIL_VERIFICATION.getContent() + email,
 				MessageCode.EMAIL_VERIFICATION_SUCCESS,
 				Duration.ofMinutes(ExpireTime.MARK_EMAIL_AS_VERIFIED.getTime())
 		);
