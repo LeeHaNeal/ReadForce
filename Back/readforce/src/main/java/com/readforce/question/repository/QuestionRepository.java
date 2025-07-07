@@ -1,5 +1,6 @@
 package com.readforce.question.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 			@Param("questionNo") Long questionNo
 	);
 
+	@Query("SELECT DISTINCT q.passage.passageNo FROM Question q")
+	List<Long> findAllUsedPassageNo();
+	
 }

@@ -126,7 +126,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			
 			Map<String, String> tokenMap = Map.of(
 					Name.ACCESS_TOKEN.toString(), accessToken,
-					Name.REFESH_TOKEN.toString(), refreshToken,
+					Name.REFRESH_TOKEN.toString(), refreshToken,
 					Name.NICKNAME.toString(), member.getNickname(),
 					Name.SOCIAL_PROVIDER.toString(), member.getSocialProvider()
 			);
