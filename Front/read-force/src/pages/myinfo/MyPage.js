@@ -14,7 +14,7 @@ const MyPage = () => {
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [wrongQuestions, setWrongQuestions] = useState([]);
   const [summary, setSummary] = useState({ total: 0, monthlyRate: 0, streak: 0 });
-  const [recentSolved, setRecentSolved] = useState([]);
+  // const [recentSolved, setRecentSolved] = useState([]);
   const [correctRate, setCorrectRate] = useState(0);
 
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const MyPage = () => {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    fetchWithAuth('/member/get-attendance-date-list')
+    fetchWithAuth('/attendance/get-attendance-date-list')
       .then(res => res.json())
       .then(data => {
         const dates = Array.isArray(data) ? data.map(d => new Date(d)) : [];
@@ -83,6 +83,20 @@ const MyPage = () => {
   }, [isLoggedIn]);
 
   useEffect(() => {
+    fetchWithAuth('/result/get-overall-correct-answer-rate')
+      .then(res => res.json())
+      .then(data => {
+        const rate = data?.OVERALL_CORRECT_ANSWER_RATE;
+        if (typeof rate === 'number') {
+          setCorrectRate(rate);
+        }
+      })
+      .catch(err => {
+        console.error('전체 정답률 불러오기 실패:', err);
+      });
+  }, []);
+
+  useEffect(() => {
     fetchWithAuth('/member/get-member-incorrect-quiz-list')
       .then(res => res.json())
       .then(data => {
@@ -95,18 +109,18 @@ const MyPage = () => {
       });
   }, []);
 
-  useEffect(() => {
-    fetchWithAuth('/member/get-member-solved-quiz-list-10')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setRecentSolved(data);
-        }
-      })
-      .catch(err => {
-        console.error("최근 푼 문제 불러오기 실패:", err);
-      });
-  }, []);
+  // useEffect(() => {
+  //   fetchWithAuth('/member/get-member-solved-quiz-list-10')
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       if (Array.isArray(data)) {
+  //         setRecentSolved(data);
+  //       }
+  //     })
+  //     .catch(err => {
+  //       console.error("최근 푼 문제 불러오기 실패:", err);
+  //     });
+  // }, []);
 
   const handleRetry = (quiz) => {
     navigate(`/question/${quiz.quiz_no}`, { state: { article: { news_no: quiz.quiz_no } } });
@@ -179,56 +193,12 @@ const MyPage = () => {
         </div>
       </div>
 
-      {/* <div className="mypage-main">
-        <div className="calendar-section">
-          <h4>출석 현황</h4>
-          <div className="calendar-summary">
-            <div className="summary-row">
-              <div className="summary-title">총 출석일</div>
-              <div className="summary-title">이번 달 출석률</div>
-              <div className="summary-title">연속 출석</div>
-            </div>
-            <div className="summary-row">
-              <div className="summary-value">{summary.total}일</div>
-              <div className="summary-value">{summary.monthlyRate}%</div>
-              <div className="summary-value">{summary.streak}일</div>
-            </div>
-          </div>
-          <div className="calendar-wrapper">
-            <Calendar
-              calendarType="gregory"
-              next2Label={null}
-              prev2Label={null}
-              minDetail="month"
-              maxDetail="month"
-              tileClassName={({ date, view }) => {
-                if (view === 'month') {
-                  const isAttendance = attendanceDates.some(att => att.toDateString() === date.toDateString());
-                  const day = date.getDay();
-                  if (isAttendance) return 'attended-day';
-                  if (day === 0) return 'sunday';
-                  if (day === 6) return 'saturday';
-                }
-                return null;
-              }}
-            />
-          </div>
-        </div>
-      </div> */}
-
       <div className="history-section">
-        <h4>최근 문제 풀이 기록</h4>
-        <ul>
-          {recentSolved.length === 0 ? (
-            <li>풀이 기록이 없습니다.</li>
-          ) : (
-            recentSolved.map((item, i) => (
-              <li key={i}>
-                {item.created_date?.slice(0, 10)} / {item.classification} / {item.question_text}
-              </li>
-            ))
-          )}
-        </ul>
+        <h4>전체 정답률</h4>
+        <div className="overall-correct-rate">
+          <span className="rate-value">{correctRate}%</span>
+          <span className="rate-label">{getBadgeLabel(correctRate)}</span>
+        </div>
       </div>
 
       <div className="wrong-section">
