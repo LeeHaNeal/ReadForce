@@ -11,7 +11,7 @@ const fetchWithAuth = async (url, options = {}) => {
   });
 
   if (res.status === 401 && refreshToken) {
-    const refreshRes = await fetch(`/authentication/reissue-refresh-token?refresh_token=${encodeURIComponent(refreshToken)}`, {
+    const refreshRes = await fetch(`/authentication/reissue-refresh-token?refreshtoken=${encodeURIComponent(refreshToken)}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded' 
