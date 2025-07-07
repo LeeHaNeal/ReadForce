@@ -16,6 +16,7 @@ const MyPage = () => {
   const [summary, setSummary] = useState({ total: 0, monthlyRate: 0, streak: 0 });
   // const [recentSolved, setRecentSolved] = useState([]);
   const [correctRate, setCorrectRate] = useState(0);
+  const [todaySolvedCount, setTodaySolvedCount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -96,6 +97,19 @@ const MyPage = () => {
       });
   }, []);
 
+  useEffect(() => {
+    fetchWithAuth('/result/get-today-solved-question-count')
+      .then(res => res.json())
+      .then(data => {
+        const count = data?.TODAY_SOLVED_QUESTION_COUNT;
+        if (typeof count === 'number') {
+          setTodaySolvedCount(count);
+        }
+      })
+      .catch(err => {
+        console.error('오늘 푼 문제 수 불러오기 실패:', err);
+      });
+  }, []);
   useEffect(() => {
     fetchWithAuth('/member/get-member-incorrect-quiz-list')
       .then(res => res.json())
@@ -193,28 +207,23 @@ const MyPage = () => {
         </div>
       </div>
 
-      <div className="history-section">
+      {/* <div className="history-section">
         <h4>전체 정답률</h4>
         <div className="overall-correct-rate">
           <span className="rate-value">{correctRate}%</span>
           <span className="rate-label">{getBadgeLabel(correctRate)}</span>
         </div>
-      </div>
+      </div> */}
 
-      <div className="wrong-section">
-        <h4>틀린 문제 다시 풀기</h4>
-        <ul>
-          {wrongQuestions.length === 0 ? (
-            <li>틀린 문제가 없습니다.</li>
-          ) : (
-            wrongQuestions.map((quiz, i) => (
-              <li key={i}>
-                {quiz.question_text}
-                <button onClick={() => handleRetry(quiz)}>다시풀기</button>
-              </li>
-            ))
-          )}
-        </ul>
+      <div className="summary-section">
+        <div className="summary-card">
+          <div className="summary-title">전체 정답률</div>
+          <div className="summary-value">{correctRate}%</div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-title">오늘 푼 문제</div>
+          <div className="summary-value">{todaySolvedCount}문제</div>
+        </div>
       </div>
     </div>
   );
