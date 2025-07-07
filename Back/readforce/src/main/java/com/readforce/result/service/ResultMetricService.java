@@ -2,6 +2,7 @@ package com.readforce.result.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,12 +65,44 @@ public class ResultMetricService {
 	@Transactional(readOnly = true)
 	public Map<String, Double> getCategoryCorrectAnswerRate(Result result) {
 		
-//		List<ResultMetric> resultMetricList = resultMetricRepository
+		List<ResultMetric> resultMetricList = resultMetricRepository.findAllByResult(result);
 		
-
+		if(resultMetricList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.RESULT_METRIC_NOT_FOUND);
+			
+		}
 		
-		return null;
+		return resultMetricList.stream()
+				.filter(metric -> metric.getCategory() != null && metric.getType() == null && metric.getLevel() == null)
+				.collect(Collectors.toMap(
+						metric -> metric.getCategory().getCategory(),
+						ResultMetric::getCorrectAnswerRate,
+						(rate1, rate2) -> rate2
+				));
 
+	}
+
+	@Transactional(readOnly = true)
+	public Map<String, Double> getTypeCorrectAnswerRate(Result result, String category) {
+
+		List<ResultMetric> resultMetricList = resultMetricRepository.findAllByResult(result);
+		
+		if(resultMetricList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.RESULT_METRIC_NOT_FOUND);
+			
+		}
+		
+		return resultMetricList.stream()
+				.filter(metric -> metric.getCategory() != null && metric.getCategory().getCategory().equals(category))
+				.filter(metric -> metric.getType() == null && metric.getLevel() == null)
+				.collect(Collectors.toMap(
+						metric -> metric.getType().getType(),
+						ResultMetric::getCorrectAnswerRate,
+						(rate1, rate2) -> rate2
+				));
+		
 	}
 
 }
