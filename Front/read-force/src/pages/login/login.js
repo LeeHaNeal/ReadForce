@@ -17,7 +17,7 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('/authentication/sign-in', {
+      const response = await fetch('/member/sign-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: id, password }),
