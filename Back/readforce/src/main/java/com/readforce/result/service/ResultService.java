@@ -1,5 +1,7 @@
 package com.readforce.result.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,13 @@ public class ResultService {
 		return resultRepository.findOverallAnswerCorrectRateByMemberEmailAndMemberStatus(email, Status.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND));
 
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Result> getActiveMemberResultByEmailWithOptional(String email) {
+
+		return resultRepository.findByMember_EmailAndMember_Status(email, Status.ACTIVE);
+		
 	}
 
 }
