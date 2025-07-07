@@ -8,10 +8,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.readforce.common.MessageCode;
+import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
 import com.readforce.passage.entity.Passage;
 import com.readforce.question.dto.QuestionCheckResultDto;
+import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.question.entity.Question;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
@@ -127,6 +130,72 @@ public class LearningService {
 
 		return learningRepository.countByMember_EmailAndCreatedAtBetween(email, startOfDay, endOfDay);
 
+	}
+
+	@Transactional(readOnly = true)
+	public List<QuestionSummaryResponseDto> getTotalLearning(String email) {
+
+		List<QuestionSummaryResponseDto> totalLearningList = learningRepository.findAllByMember_Email(email);
+		
+		if(totalLearningList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.LEARNING_NOT_FOUND);
+			
+		}
+		
+		return totalLearningList;
+				
+	}
+
+	@Transactional(readOnly = true)
+	public List<QuestionSummaryResponseDto> getTotalIncorrectLearning(String email) {
+
+		List<QuestionSummaryResponseDto> totalIncorrectLearningList = learningRepository.findIncorrectLearningByMember_Email(email);
+
+		if(totalIncorrectLearningList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.LEARNING_NOT_FOUND);
+			
+		}
+		
+		return totalIncorrectLearningList;
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<QuestionSummaryResponseDto> getTodayLearning(String email) {
+		
+		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+		LocalDateTime endOfDay = LocalDateTime.now();
+
+		List<QuestionSummaryResponseDto> todayLearningList = learningRepository.findTodayLearningByMember_Email(email, startOfDay, endOfDay);
+		
+		if(todayLearningList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.LEARNING_NOT_FOUND);
+			
+		}
+		
+		return todayLearningList;
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<QuestionSummaryResponseDto> getTodayIncorrectLearning(String email) {
+		
+		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+		LocalDateTime endOfDay = LocalDateTime.now();
+
+		List<QuestionSummaryResponseDto> todayIncorrectLearningList = learningRepository.findTodayIncorrectLearningByMember_Email(email, startOfDay, endOfDay);
+		
+		if(todayIncorrectLearningList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.LEARNING_NOT_FOUND);
+			
+		}
+		
+		return todayIncorrectLearningList;
+		
 	}
 	
 	
