@@ -42,7 +42,7 @@ public class LearningService {
 		
 		Member member = memberService.getActiveMemberByEmail(email);
 		
-		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSlovingTime());
+		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSlovingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
 		
 		updateResultAndMetric(member);
 		
@@ -100,13 +100,14 @@ public class LearningService {
 	}
 
 	@Transactional
-	public void recordLearning(Member member, Question question, Boolean isCorrect, Long solvingTime) {
+	public void recordLearning(Member member, Question question, Boolean isCorrect, Long solvingTime, Boolean isFavorit) {
 		
 		Learning learning = Learning.builder()
 				.isCorrect(isCorrect)
 				.questionSolvingTime(solvingTime)
 				.question(question)
 				.member(member)
+				.isFavorit(isFavorit)
 				.build();
 		
 		learningRepository.save(learning);
@@ -195,6 +196,21 @@ public class LearningService {
 		}
 		
 		return todayIncorrectLearningList;
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<QuestionSummaryResponseDto> getFavoritLearning(String email) {
+		
+		List<QuestionSummaryResponseDto> favoritLearningList = learningRepository.findFavoritLearningByMember_Email(email);
+
+		if(favoritLearningList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.LEARNING_NOT_FOUND);
+			
+		}
+		
+		return favoritLearningList;
 		
 	}
 	

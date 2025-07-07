@@ -94,5 +94,17 @@ public class LearningController {
 		return ResponseEntity.status(HttpStatus.OK).body(todayIncorrectLearningList);
 		
 	}
-
+	
+	@GetMapping("/get-favorit-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getFavoritLearning(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		String email = userDetails.getUsername();
+		
+		List<QuestionSummaryResponseDto> favoritLearningList = learningService.getFavoritLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(favoritLearningList);
+		
+	}
 }
