@@ -16,31 +16,31 @@ const ChallengePage = () => {
   const handleStartChallenge = () => setShowModal(true);
   const handleSolveClick = (quizNo) => navigate(`/question/${quizNo}`);
 
-  useEffect(() => {
-    const fetchWrongQuestions = async () => {
-      try {
-        const res = await api.get('/quiz/get-most-incorrected-quiz');
-        setWrongQuestions(res.data);
-      } catch (error) {
-        console.error('가장 많이 틀린 문제 불러오기 실패:', error);
-      }
-    };
-    fetchWrongQuestions();
-  }, []);
+  // useEffect(() => {
+  //   const fetchWrongQuestions = async () => {
+  //     try {
+  //       const res = await api.get('/quiz/get-most-incorrected-quiz');
+  //       setWrongQuestions(res.data);
+  //     } catch (error) {
+  //       console.error('가장 많이 틀린 문제 불러오기 실패:', error);
+  //     }
+  //   };
+  //   fetchWrongQuestions();
+  // }, []);
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
-        setTop5Data(res.data.slice(0, 5));
-      } catch (err) {
-        console.error('TOP 5 뉴스 랭킹 불러오기 실패:', err);
-        setTop5Data([]);
-      }
-    }, 500);
-    return () => clearTimeout(debounceRef.current);
-  }, [selectedLanguage]);
+  // useEffect(() => {
+  //   if (debounceRef.current) clearTimeout(debounceRef.current);
+  //   debounceRef.current = setTimeout(async () => {
+  //     try {
+  //       const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
+  //       setTop5Data(res.data.slice(0, 5));
+  //     } catch (err) {
+  //       console.error('TOP 5 뉴스 랭킹 불러오기 실패:', err);
+  //       setTop5Data([]);
+  //     }
+  //   }, 500);
+  //   return () => clearTimeout(debounceRef.current);
+  // }, [selectedLanguage]);
 
   return (
     <div className="ChallengePage-container">
