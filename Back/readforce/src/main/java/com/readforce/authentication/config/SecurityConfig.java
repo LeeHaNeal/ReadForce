@@ -61,7 +61,7 @@ public class SecurityConfig {
 				            "/email/send-verification-code-for-sign-up",
 				            "/email/verify-verification-code-for-sign-up",
 				            "/email/send-password-reset-link",
-				            "/quiz/get-most-incorrected-quiz",
+				            "/ranking/get-ranking-list",
 				            "/oauth2/**"							
 					)
 					.permitAll()

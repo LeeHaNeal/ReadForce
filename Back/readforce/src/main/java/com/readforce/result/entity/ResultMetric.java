@@ -44,7 +44,7 @@ public class ResultMetric {
 	
 	@Builder.Default
 	@Column(nullable = false)
-	private Long questionSolvingTime = 0L;
+	private Long questionSolvingTimeAverage = 0L;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
@@ -74,6 +74,11 @@ public class ResultMetric {
 	@JoinColumn(name = "language_no")
 	private Language language;
 	
-	
+	public void updateMetric(Double correctAnswerRate, Long questionSolvingTimeAverage) {
+		
+		this.correctAnswerRate = correctAnswerRate;
+		this.questionSolvingTimeAverage = questionSolvingTimeAverage;
+		
+	}
 	
 }

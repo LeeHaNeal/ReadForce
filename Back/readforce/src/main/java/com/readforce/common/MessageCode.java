@@ -15,6 +15,18 @@ public final class MessageCode {
 	public static final String VERIFICATION_CODE_NOT_BLANK = "NOT0006";
 	public static final String TEMPORAL_TOKEN_NOT_BLANK = "NOT0007";
 	public static final String REFRESH_TOKEN_NOT_BLANK = "NOT0008";
+	public static final String LANGUAGE_NOT_BLANK = "NOT0009";
+	public static final String CATEGORY_NOT_BLANK = "NOT0010";
+	public static final String TYPE_NOT_BLANK = "NOT0011";
+	public static final String LEVEL_NOT_BLANK = "NOT0012";
+	public static final String ORDER_BY_NOT_BLANK = "NOT0013";
+	public static final String CLASSIFICATION_NOT_BLANK = "NOT0014";
+	public static final String PASSAGE_NO_NOT_NULL = "NOT0015";
+	public static final String QUESTION_CLASSIFICATION_NOT_BLANK = "NOT0016";
+	public static final String SELECTED_INDEX_NOT_NULL = "NOT0017";
+	public static final String QUESTION_NO_NOT_NULL = "NOT0018";
+	public static final String QUESTION_SOLVING_TIME_NOT_NULL = "NOT0019";
+	public static final String TESTER_ID_NOT_BLANK = "NOT0020";
 	
 	
 	
@@ -33,7 +45,16 @@ public final class MessageCode {
 	public static final String FILE_SIZE_INVALID = "INV0011";
 	public static final String FILE_TYPE_INVALID = "INV0012";
 	public static final String FILE_PATTERN_INVALID = "INV0013";
-
+	public static final String VALUE_INVALID = "INV0014";
+	public static final String LANGUAGE_INVALID = "INV0015";
+	public static final String CATEGORY_INVALID = "INV0016";
+	public static final String TYPE_INVALID = "INV0017";
+	public static final String LEVEL_INVALID = "INV0018";
+	public static final String ORDER_BY_INVALID = "INV0019";
+	public static final String CLASSIFICATION_INVALID = "INV0020";
+	public static final String QUESTION_CLASSIFICATION_INVALID = "INV0021";
+	
+	
 	
 	
 	
@@ -52,6 +73,7 @@ public final class MessageCode {
 	public static final String PROFILE_IMAGE_DELETE_SUCCESS = "SUC0012";
 	public static final String REISSUE_ACCESS_TOKEN_SUCCESS = "SUC0013";
 	public static final String GET_TOKENS_SUCCESS = "SUC0014";
+	public static final String SAVE_MULTIPLE_CHOICE_RESULT_SUCCESS = "SUC0015";
 	
 	
 	
@@ -72,9 +94,19 @@ public final class MessageCode {
 	public static final String FILE_NOT_FOUND = "NOF0002";
 	public static final String PROFILE_IMAGE_NOT_FOUND = "NOF0003";
 	public static final String MEMBER_RESULT_NOT_FOUND = "NOF0004";
-	
-	
-	
+	public static final String PASSAGE_NOT_FOUND = "NOF0005";
+	public static final String ATTENDANCE_NOT_FOUND = "NOF0006";
+	public static final String QUESTION_NOT_FOUND = "NOF0007";
+	public static final String LEVEL_NOT_FOUND = "NOF0008";
+	public static final String WEAK_CATEGORY_NOT_FOUND = "NOF0009";
+	public static final String WEAK_TYPE_NOT_FOUND = "NOF0010";
+	public static final String SKILLED_LEVEL_NOT_FOUND = "NOF0011";
+	public static final String AGE_GROUP_NOT_FOUND = "NOF0012";
+	public static final String LANGUAGE_NOT_FOUND = "NOF0013";
+	public static final String CATEGORY_NOT_FOUND = "NOF0014";
+	public static final String TYPE_NOT_FOUND = "NOF0015";
+	public static final String RESULT_METRIC_NOT_FOUND = "NOF0016";
+	public static final String OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND = "NOF0017";
 
 	
 	
@@ -95,6 +127,7 @@ public final class MessageCode {
 	public static final String FAIRY_TALE_JAPANESE_CHALLENGE_ALREDY_ATTEMPTED_TODAY = "DUP0012";
 	public static final String EMAIL_ALREADY_USED = "DUP0013";
 	public static final String NICKNAME_ALREADY_USED = "DUP0014";
+	public static final String TEST_QUESTION_ALREADY_SOLVED = "DUP0015";
 	
 	
 	
