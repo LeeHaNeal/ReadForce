@@ -4,6 +4,9 @@ public enum Category {
 	
 	NEWS,
 	NOVEL,
-	FAIRY_TALE
+	FAIRY_TALE,
+	VOCABULARY,
+	FACTUAL,
+	INFERENTIAL
 	
 }

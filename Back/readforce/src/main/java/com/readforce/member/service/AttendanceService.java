@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.exception.DuplicationException;
+import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Attendance;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.AttendanceRepository;
@@ -30,7 +30,7 @@ public class AttendanceService {
 
 		if(attendanceRepository.findByMember_EmailAndAttendanceDate(email, LocalDate.now()).isPresent()) {
 			
-			throw new DuplicationException(MessageCode.TODAY_ALREADY_ATTENDANCE);
+			return;
 			
 		}
 		
@@ -49,7 +49,7 @@ public class AttendanceService {
 
 	private void updateLearningStreak(String email) {
 		
-		Result result = resultService.getActiveMemberResult(email);
+		Result result = resultService.getActiveMemberResultByEmail(email);
 		
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		
@@ -63,9 +63,16 @@ public class AttendanceService {
 
 	@Transactional(readOnly = true)
 	public List<LocalDate> getAttendanceDateList(String email) {
-
-		return attendanceRepository
-				.findAllByMember_Email(email)
+		
+		List<Attendance> attendanceList = attendanceRepository.findAllByMember_Email(email);
+		
+		if(attendanceList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.ATTENDANCE_NOT_FOUND);
+			
+		}
+		
+		return attendanceList
 				.stream()
 				.map(attendance -> attendance.getAttendanceDate())
 				.collect(Collectors.toList());

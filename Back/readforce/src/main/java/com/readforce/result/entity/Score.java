@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Category;
+import com.readforce.passage.entity.Language;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,4 +57,7 @@ public class Score {
 	@JoinColumn(name = "member_no", nullable = false)
 	private Member member;	
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "language_no", nullable = false)
+	private Language language;
 }

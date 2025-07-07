@@ -30,7 +30,7 @@ public class Language {
 	private Long languageNo;
 	
 	@Column(nullable = false)
-	private String name;
+	private String language;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

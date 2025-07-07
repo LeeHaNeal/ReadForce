@@ -11,12 +11,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MemberSummaryDto {
 
-	private String email;
+	private final String email;
 	
-	private String nickname;
+	private final String nickname;
 	
-	private String socialProvider;
+	private final String socialProvider;
 	
-	private LocalDate birthday;
+	private final LocalDate birthday;
 	
 }
