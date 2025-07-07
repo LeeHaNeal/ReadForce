@@ -62,7 +62,10 @@ public class ResultMetricService {
 	}
 
 	@Transactional(readOnly = true)
-	public Map<String, Double> getCategoryCorrectAnswerRate(String email) {
+	public Map<String, Double> getCategoryCorrectAnswerRate(Result result) {
+		
+//		List<ResultMetric> resultMetricList = resultMetricRepository
+		
 
 		
 		return null;
