@@ -54,5 +54,19 @@ public class Result {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_no", nullable = false)
 	private Member member;
+
+	public void updateLearningStreak(boolean attendedYesterday) {
+		
+		if(attendedYesterday) {
+			
+			this.learningStreak++;
+			
+		} else {
+			
+			this.learningStreak = 1;
+			
+		}
+		
+	}
 	
 }
