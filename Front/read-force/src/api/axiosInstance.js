@@ -108,7 +108,7 @@ api.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          '/auth/reissue-refresh-token',
+          '/authentication/reissue-refresh-token',
           `refresh_token=${encodeURIComponent(refreshToken)}`,
           {
             headers: {
