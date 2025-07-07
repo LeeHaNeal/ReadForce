@@ -47,6 +47,15 @@ public class FileService {
 		
 		Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
 		
+		if(!path.isAbsolute()) {
+			
+			String currentWorkingDir = System.getProperty("user.dir");
+			path = Paths.get(currentWorkingDir, uploadDir);
+			
+		}
+		
+		Path normalizedPath = path.normalize();		
+		
 		try {
 			
 			Files.createDirectories(path);

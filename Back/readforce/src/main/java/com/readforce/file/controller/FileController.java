@@ -3,6 +3,7 @@ package com.readforce.file.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
@@ -71,7 +72,7 @@ public class FileController {
 		
 		try {
 			
-			Path filePath = resource.getFile().toPath();
+			Path filePath = Paths.get(resource.getFilename());
 			contentType = Files.probeContentType(filePath);
 			
 			if(contentType == null) {
