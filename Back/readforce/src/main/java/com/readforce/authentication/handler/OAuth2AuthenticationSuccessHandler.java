@@ -3,6 +3,7 @@ package com.readforce.authentication.handler;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,8 @@ import com.readforce.common.exception.JsonException;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
+import com.readforce.result.entity.Result;
+import com.readforce.result.service.ResultService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +43,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 	private final MemberService memberService;
 	private final AttendanceService attendanceService;
 	private final StringRedisTemplate redisTemplate;
+	private final ResultService resultService;
 	
 	@Value("${custom.fronted.social-login-success.exist-member-url}")
 	private String socialLoginSuccessExistMemberUrl;
@@ -107,6 +111,16 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 			
 			Member member = memberService.getActiveMemberByEmail(email);
+			
+			Optional<Result> memberResult = resultService.getActiveMemberResultByEmailWithOptional(email);
+			
+			if(memberResult.isEmpty()) {
+				
+				Result newResult = resultService.create(member);
+				
+				memberService.createResultMetricsForMember(member, newResult);
+				
+			}
 			
 			String temporalToken = UUID.randomUUID().toString();
 			

@@ -236,7 +236,7 @@ public class MemberService {
 		
 	}
 
-	private void createResultMetricsForMember(Member member, Result result) {
+	public void createResultMetricsForMember(Member member, Result result) {
 		
 		List<Language> languageList = languageService.getAllLanguageList();
 		List<Category> categoryList = categoryService.getAllCategoryList();

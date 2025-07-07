@@ -102,7 +102,7 @@ rate-limiting:
     max-request: 100
     per-minute: 1
   email-verification:
-    max-request: 100
+    max-request: 3
     per-hour: 1
 gemini:
   api:

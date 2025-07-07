@@ -17,10 +17,10 @@ const EmailVerifyPage = () => {
     setError('');
 
     try {
-      const response = await fetch('/email/verify-verification-code-for-sign-up', {
+      const response = await fetch('/email/verify-verification-code-sign-up', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, verificationCode: code })
+        body: JSON.stringify({ email, code })
       });
 
       const data = await response.json();
