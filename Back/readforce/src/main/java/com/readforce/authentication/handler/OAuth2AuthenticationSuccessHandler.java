@@ -45,7 +45,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 	private String socialLoginSuccessExistMemberUrl;
 	
 	@Value("${custom.fronted.social-login-success.new-member-url}")
-	private String socailLoginSuccessNewMemberUrl;
+	private String socialLoginSuccessNewMemberUrl;
 
 	@Override
 	public void onAuthenticationSuccess(
@@ -95,7 +95,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 				
 			}
 			
-			targetUrl = UriComponentsBuilder.fromUriString(socailLoginSuccessNewMemberUrl)
+			targetUrl = UriComponentsBuilder.fromUriString(socialLoginSuccessNewMemberUrl)
 					.queryParam(Name.TEMPORAL_TOKEN.toString(), temporalToken)
 					.build()
 					.toUriString();

@@ -30,7 +30,7 @@ public class Type {
 	private Long typeNo;
 	
 	@Column(nullable = false)
-	private String name;
+	private String type;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

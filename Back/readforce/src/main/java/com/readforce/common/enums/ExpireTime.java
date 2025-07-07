@@ -3,6 +3,7 @@ package com.readforce.common.enums;
 public enum ExpireTime {
 	
 	DEFAULT(3),
+	SOCIAL_ACCOUNT_LINK(5),
 	MARK_EMAIL_AS_VERIFIED(10)
 	;
 	

@@ -41,7 +41,7 @@ public class Result {
 	
 	@Builder.Default
 	@Column(nullable = false)
-	private Double allCorrectAnswerRate = 0.0;
+	private Double overallCorrectAnswerRate = 0.0;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
@@ -54,5 +54,25 @@ public class Result {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_no", nullable = false)
 	private Member member;
+
+	public void updateLearningStreak(boolean attendedYesterday) {
+		
+		if(attendedYesterday) {
+			
+			this.learningStreak++;
+			
+		} else {
+			
+			this.learningStreak = 1;
+			
+		}
+		
+	}
+	
+	public void updateOverallCorrectAnswerRate(Double overallCorrectAnswerRate) {
+		
+		this.overallCorrectAnswerRate = overallCorrectAnswerRate;
+		
+	}
 	
 }
