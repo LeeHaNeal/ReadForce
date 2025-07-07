@@ -1,17 +1,20 @@
 package com.readforce.result.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
+import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
 import com.readforce.result.service.LearningService;
 
@@ -39,5 +42,69 @@ public class LearningController {
 		));
 		
 	}
-
+	
+	@GetMapping("/get-total-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getTotalLearning(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		String email = userDetails.getUsername();
+		
+		List<QuestionSummaryResponseDto> totalLearningList = learningService.getTotalLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(totalLearningList);
+		
+	}
+	
+	@GetMapping("/get-total-incorrect-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getTotalIncorrectLearning(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		String email = userDetails.getUsername();
+		
+		List<QuestionSummaryResponseDto> totalIncorrectLearningList = learningService.getTotalIncorrectLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(totalIncorrectLearningList);
+		
+	}
+	
+	@GetMapping("/get-today-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getTodayLearning(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		String email = userDetails.getUsername();
+		
+		List<QuestionSummaryResponseDto> todayLearningList = learningService.getTodayLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(todayLearningList);
+		
+	}
+	
+	@GetMapping("/get-today-incorrect-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getTodayIncorrectLearning(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		String email = userDetails.getUsername();
+		
+		List<QuestionSummaryResponseDto> todayIncorrectLearningList = learningService.getTodayIncorrectLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(todayIncorrectLearningList);
+		
+	}
+	
+	@GetMapping("/get-favorit-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getFavoritLearning(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		String email = userDetails.getUsername();
+		
+		List<QuestionSummaryResponseDto> favoritLearningList = learningService.getFavoritLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(favoritLearningList);
+		
+	}
 }

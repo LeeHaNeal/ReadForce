@@ -107,6 +107,7 @@ public final class MessageCode {
 	public static final String TYPE_NOT_FOUND = "NOF0015";
 	public static final String RESULT_METRIC_NOT_FOUND = "NOF0016";
 	public static final String OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND = "NOF0017";
+	public static final String LEARNING_NOT_FOUND = "NOF0018";
 
 	
 	

@@ -1,4 +1,4 @@
-package com.readforce.question.controller;
+package com.readforce.administrator.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/question")
+@RequestMapping("/administrator")
 @RequiredArgsConstructor
-public class QuestionController {
+public class AdministratorController {
 
+	
+	
 }
