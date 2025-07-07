@@ -38,7 +38,9 @@ spring:
   jwt:
     secret: ${JWT_SECRET_KEY}
     #access-expiration-time: 300000 # 5분
-    access-expiration-time: 20000 # 5초
+    #access-expiration-time: 20000 # 5초
+    access-expiration-time: 8600000 # 5초
+    
     refresh-expiration-time: 86400000 # 1일
   security:
     oauth2:
@@ -85,7 +87,7 @@ file:
       max-size: 5242880
       max-request-size: 5MB
       allowed-mime-types: image/jpeg,image/png,image/gif
-      default-image-path: 4b2d7245-2ca2-45ce-9954-e00f7553014a.png
+      default-image-path: ./upload/image/profile/fead8450-8969-443a-b071-0207b306cf06.png
 custom:
   fronted:
     password-reset-link-url: http://localhost:3000/resetpassword

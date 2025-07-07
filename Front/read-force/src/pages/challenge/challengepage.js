@@ -32,7 +32,7 @@ const ChallengePage = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
+        const res = await api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`);
         setTop5Data(res.data.slice(0, 5));
       } catch (err) {
         console.error('TOP 5 뉴스 랭킹 불러오기 실패:', err);
