@@ -17,7 +17,7 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('/member/sign-in', {
+      const response = await fetch('/authentication/sign-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: id, password }),
@@ -29,7 +29,7 @@ export default function Login() {
       if (response.ok) {
         const token = data.ACCESS_TOKEN;
         const refreshToken = data.REFRESH_TOKEN;
-        const nickname = data.NICK_NAME;
+        const nickname = data.NICKNAME;
 
         // ✅ JWT 토큰에서 이메일 추출
         const decoded = jwtDecode(token);

@@ -28,7 +28,7 @@ const Header = () => {
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
 
-    try {const res = await fetch("/member/sign-out", {
+    try {const res = await fetch("/authentication/sign-out", {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
