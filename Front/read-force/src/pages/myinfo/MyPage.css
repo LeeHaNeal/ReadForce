@@ -1,3 +1,4 @@
+/* 공통 레이아웃 */
 .mypage-container {
   padding: 40px 20px;
   margin: 0 auto;
@@ -9,24 +10,12 @@
 .top-section {
   display: flex;
   justify-content: space-between;
-  /* align-items: flex-start; */
-  /* flex-wrap: wrap; */
   gap: 20px;
   padding: 20px;
   margin-bottom: 40px;
 }
 
-.left-top {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* 중앙 정렬 */
-  justify-content: center;
-  padding: 20px;
-}
-
-.left-top,
-.calendar-section {
+.left-top, .calendar-section {
   flex: 1;
   min-width: 300px;
   background-color: #f9f9f9;
@@ -34,6 +23,13 @@
   align-items: center;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.left-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .profile-img {
@@ -45,7 +41,6 @@
 }
 
 .nickname {
-  margin: 0;
   font-size: 1.6rem;
   font-weight: 600;
   text-align: center;
@@ -58,34 +53,8 @@
   padding: 6px 14px;
   border-radius: 16px;
   font-size: 14px;
-  /* display: inline-block; */
-  /* margin-top: 5px; */
   text-align: center;
-
 }
-
-.settings-button {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-  margin-left: 4px;
-}
-
-.settings-button:hover {
-  transform: scale(1.2);
-}
-
-.mypage-main {
-  display: flex;
-  justify-content: space-between;
-  gap: 40px;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
-}
-
-
 
 .calendar-section h4 {
   font-size: 18px;
@@ -99,14 +68,6 @@
   font-size: 14px;
 }
 
-/* .calendar-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-} */
-
 .summary-row {
   display: flex;
   justify-content: space-between;
@@ -114,6 +75,7 @@
   margin-bottom: 4px;
 }
 
+/* 공통 summary 클래스 */
 .summary-title {
   flex: 1;
   font-weight: 600;
@@ -127,6 +89,7 @@
   color: #4ABDAC;
 }
 
+/* 달력 */
 .react-calendar {
   border: none;
   width: 100%;
@@ -152,10 +115,6 @@
   font-weight: 700 !important;
 }
 
-.react-calendar__navigation {
-  background-color: white !important;
-}
-
 .react-calendar__navigation button {
   color: black !important;
   font-weight: 600;
@@ -174,35 +133,54 @@
   color: black;
 }
 
-.history-section,
-.wrong-section {
-  margin-bottom: 40px;
+/* 하단 박스 섹션 */
+.bottom-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
 }
 
-.history-section h4,
-.wrong-section h4 {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
+.learning-status-box,
+.learning-note-box {
+  flex: 1;
+  min-width: 300px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.history-section ul,
-.wrong-section ul {
+/* 학습 현황 내부 summary 카드 */
+.learning-status-box .summary-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.learning-status-box .summary-card {
+  background-color: #fff;
+  padding: 14px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+/* 학습 노트 */
+.learning-note-box ul {
   list-style: none;
   padding: 0;
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.8;
+  color: #333;
 }
 
-.wrong-section button {
-  margin-left: 10px;
-  padding: 5px 12px;
-  background-color: #14b8a6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
+.learning-status-box h4,
+.learning-note-box h4 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
 }
 
 /* 반응형 */
@@ -212,18 +190,14 @@
   }
 
   .top-section,
-  .mypage-main {
+  .bottom-section {
     flex-direction: column;
     gap: 24px;
   }
 
-  .left-top {
-    width: 100%;
-    align-items: flex-start;
-  }
-
+  .left-top,
   .calendar-section {
-    min-width: 100%;
+    width: 100%;
     padding: 16px;
   }
 
@@ -238,40 +212,11 @@
     text-align: left;
   }
 
-  .history-section ul,
-  .wrong-section ul {
-    font-size: 14px;
-  }
-
-  .wrong-section button {
-    margin-top: 6px;
-    display: inline-block;
-    width: 100%;
-  }
-
   .settings-button {
     margin-top: 8px;
   }
 
-  .overall-correct-rate {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.2rem;
-  margin-top: 10px;
-}
-
-.rate-value {
-  font-weight: bold;
-  font-size: 2rem;
-  color: #007bff;
-}
-
-.rate-label {
-  background-color: #f0f0f0;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 1rem;
-  color: #333;
-}
+  .learning-status-box .summary-cards {
+    gap: 10px;
+  }
 }
