@@ -20,5 +20,7 @@ public class LearningMultipleChoiceRequestDto {
 	private Long questionSlovingTime;
 	
 	private Long questionNo;
+	
+	private Boolean isFavorit;
 
 }

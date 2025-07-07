@@ -95,5 +95,23 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 			@Param("startOfDay") LocalDateTime startOfDay,
 			@Param("endOfDay") LocalDateTime endOfDay
 	);
+
+	@Query("""
+			SELECT com.readforce.question.dto.QuestionSummaryResponseDto(
+				q.questionNo,
+				p.title,
+				l.createdAt,
+				l.isCorrect
+			)
+			FROM Learning l
+			JOIN l.question q
+			JOIN q.passage p
+			WHERE l.member.email = :email
+			AND isFavorit = true
+			ORDER BY l.createdAt DESC			
+			""")
+	List<QuestionSummaryResponseDto> findFavoritLearningByMember_Email(
+			@Param("email") String email
+	);
 	
 }

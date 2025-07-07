@@ -36,6 +36,10 @@ public class Learning {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long learningNo;
 	
+	@Builder.Default
+	@Column(nullable = false)
+	private Boolean isFavorit = false;
+	
 	@Column(nullable = false)
 	private Boolean isCorrect;
 	
