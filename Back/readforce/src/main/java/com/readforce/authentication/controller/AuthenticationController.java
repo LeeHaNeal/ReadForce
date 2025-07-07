@@ -84,7 +84,7 @@ public class AuthenticationController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				Name.ACCESS_TOKEN.name(), accessToken,
-				Name.REFESH_TOKEN.name(), refreshToken,
+				Name.REFRESH_TOKEN.name(), refreshToken,
 				Name.NICKNAME.name(), memberSummaryDto.getNickname(),
 				Name.SOCIAL_PROVIDER.name(), memberSummaryDto.getSocialProvider() == null ? "" : memberSummaryDto.getSocialProvider(),
 				MessageCode.MESSAGE_CODE, MessageCode.SIGN_IN_SUCCESS
@@ -156,7 +156,7 @@ public class AuthenticationController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				Name.ACCESS_TOKEN.name(), newAccessToken,
-				Name.REFESH_TOKEN.name(), newRefreshToken,
+				Name.REFRESH_TOKEN.name(), newRefreshToken,
 				MessageCode.MESSAGE_CODE, MessageCode.REISSUE_ACCESS_TOKEN_SUCCESS				
 		));
 		

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.readforce.ai.ApiException;
 import com.readforce.authentication.exception.AuthenticationException;
 import com.readforce.authentication.exception.JwtException;
 import com.readforce.common.MessageCode;
@@ -22,6 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	@ExceptionHandler(ApiException.class)
+	public ResponseEntity<Map<String, String>> handlerApiException(ApiException exception){
+		
+		log.error("[{}] 발생: {}", exception.getClass().getSimpleName(), exception.getMessage(), exception);
+		
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(MessageCode.MESSAGE_CODE, exception.getMessage()));
+		
+	}
+	
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<Map<String, String>> handlerCustomAuthenticationException(AuthenticationException exception){
 		

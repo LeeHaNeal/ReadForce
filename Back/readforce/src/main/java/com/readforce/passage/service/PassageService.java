@@ -1,5 +1,6 @@
 package com.readforce.passage.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.readforce.common.MessageCode;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.dto.PassageResponseDto;
+import com.readforce.passage.entity.Category;
+import com.readforce.passage.entity.Classification;
+import com.readforce.passage.entity.Language;
+import com.readforce.passage.entity.Level;
 import com.readforce.passage.entity.Passage;
 import com.readforce.passage.repository.PassageRepository;
 
@@ -114,6 +119,33 @@ public class PassageService {
 		return passageRepository.findById(passageNo)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND));
 
+	}
+
+	@Transactional
+	public void savePassage(
+			String title, 
+			String content, 
+			String author, 
+			LocalDate publicationDate,
+			Category categoryEntity, 
+			Level level, 
+			Language language, 
+			Classification classificationEntity
+	) {
+
+		Passage passage = Passage.builder()
+				.title(title)
+				.content(content)
+				.author(author)
+				.publicationDate(publicationDate)
+				.category(categoryEntity)
+				.level(level)
+				.language(language)
+				.classification(classificationEntity)
+				.build();
+		
+		passageRepository.save(passage);
+		
 	}
 
 }
