@@ -10,18 +10,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.readforce.authentication.exception.AuthenticationException;
+import com.readforce.authentication.exception.JwtException;
 import com.readforce.authentication.service.AuthenticationService;
 import com.readforce.authentication.util.JwtUtil;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.Header;
 import com.readforce.common.enums.Prefix;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -40,8 +44,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if(authorizationHeader != null && authorizationHeader.startsWith(Prefix.BEARER.getContent())) {
 			
 			accessToken = authorizationHeader.substring(Prefix.BEARER.getContent().length());
-			username = jwtUtil.extractUsername(accessToken);
 			
+			try {
+				
+				username = jwtUtil.extractUsername(accessToken);
+				
+			} catch(ExpiredJwtException exception) {
+				
+				log.warn("요청된 JWT 토큰이 만료되었습니다: {}", exception.getMessage());
+				
+				throw new JwtException(MessageCode.ACCESS_TOKEN_EXPIRED);
+				
+			} catch(Exception exception) {
+				
+				log.error("JWT 토큰 파싱 중 오류 발생: {}", exception.getMessage());
+				
+			}
+
 		}
 		
 		if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
