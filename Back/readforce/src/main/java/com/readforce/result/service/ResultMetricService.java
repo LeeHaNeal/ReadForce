@@ -64,8 +64,15 @@ public class ResultMetricService {
 	@Transactional(readOnly = true)
 	public Map<String, Double> getCategoryCorrectAnswerRate(Result result) {
 		
-//		List<ResultMetric> resultMetricList = resultMetricRepository
+		List<ResultMetric> resultMetricList = resultMetricRepository.findAllByResult(result);
 		
+		if(resultMetricList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.RESULT_METRIC_NOT_FOUND);
+			
+		}
+		
+				
 
 		
 		return null;

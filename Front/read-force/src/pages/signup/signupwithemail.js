@@ -52,7 +52,7 @@ const SignupWithEmail = () => {
     setMessage('');
 
     try {
-      const response = await fetch('/email/send-verification-code-for-sign-up', {
+      const response = await fetch('/email/send-verification-code-sign-up', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
