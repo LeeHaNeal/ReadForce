@@ -1,6 +1,7 @@
 package com.readforce.result.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class ResultMetricService {
 
 	}
 
+	@Transactional(readOnly = true)
 	public List<ResultMetric> getAllByResult(Result result) {
 		
 		List<ResultMetric> resultList = resultMetricRepository.findAllByResult(result);
@@ -56,6 +58,14 @@ public class ResultMetricService {
 		}
 		
 		return resultList;
+
+	}
+
+	@Transactional(readOnly = true)
+	public Map<String, Double> getCategoryCorrectAnswerRate(String email) {
+
+		
+		return null;
 
 	}
 

@@ -87,7 +87,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(questionNo, selectedIndex).getIsCorrect();
 		
-		if(questionSolvingTime < 120) {
+		if(questionSolvingTime < 180) {
 			
 			isCorrect = false;
 			

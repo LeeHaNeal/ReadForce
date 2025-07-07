@@ -425,6 +425,10 @@ public class MemberService {
 		
 		memberRepository.save(newMember);
 		
+		Result result = resultService.create(newMember);
+		
+		createResultMetricsForMember(newMember, result);
+		
 		redisTemplate.delete(Prefix.SOCIAL_SIGN_UP.getContent() + memberSocialSignUpDto.getTemporalToken());		
 		
 	}
