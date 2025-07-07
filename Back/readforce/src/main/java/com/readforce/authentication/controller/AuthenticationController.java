@@ -122,6 +122,7 @@ public class AuthenticationController {
 	
 	@PostMapping("/reissue-refresh-token")
 	public ResponseEntity<Map<String, String>> reissueRefreshToken(
+<<<<<<< HEAD
 	        @RequestParam("refreshToken")
 	        @NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
 	        String refreshToken
@@ -170,6 +171,46 @@ public class AuthenticationController {
 	            Name.REFRESH_TOKEN.name(), newRefreshToken,
 	            MessageCode.MESSAGE_CODE, MessageCode.REISSUE_ACCESS_TOKEN_SUCCESS
 	    ));
+=======
+    		@RequestParam("refreshToken")
+    		@NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
+    		String refreshToken
+	){
+		
+		String username = jwtUtil.extractUsername(refreshToken);
+		String stroedRefreshToken = authenticationService.getRefreshToken(username);
+		
+		if(stroedRefreshToken == null) {
+			
+			log.info("요청받은 리프레쉬 토큰: {}", refreshToken);
+			
+			authenticationService.deleteRefreshToken(username);
+			
+			log.warn("보안 경고: 유효하지 않은 리프레쉬 토큰 사용 시도. 사용자 {}", username);
+			
+			throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
+			
+		}
+		
+		if(!stroedRefreshToken.equals(refreshToken) || jwtUtil.isExpiredToken(stroedRefreshToken)) {
+			
+			throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
+			
+		}
+		
+		final UserDetails userDetails = authenticationService.loadUserByUsername(username);
+		final String newAccessToken = jwtUtil.generateAccessToken(userDetails);
+		final String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+		
+		authenticationService.storeRefreshToken(username, newRefreshToken);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				Name.ACCESS_TOKEN.name(), newAccessToken,
+				Name.REFRESH_TOKEN.name(), newRefreshToken,
+				MessageCode.MESSAGE_CODE, MessageCode.REISSUE_ACCESS_TOKEN_SUCCESS				
+		));
+		
+>>>>>>> develop
 	}
 
 	

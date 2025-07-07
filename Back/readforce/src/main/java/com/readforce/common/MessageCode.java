@@ -87,6 +87,7 @@ public final class MessageCode {
 	public static final String FILE_DELETE_IO_FAIL = "FAI0007";
 	public static final String VERIFY_VERIFICATION_CODE_FAIL = "FAI0008";
 	public static final String JSON_MAPPING_FAIL = "FAI0009";
+	public static final String GEMINI_API_REQUEST_FAIL = "FAI0010";
 	
 	
 	
@@ -108,7 +109,8 @@ public final class MessageCode {
 	public static final String RESULT_METRIC_NOT_FOUND = "NOF0016";
 	public static final String OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND = "NOF0017";
 	public static final String LEARNING_NOT_FOUND = "NOF0018";
-
+	public static final String CLASSIFICATION_NOT_FOUND = "NOF0019";
+	
 	
 	
 	
