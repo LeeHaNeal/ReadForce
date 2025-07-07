@@ -39,6 +39,16 @@ import com.readforce.member.dto.MemberSocialSignUpDto;
 import com.readforce.member.dto.MemberSummaryDto;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.MemberRepository;
+import com.readforce.passage.entity.Category;
+import com.readforce.passage.entity.Language;
+import com.readforce.passage.entity.Level;
+import com.readforce.passage.entity.Type;
+import com.readforce.passage.service.CategoryService;
+import com.readforce.passage.service.LanguageService;
+import com.readforce.passage.service.LevelService;
+import com.readforce.passage.service.TypeService;
+import com.readforce.result.entity.Result;
+import com.readforce.result.service.ResultMetricService;
 import com.readforce.result.service.ResultService;
 
 import lombok.RequiredArgsConstructor;
@@ -56,6 +66,11 @@ public class MemberService {
 	private final FileService fileService;
 	private final FileDeleteFailLogService fileDeleteFailLogService;
 	private final EmailService emailService;
+	private final ResultMetricService resultMetricService;
+	private final LanguageService languageService;
+	private final CategoryService categoryService;
+	private final TypeService typeService;
+	private final LevelService levelService;
 	
 	@Value("${file.image.profile.default-image-path}")
 	private String defaultProfileImagePath;
@@ -215,9 +230,43 @@ public class MemberService {
 		
 		memberRepository.save(member);
 		
-		resultService.create(member);
+		Result result = resultService.create(member);
+		
+		createResultMetricsForMember(member, result);
 		
 		redisTemplate.delete(Prefix.EMAIL_VERIFICATION + memberSignUpDto.getEmail());
+		
+	}
+
+	private void createResultMetricsForMember(Member member, Result result) {
+		
+		List<Language> languageList = languageService.getAllLanguageList();
+		List<Category> categoryList = categoryService.getAllCategoryList();
+		List<Type> typeList = typeService.getAllTypeList();
+		List<Level> levelList = levelService.getAllLevelList();
+			
+		for(Language language : languageList) {
+			
+			for(Category category : categoryList) {
+				
+				resultMetricService.createResultMetric(result, language, category, null, null);
+				
+				for(Type type : typeList) {
+					
+					resultMetricService.createResultMetric(result, language, category, type, null);
+					
+					for(Level level : levelList) {
+						
+						resultMetricService.createResultMetric(result, language, category, type, level);
+						
+					}
+					
+				}				
+				
+			}
+			
+		}
+			
 		
 	}
 

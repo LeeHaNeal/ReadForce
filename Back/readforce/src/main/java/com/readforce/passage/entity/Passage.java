@@ -59,7 +59,7 @@ public class Passage {
 	private Category category;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "type_no", nullable = false)
+	@JoinColumn(name = "type_no")
 	private Type type;
 	
 	@ManyToOne(fetch = FetchType.LAZY)

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.Status;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.result.entity.Result;
@@ -14,40 +15,43 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ResultService {
+	
+	private final ResultRepository resultRepository;
+	
+	@Transactional
+	public Result create(Member member) {
+		
+		Result result = Result.builder()
+				.member(member)
+				.build();
+		
+		return resultRepository.save(result);
+		
+	}
 
-    private final ResultRepository resultRepository;
+	@Transactional(readOnly = true)
+	public Result getActiveMemberResultByEmail(String email) {
 
-    @Transactional
-    public void create(Member member) {
-        Result result = Result.builder()
-                .member(member)
-                .build();
+		return resultRepository.findByMember_EmailAndMember_Status(email, Status.ACTIVE)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_RESULT_NOT_FOUND));
+	
+	}
 
-        resultRepository.save(result);
-    }
+	@Transactional(readOnly = true)
+	public Integer getLearningStreak(String email) {
+		
+		Result result = getActiveMemberResultByEmail(email);
+		
+		return result.getLearningStreak();
+		
+	}
 
-    @Transactional(readOnly = true)
-    public Result getActiveMemberResult(String email) {
-        return resultRepository.findByMember_Email(email)
-                .orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_RESULT_NOT_FOUND));
-    }
+	@Transactional(readOnly = true)
+	public Double getOverallCorrectAnswerRate(String email) {
 
-    @Transactional(readOnly = true)
-    public Integer getLearningStreak(String email) {
-        Result result = getActiveMemberResult(email);
-        return result.getLearningStreak();
-    }
+		return resultRepository.findOverallAnswerCorrectRateByMemberEmailAndMemberStatus(email, Status.ACTIVE)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND));
 
-    /**
-     * 결과가 없으면 생성해서 반환하는 메서드
-     */
-    @Transactional
-    public Result getOrCreateActiveMemberResult(String email, Member member) {
-        return resultRepository.findByMember_Email(email)
-                .orElseGet(() -> {
-                    create(member);
-                    return resultRepository.findByMember_Email(email)
-                            .orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_RESULT_NOT_FOUND));
-                });
-    }
+	}
+
 }

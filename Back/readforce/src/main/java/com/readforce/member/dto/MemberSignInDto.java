@@ -1,13 +1,9 @@
 package com.readforce.member.dto;
 
-import java.time.LocalDate;
-
 import com.readforce.common.MessageCode;
-import com.readforce.common.validation.ValidBirthday;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -32,7 +28,5 @@ public class MemberSignInDto {
 	        , message = MessageCode.PASSWORD_PATTERN_INVALID
 	)
 	private String password;
-	
-	
 	
 }

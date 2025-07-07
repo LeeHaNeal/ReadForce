@@ -1,9 +1,14 @@
 package com.readforce.result.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.member.entity.Member;
+import com.readforce.ranking.dto.RankingResponseDto;
 import com.readforce.result.entity.Score;
 import com.readforce.result.repository.ScoreRepository;
 
@@ -24,6 +29,15 @@ public class ScoreService {
 		
 		scoreRepository.save(score);
 		
+	}
+	
+	@Transactional(readOnly = true)
+	public List<RankingResponseDto> getTop50ByCategory(String category, String language){
+		
+		Pageable top50 = PageRequest.of(0, 50);
+		
+		return scoreRepository.findTop50ByCategory(category, language, top50);
+
 	}
 
 }

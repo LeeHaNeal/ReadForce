@@ -26,6 +26,21 @@ public class Level {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long levelNo;
 	
+	@Column(nullable = false, unique = true)
+	private Integer level;
+	
+	@Column(nullable = false)
+	private Integer paragraphCount;
+	
+	@Column(nullable = false)
+	private String vocabularyLevel;
+	
+	@Column(nullable = false)
+	private String sentenceStructure;
+	
+	@Column(nullable = false)
+	private String questionType;
+	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;

@@ -30,7 +30,7 @@ public class Category {
 	private Long categoryNo;
 	
 	@Column(nullable = false)
-	private String name;
+	private String category;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

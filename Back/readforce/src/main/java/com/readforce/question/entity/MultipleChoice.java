@@ -21,17 +21,17 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue("MULTIPLE_CHOICE")
 public class MultipleChoice extends Question {
 
-	@Column(name = "question_content", nullable = false, columnDefinition = "TEXT")
-	private String questionContent;
+	@Column(name = "question", nullable = false, columnDefinition = "TEXT")
+	private String question;
 
 	@OneToMany(mappedBy = "multipleChoice", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<Choice> choiceList = new ArrayList<>();
 	
 	@Builder
-	public MultipleChoice(Passage passage, String questionContent, List<Choice> choiceList) {
+	public MultipleChoice(Passage passage, String question, List<Choice> choiceList) {
 		
 		super(passage);
-		this.questionContent = questionContent;
+		this.question = question;
 		if(choiceList != null) {
 			for(Choice choice : choiceList) {
 				this.addChoice(choice);

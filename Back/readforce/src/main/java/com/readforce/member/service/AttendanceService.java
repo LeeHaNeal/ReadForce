@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.readforce.common.MessageCode;
+import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Attendance;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.AttendanceRepository;
@@ -18,53 +20,64 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
+	
+	private final AttendanceRepository attendanceRepository;
+	private final ResultService resultService;
+	private final MemberService memberService;
+	
+	@Transactional
+	public void recordAttendance(String email) {
 
-    private final AttendanceRepository attendanceRepository;
-    private final ResultService resultService;
-    private final MemberService memberService;
+		if(attendanceRepository.findByMember_EmailAndAttendanceDate(email, LocalDate.now()).isPresent()) {
+			
+			return;
+			
+		}
+		
+		Member member = memberService.getActiveMemberByEmail(email);
+		
+		Attendance attendance = Attendance.builder()
+				.member(member)
+				.attendanceDate(LocalDate.now())
+				.build();
+		
+		attendanceRepository.save(attendance);
+		
+		updateLearningStreak(email);
+		
+	}
 
-    @Transactional
-    public void recordAttendance(String email) {
+	private void updateLearningStreak(String email) {
+		
+		Result result = resultService.getActiveMemberResultByEmail(email);
+		
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+		
+		boolean attendedYesterday = attendanceRepository
+				.findByMember_EmailAndAttendanceDate(email, yesterday)
+				.isPresent();
+		
+		result.updateLearningStreak(attendedYesterday);
+		
+	}
 
-        // 오늘 출석 이미 했으면 리턴
-        if (attendanceRepository.findByMember_EmailAndAttendanceDate(email, LocalDate.now()).isPresent()) {
-            return;
-        }
+	@Transactional(readOnly = true)
+	public List<LocalDate> getAttendanceDateList(String email) {
+		
+		List<Attendance> attendanceList = attendanceRepository.findAllByMember_Email(email);
+		
+		if(attendanceList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.ATTENDANCE_NOT_FOUND);
+			
+		}
+		
+		return attendanceList
+				.stream()
+				.map(attendance -> attendance.getAttendanceDate())
+				.collect(Collectors.toList());
 
-        Member member = memberService.getActiveMemberByEmail(email);
+	}
+	
 
-        // Result가 없으면 생성
-        resultService.getOrCreateActiveMemberResult(email, member);
-
-        Attendance attendance = Attendance.builder()
-                .member(member)
-                .attendanceDate(LocalDate.now())
-                .build();
-
-        attendanceRepository.save(attendance);
-
-        updateLearningStreak(email, member);
-    }
-
-    private void updateLearningStreak(String email, Member member) {
-
-        Result result = resultService.getOrCreateActiveMemberResult(email, member);
-
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-
-        boolean attendedYesterday = attendanceRepository
-                .findByMember_EmailAndAttendanceDate(email, yesterday)
-                .isPresent();
-
-        result.updateLearningStreak(attendedYesterday);
-    }
-
-    @Transactional(readOnly = true)
-    public List<LocalDate> getAttendanceDateList(String email) {
-        return attendanceRepository
-                .findAllByMember_Email(email)
-                .stream()
-                .map(Attendance::getAttendanceDate)
-                .collect(Collectors.toList());
-    }
 }

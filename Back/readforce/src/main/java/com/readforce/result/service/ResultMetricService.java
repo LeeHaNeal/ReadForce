@@ -1,109 +1,62 @@
 package com.readforce.result.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.readforce.common.MessageCode;
+import com.readforce.common.exception.ResourceNotFoundException;
+import com.readforce.passage.entity.Category;
+import com.readforce.passage.entity.Language;
+import com.readforce.passage.entity.Level;
+import com.readforce.passage.entity.Type;
 import com.readforce.result.entity.Result;
 import com.readforce.result.entity.ResultMetric;
 import com.readforce.result.repository.ResultMetricRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ResultMetricService {
+	
+	private final ResultMetricRepository resultMetricRepository;
 
-    private final ResultMetricRepository resultMetricRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+	@Transactional(readOnly = true)
+	public void createResultMetric(Result result, Language language, Category category, Type type, Level level) {
 
-    /**
-     * 카테고리별 정답률 JSON 반환
-     */
-    public String getCategoryAccuracyJson(Result result) {
-        List<ResultMetric> metrics = resultMetricRepository.findByResult(result);
-        Map<String, Double> categoryAccuracy = new HashMap<>();
+		ResultMetric resultMetric = ResultMetric.builder()
+				.result(result)
+				.language(language)
+				.category(category)
+				.type(type)
+				.level(level)
+				.build();
+		
+		resultMetricRepository.save(resultMetric);	
+		
+	}
 
-        for (ResultMetric metric : metrics) {
-            if (metric.getCategory() != null) {
-                categoryAccuracy.put(
-                        metric.getCategory().getName(),  // ✅ getName() 으로 수정
-                        metric.getCorrectAnswerRate()
-                );
-            }
-        }
+	@Transactional(readOnly = true)
+	public List<ResultMetric> getAllByResultAndLanguage_Language(Result result, String language) {
 
-        return toJson(categoryAccuracy);
-    }
+		return resultMetricRepository.findAllByResultAndLanguage_Language(result, language);
 
-    /**
-     * 타입별 정답률 JSON 반환
-     */
-    public String getTypeAccuracyJson(Result result) {
-        List<ResultMetric> metrics = resultMetricRepository.findByResult(result);
-        Map<String, Double> typeAccuracy = new HashMap<>();
+	}
 
-        for (ResultMetric metric : metrics) {
-            if (metric.getType() != null) {
-                typeAccuracy.put(
-                        metric.getType().getName(),  // ✅ getName() 으로 수정
-                        metric.getCorrectAnswerRate()
-                );
-            }
-        }
+	public List<ResultMetric> getAllByResult(Result result) {
+		
+		List<ResultMetric> resultList = resultMetricRepository.findAllByResult(result);
+		
+		if(resultList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.RESULT_METRIC_NOT_FOUND);
+			
+		}
+		
+		return resultList;
 
-        return toJson(typeAccuracy);
-    }
+	}
 
-    /**
-     * 레벨별 정답률 JSON 반환
-     */
-    public String getLevelAccuracyJson(Result result) {
-        List<ResultMetric> metrics = resultMetricRepository.findByResult(result);
-        Map<String, Double> levelAccuracy = new HashMap<>();
-
-        for (ResultMetric metric : metrics) {
-            if (metric.getLevel() != null) {
-                levelAccuracy.put(
-                        String.valueOf(metric.getLevel().getLevelNo()),  // ✅ getLevelNo()
-                        metric.getCorrectAnswerRate()
-                );
-            }
-        }
-
-        return toJson(levelAccuracy);
-    }
-
-    /**
-     * 레벨별 평균 풀이 시간 JSON 반환
-     */
-    public String getLevelAvgTimeJson(Result result) {
-        List<ResultMetric> metrics = resultMetricRepository.findByResult(result);
-        Map<String, Double> levelAvgTime = new HashMap<>();
-
-        for (ResultMetric metric : metrics) {
-            if (metric.getLevel() != null) {
-                levelAvgTime.put(
-                        String.valueOf(metric.getLevel().getLevelNo()),
-                        metric.getQuestionSolvingTime().doubleValue()
-                );
-            }
-        }
-
-        return toJson(levelAvgTime);
-    }
-
-    /**
-     * Map → JSON 변환
-     */
-    private String toJson(Map<String, Double> map) {
-        try {
-            return objectMapper.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return "{}";
-        }
-    }
 }
