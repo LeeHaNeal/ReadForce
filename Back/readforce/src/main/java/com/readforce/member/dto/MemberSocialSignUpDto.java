@@ -2,6 +2,7 @@ package com.readforce.member.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.readforce.common.MessageCode;
 import com.readforce.common.validation.ValidBirthday;
 
@@ -12,23 +13,24 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
-
+@NoArgsConstructor
 public class MemberSocialSignUpDto {
-	
-	@NotBlank(message = MessageCode.TEMPORAL_TOKEN_NOT_BLANK)
-	private String temporalToken;
-	
-	@NotBlank(message = MessageCode.NICKNAME_NOT_BLANK)
-	@Size(min = 2, max = 20, message = MessageCode.NICKNAME_SIZE_INVALID)
-	@Pattern(regexp = "^[a-zA-Z가-힣\\d]{2,20}$", message = MessageCode.NICKNAME_PATTERN_INVALID)
-	private String nickname;
-	
-	@NotNull(message = MessageCode.BIRTHDAY_NOT_NULL)
-	@ValidBirthday
-	private LocalDate birthday;
-	
+
+    @JsonProperty("temporal_token")
+    @NotBlank(message = MessageCode.TEMPORAL_TOKEN_NOT_BLANK)
+    private String temporalToken;
+
+    @NotBlank(message = MessageCode.NICKNAME_NOT_BLANK)
+    @Size(min = 2, max = 20, message = MessageCode.NICKNAME_SIZE_INVALID)
+    @Pattern(regexp = "^[a-zA-Z가-힣\\d]{2,20}$", message = MessageCode.NICKNAME_PATTERN_INVALID)
+    private String nickname;
+
+    @NotNull(message = MessageCode.BIRTHDAY_NOT_NULL)
+    @ValidBirthday
+    private LocalDate birthday;
 }

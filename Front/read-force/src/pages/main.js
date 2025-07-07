@@ -11,7 +11,6 @@ const Main = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("KOREAN");
   const [top5Data, setTop5Data] = useState([]);
-  const [wrongArticles, setWrongArticles] = useState([]);
   const navigate = useNavigate();
   const debounceRef = useRef(null);
 
@@ -73,24 +72,18 @@ const Main = () => {
       : navigate(currentSlide.buttonLink);
   };
 
-  // ✅ 수정된 부분: 토큰이 있을 때만 호출
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const [wrongArticles, setWrongArticles] = useState([]);
 
-    if (!token) {
-      console.log("로그인 안 된 상태 → 가장 많이 틀린 퀴즈 요청 안 함");
-      return;
-    }
-
-    fetchWithAuth('/quiz/get-most-incorrected-quiz')
-      .then(res => res.json())
-      .then(data => {
-        setWrongArticles(data);
-      })
-      .catch(err => {
-        console.error("가장 많이 틀린 퀴즈 불러오기 실패:", err);
-      });
-  }, []);
+  // useEffect(() => {
+  //   fetchWithAuth('/quiz/get-most-incorrected-quiz')
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setWrongArticles(data);
+  //     })
+  //     .catch(err => {
+  //       console.error("가장 많이 틀린 퀴즈 불러오기 실패:", err);
+  //     });
+  // }, []);
 
   return (
     <div>
@@ -178,7 +171,9 @@ const Main = () => {
               wrongArticles.map((quiz, index) => (
                 <div className="article" key={index}>
                   <div className="flag">
-                    {quiz.news_quiz_no ? "📰" : "📚"}
+                    {quiz.news_quiz_no
+                      ? "📰" 
+                      : "📚"} 
                   </div>
                   <div>
                     <div className="title">{quiz.question_text}</div>

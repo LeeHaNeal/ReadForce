@@ -10,5 +10,7 @@ import com.readforce.result.entity.Result;
 public interface ResultRepository extends JpaRepository<Result, Long> {
 
 	Optional<Result> findByMember_Email(String email);
+	
+	Optional<Result> findByMember_MemberNo(Long memberNo);
 
 }

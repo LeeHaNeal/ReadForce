@@ -111,7 +111,7 @@ public class MemberController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(MessageCode.MESSAGE_CODE, MessageCode.PASSWORD_RESET_SUCCESS));
 		
-	}
+	}	
 	
 	@PatchMapping("/password-reset")
 	public ResponseEntity<Map<String, String>> passwordReset(
