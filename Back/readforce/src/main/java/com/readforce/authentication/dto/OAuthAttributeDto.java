@@ -36,7 +36,7 @@ public class OAuthAttributeDto {
 	
 	private static OAuthAttributeDto ofKakao(String userNameAttributeName, Map<String, Object> attributeMap) {
 		
-		Map<String, Object> kakao_account = (Map<String, Object>)attributeMap.get("kakaoAccount");
+		Map<String, Object> kakao_account = (Map<String, Object>)attributeMap.get("kakao_account");
 		
 		return OAuthAttributeDto.builder()
 				.email((String)kakao_account.get("email"))
