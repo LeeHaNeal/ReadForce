@@ -482,6 +482,8 @@ public class AiService {
    @Transactional
    public void generatePassage(AiGeneratePassageRequestDto aiGeneratePassageRequestDto) {
       
+		System.out.println("222222222222222222222222");
+
       Level level = levelService.getLevelByLevel(aiGeneratePassageRequestDto.getLevel());
       
       Language language = languageService.getLangeageByLanguage(aiGeneratePassageRequestDto.getLanguage());
@@ -492,17 +494,23 @@ public class AiService {
       
       Map<String, Object> requestResult = requestGenerate(prompt);
       
+      System.out.println("3333333333333333333333333333");
+      
       String content = extractContentFromResponse(requestResult);
       
       GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
       
       String author = NameEnum.GEMINI.name();
        
+      System.out.println("4444444444444444444444444");
+      
       LocalDate publicationDate = LocalDate.now();
        
       Category category = categoryService.getCategoryByCategory(aiGeneratePassageRequestDto.getCategory());
 
-      passageService.savePassage(
+      System.out.println("55555555555555555555" + category);
+      
+      Passage passage = passageService.savePassage(
             parsedResult.getTitle(), 
             parsedResult.getContent(), 
             author, 
@@ -512,6 +520,8 @@ public class AiService {
             language, 
             classification
       );
+      
+      System.out.println("66666666666666666666" + passage.getContent());
       
       
       
