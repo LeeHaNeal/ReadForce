@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './testquestionpage.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../../api/axiosInstance';
@@ -8,83 +8,109 @@ const TestQuestionPage = () => {
   const navigate = useNavigate();
   const language = location.state?.language || 'KOREAN';
 
-  const [questions, setQuestions] = useState([]);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [answers, setAnswers] = useState([]);
-  const [submitted, setSubmitted] = useState(false);
-
-  const quizBoxRef = useRef(null);
-  const omrGridRef = useRef(null);
-  const articleBoxRef = useRef(null);
+  const [question, setQuestion] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     api
-      .get(`/proficiency_test/get-proficiency-test-quiz-list?language=${language}`)
+      .get(`/test/start?language=${language}`)
       .then((res) => {
-        const parsed = res.data.map((item) => ({
-          article: item.get_news,
-          quiz: item.get_news_quiz,
-        }));
-        setQuestions(parsed);
-        setAnswers(Array(parsed.length).fill(null));
+        const raw = res.data;
+
+        // ✅ 여기서 정확히 변환해야 함
+        const formatted = {
+          article: {
+            title: raw.title,
+            content: raw.content,
+          },
+          quiz: {
+            questionNo: raw.questionNo,
+            questionText: raw.question,
+            choices: raw.choiceList.map((c) => c.content),
+          },
+          testerId: raw.testerId,
+        };
+
+        setQuestion(formatted);
       })
-      .catch(() => alert('문제를 불러오지 못했습니다.'));
-  }, [language]);
-
-  useEffect(() => {
-    if (quizBoxRef.current) quizBoxRef.current.scrollTop = 0;
-    if (omrGridRef.current) omrGridRef.current.scrollTop = 0;
-    if (articleBoxRef.current) articleBoxRef.current.scrollTop = 0;
-  }, [currentIdx]);
-
-  if (questions.length === 0) return <div>문제를 불러오는 중...</div>;
-
-  const current = questions[currentIdx];
+      .catch(() => {
+        alert('문제를 불러오지 못했습니다.');
+        navigate('/');
+      });
+  }, [language, navigate]);
 
   const handleSelect = (idx) => {
-    if (submitted) return;
-    const updated = [...answers];
-    updated[currentIdx] = idx;
-    setAnswers(updated);
+    if (isSubmitting) return;
+    setSelected(idx);
   };
 
-  const handleSubmitAll = () => {
-    let score = 0;
-    questions.forEach((q, i) => {
-      if (answers[i] === q.quiz.correct_answer_index) score++;
-    });
-    setSubmitted(true);
-    navigate('/test-result', {
-      state: { score, total: questions.length, answers, questions },
-    });
+  const handleSubmit = async () => {
+    if (selected === null) {
+      alert('보기를 선택하세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await api.post('/test/submit-vocabulary-result', {
+        testerId: question.testerId,
+        questionNo: question.quiz.questionNo,
+        selectedIndex: selected,
+        questionSolvingTime: 10,
+        language,
+      });
+
+      if (res.data?.choiceList) {
+        const raw = res.data;
+
+        const formatted = {
+          article: {
+            title: raw.title,
+            content: raw.content,
+          },
+          quiz: {
+            questionNo: raw.questionNo,
+            questionText: raw.question,
+            choices: raw.choiceList.map((c) => c.content),
+          },
+          testerId: raw.testerId,
+        };
+
+        setQuestion(formatted);
+        setSelected(null);
+      } else {
+        // 최종 결과
+        navigate('/test-result', { state: { result: res.data } });
+      }
+    } catch (err) {
+      alert('제출 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const goPrev = () => {
-    if (currentIdx > 0) setCurrentIdx(currentIdx - 1);
-  };
-
-  const goNext = () => {
-    if (currentIdx < questions.length - 1) setCurrentIdx(currentIdx + 1);
-  };
+  if (!question) return <div>문제를 불러오는 중...</div>;
 
   return (
     <div className="TestQuestion-layout">
-      <div className="TestQuestion-article-box" ref={articleBoxRef}>
-        <h3 className="TestQuestion-article-title">{current.article.title || '제목 없음'}</h3>
-        <p className="TestQuestion-article-content">{current.article.content || '내용 없음'}</p>
+      <div className="TestQuestion-article-box">
+        <h3 className="TestQuestion-article-title">{question.article.title}</h3>
+        <p className="TestQuestion-article-content">{question.article.content}</p>
       </div>
 
       <div className="TestQuestion-right-container">
-        <div className="TestQuestion-quiz-box" ref={quizBoxRef}>
-          <h4 className="TestQuestion-quiz-title">문제 {currentIdx + 1}</h4>
-          <p className="TestQuestion-quiz-question">{current.quiz.question_text}</p>
+        <div className="TestQuestion-quiz-box">
+          <h4 className="TestQuestion-quiz-title">문제</h4>
+          <p className="TestQuestion-quiz-question">{question.quiz.questionText}</p>
 
-          {[current.quiz.choice1, current.quiz.choice2, current.quiz.choice3, current.quiz.choice4].map((opt, idx) => (
+          {question.quiz.choices.map((opt, idx) => (
             <button
               key={idx}
-              className={`TestQuestion-quiz-option ${answers[currentIdx] === idx ? 'selected' : ''}`}
+              className={`TestQuestion-quiz-option ${selected === idx ? 'selected' : ''}`}
               onClick={() => handleSelect(idx)}
-              disabled={submitted}
+              disabled={isSubmitting}
             >
               {String.fromCharCode(65 + idx)}. {opt}
             </button>
@@ -92,43 +118,13 @@ const TestQuestionPage = () => {
         </div>
 
         <div className="TestQuestion-controls">
-          <button onClick={goPrev} disabled={currentIdx === 0}>이전</button>
-          <button onClick={goNext} disabled={currentIdx === questions.length - 1}>다음</button>
-          {currentIdx === questions.length - 1 && !submitted && (
-            <button
-              className="TestQuestion-submit"
-              onClick={handleSubmitAll}
-              disabled={answers.includes(null)}
-            >
-              정답 제출
-            </button>
-          )}
-        </div>
-
-        <div className="TestQuestion-omr" ref={omrGridRef}>
-          {questions.map((_, qIdx) => (
-            <div key={qIdx} className="TestQuestion-omr-row">
-              <span className="TestQuestion-omr-number" onClick={() => setCurrentIdx(qIdx)}>
-                {qIdx + 1}
-              </span>
-              {['A', 'B', 'C', 'D'].map((label, cIdx) => (
-                <span
-                  key={cIdx}
-                  className={`TestQuestion-omr-choice ${answers[qIdx] === cIdx ? 'selected' : ''}`}
-                  onClick={() => {
-                    if (!submitted) {
-                      const updated = [...answers];
-                      updated[qIdx] = cIdx;
-                      setAnswers(updated);
-                    }
-                    setCurrentIdx(qIdx);
-                  }}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-          ))}
+          <button
+            className="TestQuestion-submit"
+            onClick={handleSubmit}
+            disabled={selected === null || isSubmitting}
+          >
+            제출
+          </button>
         </div>
       </div>
     </div>

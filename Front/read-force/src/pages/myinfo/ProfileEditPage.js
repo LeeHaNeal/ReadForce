@@ -22,7 +22,7 @@ const ProfileEditPage = () => {
 
   const fetchProfileImage = async () => {
     try {
-      const res = await axiosInstance.get('/member/get-profile-image', {
+      const res = await axiosInstance.get('/file/get-profile-image', {
         responseType: 'blob',
       });
       const url = URL.createObjectURL(res.data);
@@ -95,9 +95,9 @@ const ProfileEditPage = () => {
 
     if (selectedFile) {
       const formData = new FormData();
-      formData.append('profile_image_file', selectedFile);
+      formData.append('profileImageFile', selectedFile);
       updates.push(
-        axiosInstance.post('/member/upload-profile-image', formData, {
+        axiosInstance.post('/file/upload-profile-image', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
       );
@@ -129,7 +129,7 @@ const ProfileEditPage = () => {
 
   const handleImageDelete = async () => {
     try {
-      await axiosInstance.delete('/member/delete-profile-image');
+      await axiosInstance.delete('/file/delete-profile-image');
       await fetchProfileImage();
       setSelectedFile(null);
     } catch {
