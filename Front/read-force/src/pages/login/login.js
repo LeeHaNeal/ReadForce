@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; // ✅ 올바른 import
 import './login.css';
 import kakaoIcon from '../../assets/image/kakao.png';
-import naverIcon from '../../assets/image/naver.png';
+// import naverIcon from '../../assets/image/naver.png';
 import googleIcon from '../../assets/image/google.png';
 
 export default function Login() {
@@ -92,13 +92,13 @@ export default function Login() {
               >
                 <img src={kakaoIcon} alt="카카오" />
               </button>
-              <button
+              {/* <button
                 type="button"
                 className="social-btn"
                 onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/naver"}
               >
                 <img src={naverIcon} alt="네이버" />
-              </button>
+              </button> */}
               <button
                 type="button"
                 className="social-btn"

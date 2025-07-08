@@ -166,8 +166,9 @@ public class AuthenticationController {
 			@NotBlank(message = MessageCode.TEMPORAL_TOKEN_NOT_BLANK)
 			String temporalToken
 	){
+
 		
-		String temporalTokenJson = (String)redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
+		String temporalTokenJson = redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
 		
 		if(temporalTokenJson == null) {
 			
@@ -195,7 +196,7 @@ public class AuthenticationController {
 			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
 			
 		}
-		
+		System.out.println("11111111111111111111111111111111111"+tokenMap);
 		return ResponseEntity.status(HttpStatus.OK).body(tokenMap);
 		
 	}

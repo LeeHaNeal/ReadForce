@@ -54,7 +54,7 @@ public class SecurityConfig {
 					auth -> auth.requestMatchers(
 							"/authentication/sign-in",
 							"/authentication/reissueRefreshToken",
-							"/authenticatino/get-tokens",
+							"/authentication/get-tokens",
 				            "/member/sign-up",
 				            "/member/social-sign-up",
 				            "/member/email-check",
