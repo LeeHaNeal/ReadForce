@@ -132,10 +132,6 @@ public class PassageService {
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND));
 
 	}
-	@Transactional
-	public Passage savePassage(Passage passage) {
-	    return passageRepository.save(passage);
-	}
 
 	@Transactional
 	public Passage savePassage(

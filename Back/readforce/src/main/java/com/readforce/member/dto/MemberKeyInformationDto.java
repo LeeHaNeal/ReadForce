@@ -5,13 +5,10 @@ import com.readforce.common.enums.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 
 @Getter
 @Builder
 @AllArgsConstructor
-
 public class MemberKeyInformationDto {
 
 	private final String email;

@@ -74,10 +74,10 @@ public final class MessageCode {
 	public static final String REISSUE_ACCESS_TOKEN_SUCCESS = "SUC0013";
 	public static final String GET_TOKENS_SUCCESS = "SUC0014";
 	public static final String SAVE_MULTIPLE_CHOICE_RESULT_SUCCESS = "SUC0015";
-	public static final String GENERATE_TEST_PASSAGE_SUCCESS = "SUC0016";
+	public static final String GENERATE_TEST_SUCCESS = "SUC0016";
 	public static final String GENERATE_PASSAGE_SUCCESS = "SUC0017";
 	public static final String GENERATE_QUESTION_SUCCESS = "SUC0018";
-	public static final String GENERATE_TEST_QUESTION_SUCCESS = "SUC0019";
+	
 	
 	
 	
