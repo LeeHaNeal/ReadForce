@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Language;
@@ -41,9 +43,9 @@ public class ResultMetricService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ResultMetric> getAllByResultAndLanguage_Language(Result result, String language) {
+	public List<ResultMetric> getAllByResultAndLanguage_Language(Result result, LanguageEnum language) {
 
-		return resultMetricRepository.findAllByResultAndLanguage_Language(result, language);
+		return resultMetricRepository.findAllByResultAndLanguage_LanguageName(result, language);
 
 	}
 
@@ -76,7 +78,7 @@ public class ResultMetricService {
 		return resultMetricList.stream()
 				.filter(metric -> metric.getCategory() != null && metric.getType() == null && metric.getLevel() == null)
 				.collect(Collectors.toMap(
-						metric -> metric.getCategory().getCategory(),
+						metric -> metric.getCategory().getCategoryName().name(),
 						ResultMetric::getCorrectAnswerRate,
 						(rate1, rate2) -> rate2
 				));
@@ -84,7 +86,7 @@ public class ResultMetricService {
 	}
 
 	@Transactional(readOnly = true)
-	public Map<String, Double> getTypeCorrectAnswerRate(Result result, String category) {
+	public Map<String, Double> getTypeCorrectAnswerRate(Result result, CategoryEnum category) {
 
 		List<ResultMetric> resultMetricList = resultMetricRepository.findAllByResult(result);
 		
@@ -95,10 +97,10 @@ public class ResultMetricService {
 		}
 		
 		return resultMetricList.stream()
-				.filter(metric -> metric.getCategory() != null && metric.getCategory().getCategory().equals(category))
+				.filter(metric -> metric.getCategory().getCategoryName().name() != null && metric.getCategory().getCategoryName().name().equals(category.name()))
 				.filter(metric -> metric.getType() == null && metric.getLevel() == null)
 				.collect(Collectors.toMap(
-						metric -> metric.getType().getType(),
+						metric -> metric.getType().getTypeName().name(),
 						ResultMetric::getCorrectAnswerRate,
 						(rate1, rate2) -> rate2
 				));

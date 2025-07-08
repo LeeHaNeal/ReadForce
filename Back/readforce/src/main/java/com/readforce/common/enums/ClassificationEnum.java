@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum Classification {
+public enum ClassificationEnum {
 
 	NORMAL,
 	CHALLANGE,

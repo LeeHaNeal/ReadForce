@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.AgeGroup;
 import com.readforce.member.entity.Member;
@@ -50,7 +53,7 @@ public class LevelService {
 	@Transactional(readOnly = true)
 	public Level getLevelByLevel(Integer level) {
 		
-		return levelRepository.findByLevel(level)
+		return levelRepository.findByLevelNumber(level)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.LEVEL_NOT_FOUND));
 		
 	}
@@ -63,7 +66,7 @@ public class LevelService {
 	}
 
 	@Transactional(readOnly = true)
-	public Integer findOptimalLevel(Member member, String language, String weakCategory, String weakType) {
+	public Integer findOptimalLevel(Member member, LanguageEnum language, CategoryEnum weakCategory, TypeEnum weakType) {
 		
 		Integer[] optimalLevelRange = findOptimalLevelRange(member.getEmail(), language, weakCategory, weakType);
 
@@ -71,7 +74,7 @@ public class LevelService {
 
 	}
 
-	private Integer findFinalRecommenedLevel(Member member, String language, Integer skilledLevel, Integer challengeLevel, String weakCategory, String weakType) {
+	private Integer findFinalRecommenedLevel(Member member, LanguageEnum language, Integer skilledLevel, Integer challengeLevel, CategoryEnum weakCategory, TypeEnum weakType) {
 		
 		AgeGroup ageGroup = ageGroupService.getAgeGroupForMember(member);
 		
@@ -103,19 +106,19 @@ public class LevelService {
 
 	}
 
-	private Integer[] findOptimalLevelRange(String email, String language, String weakCategory, String weakType) {
+	private Integer[] findOptimalLevelRange(String email, LanguageEnum language, CategoryEnum weakCategory, TypeEnum weakType) {
 
 		Result result = resultService.getActiveMemberResultByEmail(email);
 		
 		List<ResultMetric> metricList = resultMetricService.getAllByResultAndLanguage_Language(result, language);
 		
 		Map<Integer, Double> levelCorrectRateMap = metricList.stream()
-				.filter(metric -> weakCategory.equals(metric.getCategory().getCategory())
-						&& weakType.equals(metric.getType().getType())
+				.filter(metric -> weakCategory.name().equals(metric.getCategory().getCategoryName().name())
+						&& weakType.name().equals(metric.getType().getTypeName().name())
 						&& metric.getLevel() != null
 						&& metric.getCorrectAnswerRate() != null)
 				.collect(Collectors.toMap(
-						metric -> metric.getLevel().getLevel(),
+						metric -> metric.getLevel().getLevelNumber(),
 						ResultMetric::getCorrectAnswerRate,
 						(rate1, rate2) -> rate1
 				));

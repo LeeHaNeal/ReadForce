@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Category;
-import com.readforce.passage.validation.ValidEnum;
+import com.readforce.common.enums.CategoryEnum;
 import com.readforce.result.entity.Result;
 import com.readforce.result.service.ResultMetricService;
 import com.readforce.result.service.ResultService;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,9 +48,8 @@ public class ResultMetricController {
 	@GetMapping("/get-type-correct-answer-rate-by-category")
 	public ResponseEntity<Map<String, Double>> getTypeCorrectAnswerRateByCategory(
 			@RequestParam("category")
-			@NotBlank(message = MessageCode.CATEGORY_NOT_BLANK)
-			@ValidEnum(enumClass = Category.class, message = MessageCode.CATEGORY_INVALID)
-			String category,
+			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+			CategoryEnum category,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
 		

@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.ClassificationEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.OrderByEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.service.PassageService;
@@ -45,17 +49,17 @@ public class QuestionService {
 		Question question = getQuestionWithPassage(questionNo);
 		
 		return QuestionLevelAndCategoryAndLanguageDto.builder()
-				.language(question.getPassage().getLanguage().getLanguage())
-				.category(question.getPassage().getCategory().getCategory())
-				.level(question.getPassage().getLevel().getLevel())
+				.language(question.getPassage().getLanguage().getLanguageName())
+				.category(question.getPassage().getCategory().getCategoryName())
+				.level(question.getPassage().getLevel().getLevelNumber())
 				.build();
 
 	}
 	
 	@Transactional(readOnly = true)
-	public List<PassageResponseDto> getUnusedVocabularyPassageList(String language, String classification){
+	public List<PassageResponseDto> getUnusedVocabularyPassageList(LanguageEnum language, ClassificationEnum classification){
 		
-		List<PassageResponseDto> allPassageDtoList = passageService.getPassageListByLanguageAndCategory("ASC", language, classification, "VOCABULARY");
+		List<PassageResponseDto> allPassageDtoList = passageService.getPassageListByLanguageAndCategory(OrderByEnum.ASC, language, classification, CategoryEnum.VOCABULARY);
 
 		List<Long> usedPassageNoList = questionRepository.findAllUsedPassageNo();
 		

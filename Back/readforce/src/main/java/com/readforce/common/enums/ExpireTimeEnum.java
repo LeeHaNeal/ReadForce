@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum ExpireTime {
+public enum ExpireTimeEnum {
 	
 	DEFAULT(3),
 	SOCIAL_ACCOUNT_LINK(5),
@@ -9,7 +9,7 @@ public enum ExpireTime {
 	
 	private final long expireTime;
 	
-	ExpireTime(long expireTime){
+	ExpireTimeEnum(long expireTime){
 		
 		this.expireTime = expireTime;
 		

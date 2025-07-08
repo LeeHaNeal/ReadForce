@@ -2,9 +2,10 @@ package com.readforce.passage.entity;
 
 import java.time.LocalDateTime;
 
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.readforce.common.enums.ClassificationEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,7 +35,7 @@ public class Classification {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private com.readforce.common.enums.Classification classification;
+	private ClassificationEnum classificationName;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

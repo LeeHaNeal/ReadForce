@@ -10,18 +10,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Category;
-import com.readforce.common.enums.Classification;
-import com.readforce.common.enums.Language;
-import com.readforce.common.enums.OrderBy;
-import com.readforce.common.enums.Type;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.ClassificationEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.OrderByEnum;
+import com.readforce.common.enums.TypeEnum;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.service.PassageService;
-import com.readforce.passage.validation.ValidEnum;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,21 +33,17 @@ public class PassageController {
 	@GetMapping("/get-passage-list-by-language-and-category")
 	public ResponseEntity<List<PassageResponseDto>> getPassageListByLanguageAndCategory(
 			@RequestParam("orderBy")
-			@NotBlank(message = MessageCode.ORDER_BY_NOT_BLANK)
-			@ValidEnum(enumClass = OrderBy.class, message = MessageCode.ORDER_BY_INVALID)
-			String orderBy,
+			@NotNull(message = MessageCode.ORDER_BY_NOT_NULL)
+			OrderByEnum orderBy,
 			@RequestParam("language")
-			@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-			@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-			String language,
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language,
 			@RequestParam("classification")
-			@NotBlank(message = MessageCode.CLASSIFICATION_NOT_BLANK)
-			@ValidEnum(enumClass = Classification.class, message = MessageCode.CLASSIFICATION_INVALID)
-			String classification,
+			@NotNull(message = MessageCode.CLASSIFICATION_NOT_NULL)
+			ClassificationEnum classification,
 			@RequestParam("category")
-			@NotBlank(message = MessageCode.CATEGORY_NOT_BLANK)
-			@ValidEnum(enumClass = Category.class, message = MessageCode.CATEGORY_INVALID)
-			String category
+			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+			CategoryEnum category
 	){
 		
 		List<PassageResponseDto> passageList = 
@@ -62,25 +57,20 @@ public class PassageController {
 	@GetMapping("/get-passage-list-by-language-and-category-and-type")
 	public ResponseEntity<List<PassageResponseDto>> getPassageListByLanguageAndCategoryAndType(
 			@RequestParam("orderBy")
-			@NotBlank(message = MessageCode.ORDER_BY_NOT_BLANK)
-			@ValidEnum(enumClass = OrderBy.class, message = MessageCode.ORDER_BY_INVALID)
-			String orderBy,
+			@NotNull(message = MessageCode.ORDER_BY_NOT_NULL)
+			OrderByEnum orderBy,
 			@RequestParam("language")
-			@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-			@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-			String language,
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language,
 			@RequestParam("classification")
-			@NotBlank(message = MessageCode.CLASSIFICATION_NOT_BLANK)
-			@ValidEnum(enumClass = Classification.class, message = MessageCode.CLASSIFICATION_INVALID)
-			String classification,
+			@NotNull(message = MessageCode.CLASSIFICATION_NOT_NULL)
+			ClassificationEnum classification,
 			@RequestParam("category")
-			@NotBlank(message = MessageCode.CATEGORY_NOT_BLANK)
-			@ValidEnum(enumClass = Category.class, message = MessageCode.CATEGORY_INVALID)
-			String category,
+			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+			CategoryEnum category,
 			@RequestParam("type")
-			@NotBlank(message = MessageCode.TYPE_NOT_BLANK)
-			@ValidEnum(enumClass = Type.class, message = MessageCode.TYPE_INVALID)
-			String type
+			@NotNull(message = MessageCode.TYPE_NOT_NULL)
+			TypeEnum type
 			
 	){
 		
@@ -95,27 +85,22 @@ public class PassageController {
 	@GetMapping("/get-passage-list-by-language-and-category-and-type-and-level")
 	public ResponseEntity<List<PassageResponseDto>> getPassageListByLanguageAndCategoryAndTypeAndLevel(
 			@RequestParam("orderBy")
-			@NotBlank(message = MessageCode.ORDER_BY_NOT_BLANK)
-			@ValidEnum(enumClass = OrderBy.class, message = MessageCode.ORDER_BY_INVALID)
-			String orderBy,
+			@NotNull(message = MessageCode.ORDER_BY_NOT_NULL)
+			OrderByEnum orderBy,
 			@RequestParam("language")
-			@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-			@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-			String language,
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language,
 			@RequestParam("classification")
-			@NotBlank(message = MessageCode.CLASSIFICATION_NOT_BLANK)
-			@ValidEnum(enumClass = Classification.class, message = MessageCode.CLASSIFICATION_INVALID)
-			String classification,
+			@NotNull(message = MessageCode.CLASSIFICATION_NOT_NULL)
+			ClassificationEnum classification,
 			@RequestParam("category")
-			@NotBlank(message = MessageCode.CATEGORY_NOT_BLANK)
-			@ValidEnum(enumClass = Category.class, message = MessageCode.CATEGORY_INVALID)
-			String category,
+			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+			CategoryEnum category,
 			@RequestParam("type")
-			@NotBlank(message = MessageCode.TYPE_NOT_BLANK)
-			@ValidEnum(enumClass = Type.class, message = MessageCode.TYPE_INVALID)
-			String type,
+			@NotNull(message = MessageCode.TYPE_NOT_NULL)
+			TypeEnum type,
 			@RequestParam("level")
-			@NotBlank(message = MessageCode.LEVEL_NOT_BLANK)
+			@NotNull(message = MessageCode.LEVEL_NOT_NULL)
 			@Min(value = 1, message = MessageCode.LEVEL_INVALID)
 			@Max(value = 10, message = MessageCode.LEVEL_INVALID)
 			Integer level

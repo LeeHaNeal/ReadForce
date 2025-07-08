@@ -1,4 +1,4 @@
-package com.readforce.common.validation;
+package com.readforce.member.validation;
 
 import java.time.LocalDate;
 

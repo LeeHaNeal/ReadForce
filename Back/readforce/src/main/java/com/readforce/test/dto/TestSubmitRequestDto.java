@@ -1,8 +1,7 @@
 package com.readforce.test.dto;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Language;
-import com.readforce.passage.validation.ValidEnum;
+import com.readforce.common.enums.LanguageEnum;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +26,6 @@ public class TestSubmitRequestDto {
 	@NotNull(message = MessageCode.QUESTION_SOLVING_TIME_NOT_NULL)
 	private Long questionSolvingTime;
 	
-	@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-	@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-	private String language;
+	@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+	private LanguageEnum language;
 }
