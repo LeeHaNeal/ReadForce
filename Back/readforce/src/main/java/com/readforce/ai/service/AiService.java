@@ -152,19 +152,32 @@ public class AiService {
 		
 			case KOREAN:
 				prompt = String.format(
-				"""
-					당신은 한국어 어휘의 전문가입니다.
-					'난이도 %d (%s)' 수준의 단어를 JSON 형식으로 생성해 주세요.
-					 **반드시 하나의 JSON 객체만 반환해야 합니다.**
-					
-					요청 형식:
-					{
-					  "title": "여기에 단어를 생성해주세요.",
-					  "content": "여기에 단어의 사전적 의미를 작성해주세요.",
-					  "level": "여기에 단어 생성에 사용된 난이도를 적어주세요." 
-					}
-									
-					""", level.getLevelNumber(), level.getVocabularyLevel());
+						"""
+			                당신은 한국어 어휘의 전문가입니다.
+			                '난이도 %d (%s)' 수준의 단어 데이터를 생성해야 합니다.
+	
+			                ## 중요 규칙
+			                - 반드시 **하나의 JSON 객체** 형식으로만 응답해야 합니다.
+			                - 절대로 JSON 배열(리스트) 형식인 `[ ]` 로 감싸서 반환하면 안 됩니다.
+	
+			                ## 올바른 응답 형식 (JSON 객체):
+			                {
+			                  "title": "단어",
+			                  "content": "단어의 뜻",
+			                  "level": "난이도 1 (초등 저학년)"
+			                }
+	
+			                ## 잘못된 응답 형식 (JSON 배열):
+			                [
+			                  {
+			                    "title": "단어",
+			                    "content": "단어의 뜻",
+			                    "level": "난이도 1 (초등 저학년)"
+			                  }
+			                ]
+	
+			                이제 규칙에 맞춰 '난이도 %d (%s)' 수준의 단어를 생성해 주세요.
+		                """, level.getLevelNumber(), level.getVocabularyLevel(), level.getLevelNumber(), level.getVocabularyLevel());
 				break;
 			
 			default:
@@ -773,7 +786,19 @@ public class AiService {
 							
 							if(firstPart.containsKey("text")) {
 								
-								return (String) firstPart.get("text");
+								String text = (String)firstPart.get("text");
+								if(text.startsWith("```json")) {
+									
+									text = text.substring(7);
+									
+								}
+								if(text.endsWith("```")) {
+									
+									text = text.substring(0, text.length() - 3);
+									
+								}
+								
+								return text.trim();
 								
 							}
 							
