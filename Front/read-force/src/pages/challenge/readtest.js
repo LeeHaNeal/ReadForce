@@ -1,13 +1,41 @@
 import React, { useState } from "react";
 import "./readtest.css";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/axiosInstance";
 
 const ReadTest = () => {
   const navigate = useNavigate();
   const [language, setLanguage] = useState("KOREAN");
 
-  const handleStart = () => {
-    navigate("/test-question", { state: { language } });
+  const handleStart = async () => {
+    try {
+      const res = await api.get(`/test/start?language=${language}`);
+      const raw = res.data;
+
+      if (!raw || !raw.questionNo) {
+        alert("문제가 없습니다.");
+        return;
+      }
+
+      const formattedQuestion = {
+        article: {
+          title: raw.title,
+          content: raw.content,
+        },
+        quiz: {
+          questionNo: raw.questionNo,
+          questionText: raw.question,
+          choices: raw.choiceList.map((c) => c.content),
+        },
+        testerId: raw.testerId,
+        language: language,
+      };
+
+      navigate("/test-question", { state: { question: formattedQuestion } });
+    } catch (err) {
+      console.error("문제 불러오기 실패", err);
+      alert("문제를 불러오지 못했습니다.");
+    }
   };
 
   return (
@@ -17,37 +45,31 @@ const ReadTest = () => {
       <div className="ReadTest-card">
         <h3>
           <strong>
-            <span style={{ textDecoration: 'none', color: 'inherit' }}>
+            <span style={{ textDecoration: "none", color: "inherit" }}>
               리드 <span style={{ color: "#439395" }}>포스</span>
             </span>
           </strong>
           는 뉴스 기반 문해력 테스트 플랫폼입니다.
         </h3>
         <p>
-          <strong><i>AI</i></strong>가 뉴스를 요약하고, 우리는 문제를 풀며 <strong>문해력</strong>을 기릅니다.
+          <strong>
+            <i>AI</i>
+          </strong>
+          가 뉴스를 요약하고, 우리는 문제를 풀며 <strong>문해력</strong>을 기릅니다.
         </p>
         <p>세상을 <strong>읽는 힘</strong>, 지금부터 시작하세요.</p>
       </div>
 
       <div className="ReadTest-language-buttons">
-        <button
-          className={language === "KOREAN" ? "ReadTest-lang-btn active" : "ReadTest-lang-btn"}
-          onClick={() => setLanguage("KOREAN")}
-        >
-          한국어
-        </button>
-        <button
-          className={language === "ENGLISH" ? "ReadTest-lang-btn active" : "ReadTest-lang-btn"}
-          onClick={() => setLanguage("ENGLISH")}
-        >
-          English
-        </button>
-        <button
-          className={language === "JAPANESE" ? "ReadTest-lang-btn active" : "ReadTest-lang-btn"}
-          onClick={() => setLanguage("JAPANESE")}
-        >
-          日本語
-        </button>
+        {["KOREAN", "ENGLISH", "JAPANESE"].map((lang, i) => (
+          <button
+            key={lang}
+            className={language === lang ? "ReadTest-lang-btn active" : "ReadTest-lang-btn"}
+            onClick={() => setLanguage(lang)}
+          >
+            {["한국어", "English", "日本語"][i]}
+          </button>
+        ))}
       </div>
 
       <button className="ReadTest-btn" onClick={handleStart}>
