@@ -94,11 +94,17 @@ public class PassageService {
 	@Transactional(readOnly = true)
 	public Passage getTestPassage(LanguageEnum language, CategoryEnum category, Integer level) {
 		
-		long count = passageRepository.countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumber(language, category, level);
+		long count = passageRepository.countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumberAndClassification_ClassificationName(language, category, level, ClassificationEnum.TEST);
+		
+		if(count == 0) {
+			
+			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+			
+		}
 		
 		int randomIndex = (int)(Math.random() * count);
 		
-		Page<Passage> passagePage = passageRepository.findAll(PageRequest.of(randomIndex, 1));
+		Page<Passage> passagePage = passageRepository.findByLanguageAndCategoryAndLevelAndClassification(language, category, level, ClassificationEnum.TEST, PageRequest.of(randomIndex, 1));
 		
 		if(passagePage.hasContent()) {
 			

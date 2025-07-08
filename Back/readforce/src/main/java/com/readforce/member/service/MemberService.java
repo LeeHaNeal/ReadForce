@@ -277,6 +277,7 @@ public class MemberService {
 		
 		member.modifyInformation(memberModifyDto.getNickname(), memberModifyDto.getBirthday(), null);
 		
+		memberRepository.save(member);
 		
 		return member.getNickname();
 				

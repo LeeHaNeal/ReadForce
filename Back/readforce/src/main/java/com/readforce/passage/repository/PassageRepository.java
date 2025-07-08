@@ -2,6 +2,8 @@ package com.readforce.passage.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -104,8 +106,6 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			@Param("level") Integer level
 	);
 	
-	long countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumber(LanguageEnum language, CategoryEnum category, Integer level);
-
 	@Query("""
 			SELECT p
 			FROM Passage p 
@@ -117,6 +117,29 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			WHERE q.passage.passageNo IS NULL
 	""")
 	List<Passage> findNoQuestionPassageList();
+
+	long countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumberAndClassification_ClassificationName(
+			LanguageEnum language, 
+			CategoryEnum category, 
+			Integer level, 
+			ClassificationEnum test
+	);
+
+	@Query("""
+			SELECT p
+			FROM Passage p
+			WHERE p.language.languageName = :language
+			AND p.category.categoryName = :category
+			AND p.level.levelNumber = :level
+			AND p.classification.classificationName = :classification					
+	""")
+	Page<Passage> findByLanguageAndCategoryAndLevelAndClassification(
+			@Param("language") LanguageEnum language, 
+			@Param("category") CategoryEnum category,
+			@Param("level") Integer level, 
+			@Param("classification") ClassificationEnum classification, 
+			Pageable pageable
+	);
 	
 	
 	
