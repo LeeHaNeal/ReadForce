@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class TestController {
 
-	private TestService testService;
+	private final TestService testService;
 	
 	@GetMapping("/start")
 	public ResponseEntity<QuestionTestResponseDto> start(

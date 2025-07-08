@@ -12,12 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GeminiGenerateTestPassageAndQuestionResponseDto {
+public class GeminiGenerateQuestionResponseDto {
 
-	private String title;
-	
-	private String content;
-	
 	private String question;
 	
 	private List<String> choiceList;

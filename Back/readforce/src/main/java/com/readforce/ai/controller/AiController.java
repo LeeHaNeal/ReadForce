@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.readforce.ai.dto.AiGenerateTestRequestDto;
+import com.readforce.ai.dto.AiGeneratePassageRequestDto;
 import com.readforce.ai.service.AiService;
 import com.readforce.common.MessageCode;
 
@@ -35,6 +35,31 @@ public class AiController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_SUCCESS
+		));
+		
+	}
+	
+	@PostMapping("/generate-passage")
+	public ResponseEntity<Map<String, String>> generatePassage(
+			@RequestBody AiGeneratePassageRequestDto aiGeneratePassageRequestDto
+	){
+		
+		aiService.generatePassage(aiGeneratePassageRequestDto);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_PASSAGE_SUCCESS
+		));
+		
+	}
+	
+	
+	@PostMapping("/generate-question")
+	public ResponseEntity<Map<String, String>> generateQuestion(){
+		
+		aiService.generateQuestion();
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_QUESTION_SUCCESS
 		));
 		
 	}
