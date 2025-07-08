@@ -177,7 +177,7 @@ public class AiService {
 			                ]
 	
 			                이제 규칙에 맞춰 '난이도 %d (%s)' 수준의 단어를 생성해 주세요.
-		                """, level.getLevelNumber(), level.getVocabularyLevel());
+		                """, level.getLevelNumber(), level.getVocabularyLevel(), level.getLevelNumber(), level.getVocabularyLevel());
 				break;
 			
 			default:
