@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Category;
@@ -35,7 +37,7 @@ public class CategoryService {
 	}
 
 	@Transactional(readOnly = true)
-	public String findWeakCategory(Member member, String language) {
+	public CategoryEnum findWeakCategory(Member member, LanguageEnum language) {
 
 		Result result = resultService.getActiveMemberResultByEmail(member.getEmail());
 		
@@ -52,7 +54,7 @@ public class CategoryService {
 			
 			if(weakCategory.isPresent()) {
 				
-				return weakCategory.get().getCategory();
+				return weakCategory.get().getCategoryName();
 				
 			}
 			
@@ -63,9 +65,9 @@ public class CategoryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Category getCategoryByCategory(String category) {
+	public Category getCategoryByCategory(CategoryEnum category) {
 		
-		return categoryRepository.findByCategory(category)
+		return categoryRepository.findByCategoryName(category)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.CATEGORY_NOT_FOUND));
 		
 	}

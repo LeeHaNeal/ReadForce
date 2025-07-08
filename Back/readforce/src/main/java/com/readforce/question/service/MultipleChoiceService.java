@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Classification;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.ClassificationEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Passage;
@@ -61,10 +64,10 @@ public class MultipleChoiceService {
 	}
 
 	@Transactional(readOnly = true)
-	public MultipleChoiceResponseDto getUnsolvedMultipleChoiceQuestion(Member member, String language, String category, String type, Integer level, List<Long> solvedPassageNoList) {
+	public MultipleChoiceResponseDto getUnsolvedMultipleChoiceQuestion(Member member, LanguageEnum language, CategoryEnum category, TypeEnum type, Integer level, List<Long> solvedPassageNoList) {
 		
 		List<Long> passageNoList = passageService
-				.getPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(language, Classification.NORMAL.name(), category, type, level);
+				.getPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(language, ClassificationEnum.NORMAL, category, type, level);
 
 		List<Long> unsolvedPassageList = passageNoList.stream()
 				.filter(passageNo -> !solvedPassageNoList.contains(passageNo))
@@ -94,8 +97,8 @@ public class MultipleChoiceService {
 				.content(recommendPassage.getContent())
 				.author(recommendPassage.getAuthor())
 				.publicationDate(recommendPassage.getPublicationDate())
-				.category(recommendPassage.getCategory().getCategory())
-				.level(recommendPassage.getLevel().getLevel())
+				.category(recommendPassage.getCategory().getCategoryName().name())
+				.level(recommendPassage.getLevel().getLevelNumber())
 				.questionNo(recommendMultipleChoice.get(0).getQuestionNo())
 				.question(recommendMultipleChoice.get(0).getQuestion())
 				.choiceList(recommendMultipleChoice.get(0).getChoiceList().stream()
@@ -103,6 +106,13 @@ public class MultipleChoiceService {
 						.collect(Collectors.toList())
 				)
 				.build();
+		
+	}
+
+	@Transactional
+	public void saveMultipleChoice(MultipleChoice multipleChoice) {
+
+		multipleChoiceRepository.save(multipleChoice);
 		
 	}
 

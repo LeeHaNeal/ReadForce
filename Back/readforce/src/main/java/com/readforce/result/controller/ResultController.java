@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.readforce.common.enums.Name;
+import com.readforce.common.enums.NameEnum;
 import com.readforce.result.service.LearningService;
 import com.readforce.result.service.ResultService;
 
@@ -34,7 +34,7 @@ public class ResultController {
 		Double overallCorrectAnswerRate = resultService.getOverallCorrectAnswerRate(email);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-				Name.OVERALL_CORRECT_ANSWER_RATE.name(), overallCorrectAnswerRate
+				NameEnum.OVERALL_CORRECT_ANSWER_RATE.name(), overallCorrectAnswerRate
 		));
 
 	}
@@ -49,7 +49,7 @@ public class ResultController {
 		Integer count = learningService.getTodaySolvedQuestionCount(email);
 
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-				Name.TODAY_SOLVED_QUESTION_COUNT.name(), count
+				NameEnum.TODAY_SOLVED_QUESTION_COUNT.name(), count
 		));
 		
 	}

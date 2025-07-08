@@ -136,7 +136,7 @@ public class LearningService {
 	@Transactional(readOnly = true)
 	public List<QuestionSummaryResponseDto> getTotalLearning(String email) {
 
-		List<QuestionSummaryResponseDto> totalLearningList = learningRepository.findAllByMember_Email(email);
+		List<Learning> totalLearningList = learningRepository.findAllByMember_Email(email);
 		
 		if(totalLearningList.isEmpty()) {
 			
@@ -144,14 +144,16 @@ public class LearningService {
 			
 		}
 		
-		return totalLearningList;
+		return totalLearningList.stream()
+				.map(QuestionSummaryResponseDto::new)
+				.collect(Collectors.toList());
 				
 	}
 
 	@Transactional(readOnly = true)
 	public List<QuestionSummaryResponseDto> getTotalIncorrectLearning(String email) {
 
-		List<QuestionSummaryResponseDto> totalIncorrectLearningList = learningRepository.findIncorrectLearningByMember_Email(email);
+		List<Learning> totalIncorrectLearningList = learningRepository.findIncorrectLearningByMember_Email(email);
 
 		if(totalIncorrectLearningList.isEmpty()) {
 			
@@ -159,7 +161,9 @@ public class LearningService {
 			
 		}
 		
-		return totalIncorrectLearningList;
+		return totalIncorrectLearningList.stream()
+				.map(QuestionSummaryResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 
@@ -169,7 +173,7 @@ public class LearningService {
 		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
 		LocalDateTime endOfDay = LocalDateTime.now();
 
-		List<QuestionSummaryResponseDto> todayLearningList = learningRepository.findTodayLearningByMember_Email(email, startOfDay, endOfDay);
+		List<Learning> todayLearningList = learningRepository.findTodayLearningByMember_Email(email, startOfDay, endOfDay);
 		
 		if(todayLearningList.isEmpty()) {
 			
@@ -177,7 +181,9 @@ public class LearningService {
 			
 		}
 		
-		return todayLearningList;
+		return todayLearningList.stream()
+				.map(QuestionSummaryResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 
@@ -187,7 +193,7 @@ public class LearningService {
 		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
 		LocalDateTime endOfDay = LocalDateTime.now();
 
-		List<QuestionSummaryResponseDto> todayIncorrectLearningList = learningRepository.findTodayIncorrectLearningByMember_Email(email, startOfDay, endOfDay);
+		List<Learning> todayIncorrectLearningList = learningRepository.findTodayIncorrectLearningByMember_Email(email, startOfDay, endOfDay);
 		
 		if(todayIncorrectLearningList.isEmpty()) {
 			
@@ -195,14 +201,16 @@ public class LearningService {
 			
 		}
 		
-		return todayIncorrectLearningList;
+		return todayIncorrectLearningList.stream()
+				.map(QuestionSummaryResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 
 	@Transactional(readOnly = true)
 	public List<QuestionSummaryResponseDto> getFavoritLearning(String email) {
 		
-		List<QuestionSummaryResponseDto> favoritLearningList = learningRepository.findFavoritLearningByMember_Email(email);
+		List<Learning> favoritLearningList = learningRepository.findFavoritLearningByMember_Email(email);
 
 		if(favoritLearningList.isEmpty()) {
 			
@@ -210,7 +218,9 @@ public class LearningService {
 			
 		}
 		
-		return favoritLearningList;
+		return favoritLearningList.stream()
+				.map(QuestionSummaryResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 	

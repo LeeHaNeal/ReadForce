@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum Name {
+public enum NameEnum {
 
 	TEMPORAL_TOKEN,
 	ACCESS_TOKEN,

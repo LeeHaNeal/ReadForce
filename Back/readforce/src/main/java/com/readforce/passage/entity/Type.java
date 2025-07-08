@@ -5,9 +5,13 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.readforce.common.enums.TypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,8 +33,9 @@ public class Type {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long typeNo;
 	
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private String type;
+	private TypeEnum typeName;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

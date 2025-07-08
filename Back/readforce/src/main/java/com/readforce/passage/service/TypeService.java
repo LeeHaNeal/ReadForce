@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Type;
@@ -35,7 +38,7 @@ public class TypeService {
 	}
 
 	@Transactional(readOnly = true)
-	public String findWeakType(Member member, String language, String weakCategory) {
+	public TypeEnum findWeakType(Member member, LanguageEnum language, CategoryEnum weakCategory) {
 
 		Result result = resultService.getActiveMemberResultByEmail(member.getEmail());
 		
@@ -46,7 +49,7 @@ public class TypeService {
 			final double currentThreshold = threshold;
 			
 			Optional<Type> weakType = metricList.stream()
-					.filter(metric -> weakCategory.equals(metric.getCategory().getCategory()))
+					.filter(metric -> weakCategory.name().equals(metric.getCategory().getCategoryName().name()))
 					.filter(metric -> metric.getType() != null
 						&& metric.getCorrectAnswerRate() != null
 						&& metric.getCorrectAnswerRate() <= currentThreshold)
@@ -55,7 +58,7 @@ public class TypeService {
 			
 			if(weakType.isPresent()) {
 				
-				return weakType.get().getType();
+				return weakType.get().getTypeName();
 				
 			}
 			
@@ -66,9 +69,9 @@ public class TypeService {
 	}
 
 	@Transactional(readOnly = true)
-	public Type getTypeByType(String type) {
+	public Type getTypeByType(TypeEnum type) {
 
-		return typeRepository.findByType(type)
+		return typeRepository.findByTypeName(type)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.TYPE_NOT_FOUND));
 
 	}

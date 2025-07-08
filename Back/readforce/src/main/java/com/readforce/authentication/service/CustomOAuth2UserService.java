@@ -18,8 +18,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.readforce.authentication.dto.OAuth2UserDto;
 import com.readforce.authentication.dto.OAuthAttributeDto;
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Prefix;
-import com.readforce.common.enums.Role;
+import com.readforce.common.enums.PrefixEnum;
+import com.readforce.common.enums.RoleEnum;
 import com.readforce.common.exception.DuplicationException;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
@@ -68,11 +68,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			
 			log.warn(state);
 			
-			String email = redisTemplate.opsForValue().get(Prefix.SOCIAL_LINK_STATE.getContent() + state);
+			String email = redisTemplate.opsForValue().get(PrefixEnum.SOCIAL_LINK_STATE.getContent() + state);
 			
 			if(email != null) {
 				
-				redisTemplate.delete(Prefix.SOCIAL_LINK_STATE.getContent() + state);
+				redisTemplate.delete(PrefixEnum.SOCIAL_LINK_STATE.getContent() + state);
 				
 				try {
 					
@@ -132,12 +132,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	private OAuth2UserDto createOAuth2UserDto(Member member, OAuthAttributeDto oAuthAttributeDto, boolean isNewUser, String registrationId) {
 		
 		String primaryEmail;
-		Role role;
+		RoleEnum role;
 		
 		if(isNewUser) {
 			
 			primaryEmail = oAuthAttributeDto.getEmail();
-			role = Role.USER;			
+			role = RoleEnum.USER;			
 			
 		} else {
 			
@@ -146,7 +146,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			
 		}
 		
-		GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(Prefix.ROLE.getContent() + role.name());
+		GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(PrefixEnum.ROLE.getContent() + role.name());
 		
 		return new OAuth2UserDto(
 				Collections.singleton(grantedAuthority),
