@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.ai.dto.AiGeneratePassageRequestDto;
+import com.readforce.ai.dto.AiGenerateTestRequestDto;
 import com.readforce.ai.service.AiService;
 import com.readforce.common.MessageCode;
 
