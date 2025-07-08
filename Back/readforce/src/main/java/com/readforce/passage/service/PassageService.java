@@ -134,7 +134,7 @@ public class PassageService {
 	}
 
 	@Transactional
-	public void savePassage(
+	public Passage savePassage(
 			String title, 
 			String content, 
 			String author, 
@@ -156,7 +156,7 @@ public class PassageService {
 				.classification(classificationEntity)
 				.build();
 		
-		passageRepository.save(passage);
+		return passageRepository.save(passage);
 		
 	}
 
