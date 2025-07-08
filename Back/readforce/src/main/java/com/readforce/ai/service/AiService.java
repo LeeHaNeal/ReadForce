@@ -16,15 +16,14 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readforce.ai.ApiException;
+import com.readforce.ai.dto.GeminiGenerateTestPassageAndQuestionResponseDto;
 import com.readforce.ai.dto.GeminiGenerateTestPassageResponseDto;
-import com.readforce.ai.dto.GeminiGenerateTestQuestionResponseDto;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.NameEnum;
 import com.readforce.common.exception.JsonException;
-import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Classification;
@@ -195,91 +194,72 @@ public class AiService {
 	public void generateTestQuestion(LanguageEnum languageEnum) {
 		
 		Language language = languageService.getLangeageByLanguage(languageEnum);
+		Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
 		
 		List<CategoryEnum> testCategoryList = new ArrayList<CategoryEnum>();
 		testCategoryList.add(CategoryEnum.VOCABULARY);
 		testCategoryList.add(CategoryEnum.FACTUAL);
 		testCategoryList.add(CategoryEnum.INFERENTIAL);
 		
-			
-		List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(language.getLanguageName(), ClassificationEnum.TEST);
-		
-		if(unusedPassageList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-			
-		}
-		
-		PassageResponseDto randomPassageDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
-		
-		Level level = levelService.getLevelByLevel(randomPassageDto.getLevel());
-		String title = randomPassageDto.getTitle();
-		String content = randomPassageDto.getContent();
-		
 		for(CategoryEnum testCategory : testCategoryList) {
+			
+			if(testCategory == CategoryEnum.VOCABULARY) {
+				
+				List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
 
-			String prompt = "";
-			
-			switch(testCategory) {
-			
-			case VOCABULARY:
-				prompt = gernerateTestVocabularyQuestionPrompt(language, level, title, content);
-				break;
+				if(unusedPassageList.isEmpty()) {
+					
+					continue;
+					
+				}
 				
-			case FACTUAL:
-				prompt = generateTestFactualPassageAndQuestionPrompt(language, level);
-				break;
+				PassageResponseDto randomPassagDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
 				
-			case INFERENTIAL:
-				prompt = generateTestInferentialPassageAndQuestionPrompt(language, level);
-				break;
+				Passage passage = passageService.getPassageByPassageNo(randomPassagDto.getPassageNo());
 				
-			default:				
+				String prompt = gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
+
+				String requestResult = requestGenerate(prompt);
 				
-			}
-			
-			String requestResult = requestGenerate(prompt);
-			
-			GeminiGenerateTestQuestionResponseDto parsedResult = parseQuestionResponse(requestResult);
-			
-			Passage passage = passageService.getPassageByPassageNo(randomPassageDto.getPassageNo());
-			
-			List<Choice> choiceList = new ArrayList<>();
-			
-			for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
+				GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(requestResult);
 				
-				Choice choice = Choice.builder()
-						.choiceIndex(i)
-						.content(parsedResult.getChoiceList().get(i))
-						.isCorrect(i == parsedResult.getCorrectAnswerIndex())
-						.build();
+				saveMultipleChoiceQuestion(passage, parsedResult);
+
+			} else {
 				
-				choiceList.add(choice);
-				
-			}
+				for(Level level : levelService.getAllLevelList()) {
+					
+					String prompt = (testCategory == CategoryEnum.FACTUAL)
+							? generateTestFactualPassageAndQuestionPrompt(language, level)
+							: generateTestInferentialPassageAndQuestionPrompt(language, level);
+					
+					String requestResult = requestGenerate(prompt);
+					
+					GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(requestResult);
+					
+					Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
+					
+					Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification);
 							
-			MultipleChoice multipleChoice = MultipleChoice.builder()
-					.passage(passage)
-					.question(parsedResult.getQuestion())
-					.choiceList(choiceList)
-					.build();
-			
-			multipleChoiceService.saveMultipleChoice(multipleChoice);
-			
+					saveMultipleChoiceQuestion(newPassage, parsedResult);
+
+				}
+
+			}
+
 		}
-
-
+		
 	}
 	
-	private GeminiGenerateTestQuestionResponseDto parseQuestionResponse(String requestResult) {
+	private GeminiGenerateTestPassageAndQuestionResponseDto parsePassageAndQuestionResponse(String requestResult) {
 
 		try {
 			
 			String jsonContent = extractJsonFromResponse(requestResult);
 			
-			return objectMapper.readValue(jsonContent, GeminiGenerateTestQuestionResponseDto.class);
+			return objectMapper.readValue(jsonContent, GeminiGenerateTestPassageAndQuestionResponseDto.class);
 			
-		} catch (Exception exception) {
+		} catch(Exception exception) {
 			
 			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
 			
@@ -287,6 +267,32 @@ public class AiService {
 		
 	}
 
+
+	private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateTestPassageAndQuestionResponseDto parsedResult) {
+		
+		List<Choice> choiceList = new ArrayList<>();
+		
+		for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
+			
+			Choice choice = Choice.builder()
+					.choiceIndex(i)
+					.content(parsedResult.getChoiceList().get(i))
+					.isCorrect(i == parsedResult.getCorrectAnswerIndex())
+					.build();
+			
+			choiceList.add(choice);
+			
+		}
+						
+		MultipleChoice multipleChoice = MultipleChoice.builder()
+				.passage(passage)
+				.question(parsedResult.getQuestion())
+				.choiceList(choiceList)
+				.build();
+		
+		multipleChoiceService.saveMultipleChoice(multipleChoice);
+		
+	}
 
 	private String gernerateTestVocabularyQuestionPrompt(Language language, Level level, String title, String content) {
 		
@@ -307,7 +313,7 @@ public class AiService {
 						반드시 아래의 JSON 형식으로만 응답해 주세요:
 						{
 						  "question": "생성된 질문",
-						  "options": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
+						  "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
 						  "correctAnswerIndex": 정답_선택지의_인덱스 (0-3)
 						}
 				""", level.getLevelNumber(), level.getVocabularyLevel(), title, title, content);
@@ -337,7 +343,7 @@ public class AiService {
 		                  "title": "여기에 지문 제목을 생성해주세요.",
 		                  "content": "여기에 지문 내용을 생성해주세요.",
 		                  "question": "생성된 질문",
-		                  "options": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
+		                  "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
 		                  "correctAnswerIndex": 정답_선택지의_인덱스 (0-3)
 		                }
 				""", level.getLevelNumber(), level.getVocabularyLevel());
@@ -369,7 +375,7 @@ public class AiService {
 			                  "title": "여기에 지문 제목을 생성해주세요.",
 			                  "content": "여기에 지문 내용을 생성해주세요.",
 			                  "question": "생성된 질문",
-			                  "options": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
+			                  "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
 			                  "correctAnswerIndex": 정답_선택지의_인덱스 (0-3)
 			                }
 			    """, level.getLevelNumber(), level.getVocabularyLevel());
