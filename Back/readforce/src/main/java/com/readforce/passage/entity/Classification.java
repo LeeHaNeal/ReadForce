@@ -28,16 +28,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Classification {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long classificationNo;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private com.readforce.common.enums.Classification classification;
-	
-	@CreatedDate
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long classificationNo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "classification_name", nullable = false)  // 🔑 컬럼명 매핑
+    private com.readforce.common.enums.Classification classification;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
+

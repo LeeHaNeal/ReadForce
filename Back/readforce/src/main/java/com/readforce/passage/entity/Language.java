@@ -25,15 +25,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Language {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long languageNo;
-	
-	@Column(nullable = false)
-	private String language;
-	
-	@CreatedDate
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;	
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "language_no")
+    private Long languageNo;
+
+    @Column(name = "language_name", nullable = false)
+    private String language;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }
+

@@ -64,10 +64,9 @@ public class CategoryService {
 
 	@Transactional(readOnly = true)
 	public Category getCategoryByCategory(String category) {
-		
-		return categoryRepository.findByCategory(category)
-				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.CATEGORY_NOT_FOUND));
-		
+	    return categoryRepository.findByCategory(category)
+	            .orElseThrow(() -> new ResourceNotFoundException(MessageCode.CATEGORY_NOT_FOUND));
 	}
+
 	
 }

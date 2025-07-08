@@ -29,8 +29,9 @@ public class Type {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long typeNo;
 	
-	@Column(nullable = false)
+	@Column(name = "type_name", nullable = false)
 	private String type;
+
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
