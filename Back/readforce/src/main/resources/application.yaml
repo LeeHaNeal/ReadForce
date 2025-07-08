@@ -87,7 +87,7 @@ file:
       max-size: 5242880
       max-request-size: 5MB
       allowed-mime-types: image/jpeg,image/png,image/gif
-      default-image-path: ./upload/image/profile/fead8450-8969-443a-b071-0207b306cf06.png
+      default-image-path: fead8450-8969-443a-b071-0207b306cf06
 custom:
   fronted:
     password-reset-link-url: http://localhost:3000/resetpassword

@@ -122,56 +122,7 @@ public class AuthenticationController {
 	
 	@PostMapping("/reissue-refresh-token")
 	public ResponseEntity<Map<String, String>> reissueRefreshToken(
-<<<<<<< HEAD
-	        @RequestParam("refreshToken")
-	        @NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
-	        String refreshToken
-	) {
-	    log.info("[Reissue] 요청받은 RefreshToken: {}", refreshToken);
-
-	    String username;
-	    try {
-	        username = jwtUtil.extractUsername(refreshToken);
-	        log.info("[Reissue] 추출된 username: {}", username);
-	    } catch (Exception e) {
-	        log.error("[Reissue] RefreshToken에서 username 추출 실패", e);
-	        throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
-	    }
-
-	    String storedRefreshToken = authenticationService.getRefreshToken(username);
-	    log.info("[Reissue] Redis에 저장된 RefreshToken: {}", storedRefreshToken);
-
-	    if (storedRefreshToken == null) {
-	        log.warn("[Reissue] 저장된 RefreshToken 없음 → 사용자: {}", username);
-	        authenticationService.deleteRefreshToken(username); // precaution
-	        throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
-	    }
-
-	    if (!storedRefreshToken.equals(refreshToken)) {
-	        log.warn("[Reissue] RefreshToken 불일치 → 사용자: {}", username);
-	        throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
-	    }
-
-	    if (jwtUtil.isExpiredToken(storedRefreshToken)) {
-	        log.warn("[Reissue] RefreshToken 만료됨 → 사용자: {}", username);
-	        throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
-	    }
-
-	    // 토큰 재발급
-	    final UserDetails userDetails = authenticationService.loadUserByUsername(username);
-	    final String newAccessToken = jwtUtil.generateAccessToken(userDetails);
-	    final String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
-
-	    authenticationService.storeRefreshToken(username, newRefreshToken);
-
-	    log.info("[Reissue] 새 AccessToken 및 RefreshToken 발급 성공 → 사용자: {}", username);
-
-	    return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-	            Name.ACCESS_TOKEN.name(), newAccessToken,
-	            Name.REFRESH_TOKEN.name(), newRefreshToken,
-	            MessageCode.MESSAGE_CODE, MessageCode.REISSUE_ACCESS_TOKEN_SUCCESS
-	    ));
-=======
+	        
     		@RequestParam("refreshToken")
     		@NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
     		String refreshToken
@@ -209,8 +160,7 @@ public class AuthenticationController {
 				Name.REFRESH_TOKEN.name(), newRefreshToken,
 				MessageCode.MESSAGE_CODE, MessageCode.REISSUE_ACCESS_TOKEN_SUCCESS				
 		));
-		
->>>>>>> develop
+
 	}
 
 	
