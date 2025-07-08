@@ -43,7 +43,7 @@ public class RateLimitingService {
 	
 	public boolean isIpRequestAllowed(String ipAddress) {
 		
-		String key = PrefixEnum.IP_RATE_LIMIT + ipAddress;
+		String key = PrefixEnum.IP_RATE_LIMIT.getContent() + ipAddress;
 		
 		return isRequestAllowed(key, ipMaxRequest, Duration.ofMinutes(ipPerMinute));
 		
@@ -51,7 +51,7 @@ public class RateLimitingService {
 	
 	public boolean isEmailRequestAllowed(String email) {
 		
-		String key = PrefixEnum.EMAIL_RATE_LIMIT + email;
+		String key = PrefixEnum.EMAIL_RATE_LIMIT.getContent() + email;
 		
 		return isRequestAllowed(key, emailMaxRequest, Duration.ofMinutes(emailPerMinute));
 		

@@ -134,7 +134,7 @@ public class PassageService {
 	}
 
 	@Transactional
-	public void savePassage(
+	public Passage savePassage(
 			String title, 
 			String content, 
 			String author, 
@@ -156,7 +156,22 @@ public class PassageService {
 				.classification(classificationEntity)
 				.build();
 		
-		passageRepository.save(passage);
+		return passageRepository.save(passage);
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<Passage> getNoQuestionPassage() {
+
+		List<Passage> noQuestionPassageList = passageRepository.findNoQuestionPassageList();
+		
+		if(noQuestionPassageList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.NO_QUESTION_PASSAGE_NOT_FOUND);
+			
+		}
+		
+		return noQuestionPassageList;
 		
 	}
 

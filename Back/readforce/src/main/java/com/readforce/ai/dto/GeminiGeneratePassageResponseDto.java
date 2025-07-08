@@ -1,7 +1,5 @@
 package com.readforce.ai.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,12 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GeminiGenerateTestQuestionResponseDto {
+public class GeminiGeneratePassageResponseDto {
 
-	private String question;
+	private String title;
 	
-	private List<String> choiceList;
-	
-	private Integer correctAnswerIndex;
+	private String content;
 	
 }
