@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readforce.ai.ApiException;
 import com.readforce.ai.dto.GeminiGenerateTestPassageAndQuestionResponseDto;
@@ -95,24 +96,43 @@ public class AiService {
 	}
 	
 	
+//	private GeminiGenerateTestPassageResponseDto parsingResponse(String requestResult) {
+//
+//		try {
+//			
+//			String jsonContent = extractJsonFromResponse(requestResult);
+//	        System.out.println("🔍 파싱 전 JSON 내용: " + jsonContent);
+//
+//			
+//			GeminiGenerateTestPassageResponseDto parsedResponse = objectMapper.readValue(jsonContent, GeminiGenerateTestPassageResponseDto.class); 
+//			
+//			return parsedResponse;
+//			
+//		} catch(Exception exception) {
+//	        System.err.println("❌ JSON 파싱 오류 발생: " + exception.getMessage());
+//	        System.err.println("⚠️ 문제의 원본 응답 내용: " + requestResult);
+//			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
+//			
+//		}
+//
+//	}
 	private GeminiGenerateTestPassageResponseDto parsingResponse(String requestResult) {
+	    try {
+	        String jsonContent = extractJsonFromResponse(requestResult);
 
-		try {
-			
-			String jsonContent = extractJsonFromResponse(requestResult);
-			
-			GeminiGenerateTestPassageResponseDto parsedResponse = objectMapper.readValue(jsonContent, GeminiGenerateTestPassageResponseDto.class); 
-			
-			return parsedResponse;
-			
-		} catch(Exception exception) {
-			
-			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-			
-		}
+	        // 🔥 JSON 문자열이 한번 더 이스케이프된 경우 unescape 처리
+	        jsonContent = objectMapper.readValue(jsonContent, String.class); // unescape
 
+	        System.out.println("✅ 언이스케이프 후 파싱 대상 JSON: " + jsonContent);
+
+	        return objectMapper.readValue(jsonContent, GeminiGenerateTestPassageResponseDto.class);
+
+	    } catch (Exception exception) {
+	        System.err.println("❌ JSON 파싱 오류: " + exception.getMessage());
+	        System.err.println("⚠️ 문제 응답: " + requestResult);
+	        throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
+	    }
 	}
-
 
 	private String extractJsonFromResponse(String requestResult) {
 
@@ -128,9 +148,6 @@ public class AiService {
 		return "{}";
 	}
 	
-	
-
-
 	private String requestGenerate(String prompt) {
 
 		HttpHeaders httpHeaders = new HttpHeaders();

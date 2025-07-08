@@ -6,6 +6,8 @@ import Flex from 'react-calendar/dist/Flex.js';
 const AdminPage = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
+    const [loadingAI, setLoadingAI] = useState(false);
+    const [aiMessage, setAiMessage] = useState('');
 
     useEffect(() => {
         const nickname = localStorage.getItem("nickname");
@@ -74,13 +76,45 @@ const AdminPage = () => {
         );
     };
 
+    const handleGenerateAITest = async () => {
+        setLoadingAI(true);
+        try {
+            const res = await fetchWithAuth("/ai/generate-test", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: "KOREAN", // ENGLISH 등도 가능
+                }),
+            });
+
+            if (!res.ok) throw new Error("AI 문제 생성 실패");
+
+            const data = await res.json();
+            alert("✅ " + data.message);
+        } catch (err) {
+            console.error(err);
+            alert("❌ 문제 생성 중 오류가 발생했습니다.");
+        } finally {
+            setLoadingAI(false);
+        }
+    };
+
     return (
         <div style={{ padding: "24px" }}>
             <span style={ADMIN_BUTTONS_LIST}>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/adminnews")}>뉴스 관리</button>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminliterature')}>문학 관리</button>
             </span>
-            <h2>회원 관리</h2>
+            <div style={ADMIN_TITLE}>
+                <div>
+                    <h2>회원 관리</h2>
+                </div>
+                <div>
+                    <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateAITest} disabled={loadingAI}>
+                        {loadingAI ? '생성 중...' : 'ai 테스트 문제 생성'}
+                    </button>
+                </div>
+            </div>
             <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
                 <thead>
                     <tr>
@@ -176,6 +210,23 @@ const thStyle = {
 const tdStyle = {
     border: "1px solid #ddd",
     padding: "8px",
+};
+
+const ADMIN_TITLE = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "16px"
+};
+
+const ADMIN_AI_BUTTONS = {
+    marginBottom: "16px",
+    padding: "8px 16px",
+    backgroundColor: "#007BFF",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer"
 };
 
 export default AdminPage;
