@@ -114,5 +114,6 @@ public class PassageController {
 		return ResponseEntity.status(HttpStatus.OK).body(passageList);	
 		
 	}
+
 	
 }
