@@ -23,6 +23,7 @@ import com.readforce.passage.entity.Classification;
 import com.readforce.passage.entity.Language;
 import com.readforce.passage.entity.Level;
 import com.readforce.passage.entity.Passage;
+import com.readforce.passage.entity.Type;
 import com.readforce.passage.repository.PassageRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -93,11 +94,17 @@ public class PassageService {
 	@Transactional(readOnly = true)
 	public Passage getTestPassage(LanguageEnum language, CategoryEnum category, Integer level) {
 		
-		long count = passageRepository.countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumber(language, category, level);
+		long count = passageRepository.countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumberAndClassification_ClassificationName(language, category, level, ClassificationEnum.TEST);
+		
+		if(count == 0) {
+			
+			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+			
+		}
 		
 		int randomIndex = (int)(Math.random() * count);
 		
-		Page<Passage> passagePage = passageRepository.findAll(PageRequest.of(randomIndex, 1));
+		Page<Passage> passagePage = passageRepository.findByLanguageAndCategoryAndLevelAndClassification(language, category, level, ClassificationEnum.TEST, PageRequest.of(randomIndex, 1));
 		
 		if(passagePage.hasContent()) {
 			
@@ -142,22 +149,43 @@ public class PassageService {
 			Category categoryEntity, 
 			Level level, 
 			Language language, 
-			Classification classificationEntity
+			Classification classificationEntity,
+			Type type
 	) {
 
-		Passage passage = Passage.builder()
-				.title(title)
-				.content(content)
-				.author(author)
-				.publicationDate(publicationDate)
-				.category(categoryEntity)
-				.level(level)
-				.language(language)
-				.classification(classificationEntity)
-				.build();
-		
-		return passageRepository.save(passage);
-		
+		if(type != null) {
+			
+			Passage passage = Passage.builder()
+					.title(title)
+					.content(content)
+					.author(author)
+					.publicationDate(publicationDate)
+					.category(categoryEntity)
+					.level(level)
+					.language(language)
+					.type(type)
+					.classification(classificationEntity)
+					.build();
+			
+			return passageRepository.save(passage);
+			
+		} else {
+			
+			Passage passage = Passage.builder()
+					.title(title)
+					.content(content)
+					.author(author)
+					.publicationDate(publicationDate)
+					.category(categoryEntity)
+					.level(level)
+					.language(language)
+					.classification(classificationEntity)
+					.build();
+			
+			return passageRepository.save(passage);			
+			
+		}
+
 	}
 
 	@Transactional(readOnly = true)
