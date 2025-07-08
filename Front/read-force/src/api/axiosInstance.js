@@ -82,7 +82,7 @@ api.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && error.response?.status === 400 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem('refresh_token');
 
@@ -109,7 +109,7 @@ api.interceptors.response.use(
       try {
         const res = await axios.post(
           '/authentication/reissue-refresh-token',
-          `refresh_token=${encodeURIComponent(refreshToken)}`,
+          `refreshToken=${encodeURIComponent(refreshToken)}`,
           {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -119,6 +119,8 @@ api.interceptors.response.use(
 
         const { ACCESS_TOKEN, REFRESH_TOKEN } = res.data;
 
+        console.log('✅ 새로 발급된 ACCESS_TOKEN:', ACCESS_TOKEN);
+        console.log('✅ 새로 발급된 REFRESH_TOKEN:', REFRESH_TOKEN);
         localStorage.setItem('token', ACCESS_TOKEN);
         localStorage.setItem('refresh_token', REFRESH_TOKEN);
 

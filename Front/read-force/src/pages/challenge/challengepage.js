@@ -14,7 +14,20 @@ const ChallengePage = () => {
 
   const handleRankingClick = () => navigate('/ranking');
   const handleStartChallenge = () => setShowModal(true);
-  const handleSolveClick = (quizNo) => navigate(`/question/${quizNo}`);
+
+  const handleSolveClick = (quizNo, item) => {
+    navigate(`/question/${quizNo}`, {
+      state: {
+        article: {
+          news_no: quizNo,
+          title: item.title ?? '',
+          summary: item.summary ?? '',
+          content: item.content ?? '',
+          language: item.language ?? '한국어',
+        }
+      }
+    });
+  };
 
   useEffect(() => {
     const fetchWrongQuestions = async () => {
@@ -32,7 +45,7 @@ const ChallengePage = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
+        const res = await api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`);
         setTop5Data(res.data.slice(0, 5));
       } catch (err) {
         console.error('TOP 5 뉴스 랭킹 불러오기 실패:', err);
@@ -103,11 +116,12 @@ const ChallengePage = () => {
 
         {wrongQuestions.map((item, index) => {
           const correctRate = 100 - item.percentage;
+          const quizNo = item.news_quiz_no ?? item.literature_quiz_no;
           return (
-            <div className="ChallengePage-wrong-item" key={item.news_quiz_no ?? item.literature_quiz_no ?? `wrong-${index}`}>
+            <div className="ChallengePage-wrong-item" key={quizNo ?? `wrong-${index}`}>
               <p>{item.question_text}</p>
               <span>{correctRate}%</span>
-              <button onClick={() => handleSolveClick(item.news_quiz_no ?? item.literature_quiz_no)}>문제풀기</button>
+              <button onClick={() => handleSolveClick(quizNo, item)}>문제풀기</button>
             </div>
           );
         })}

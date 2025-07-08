@@ -3,11 +3,11 @@ import api from '../../api/axiosInstance';
 import './RankingPage.css';
 
 const categories = [
-  { label: '소설', classification: 'LITERATURE', type: 'NOVEL', language: '', scoreKey: 'novel' },
-  { label: '동화', classification: 'LITERATURE', type: 'FAIRYTALE', language: '', scoreKey: 'fairytale' },
-  { label: '뉴스(영어)', classification: 'NEWS', type: '', language: 'ENGLISH', scoreKey: 'english_news' },
-  { label: '뉴스(일본어)', classification: 'NEWS', type: '', language: 'JAPANESE', scoreKey: 'japanese_news' },
-  { label: '뉴스(한국어)', classification: 'NEWS', type: '', language: 'KOREAN', scoreKey: 'korean_news' },
+  { label: '소설', category: 'NOVEL', language: 'KOREAN', scoreKey: 'novel' },
+  { label: '동화', category: 'FAIRY_TALE', language: 'KOREAN', scoreKey: 'fairytale' },
+  { label: '뉴스(영어)', category: 'NEWS', language: 'ENGLISH', scoreKey: 'english_news' },
+  { label: '뉴스(일본어)', category: 'NEWS', language: 'JAPANESE', scoreKey: 'japanese_news' },
+  { label: '뉴스(한국어)', category: 'NEWS', language: 'KOREAN', scoreKey: 'korean_news' },
 ];
 
 const RankingPage = () => {
@@ -21,24 +21,16 @@ const RankingPage = () => {
       setIsLoading(true);
       setError(null);
 
-      const { classification, type, language } = selectedCategory;
-      let url = '';
-      let params = {};
-
-      if (classification === 'LITERATURE') {
-        url = '/ranking/get-literature-ranking';
-        params = { type };
-      } else if (classification === 'NEWS') {
-        url = '/ranking/get-news-ranking';
-        params = { language };
-      }
+      const { category, language } = selectedCategory;
 
       try {
-        const res = await api.get(url, { params });
-        setRankingData(res.data);
+        const response = await api.get('/ranking/get-ranking-list', {
+          params: { category, language },
+        });
+        setRankingData(response.data);
       } catch (err) {
-        console.error('❌ 랭킹 API 에러:', err);
-        setError('랭킹 정보를 불러오지 못했습니다. 다시 시도해주세요.');
+        console.error('❌ 랭킹 API 오류:', err);
+        setError('랭킹 정보를 불러오지 못했습니다.');
         setRankingData([]);
       } finally {
         setIsLoading(false);
@@ -48,7 +40,7 @@ const RankingPage = () => {
     fetchRanking();
   }, [selectedCategory]);
 
-  const renderScore = (user) => user[selectedCategory.scoreKey] ?? 0;
+  const renderScore = (user) => user[selectedCategory.scoreKey] ?? user.score ?? 0;
 
   return (
     <div className="RankingPage-container">
@@ -58,8 +50,8 @@ const RankingPage = () => {
         {categories.map((cat) => (
           <button
             key={cat.label}
-            onClick={() => setSelectedCategory(cat)}
             className={selectedCategory.label === cat.label ? 'active' : ''}
+            onClick={() => setSelectedCategory(cat)}
           >
             {cat.label}
           </button>
@@ -75,7 +67,7 @@ const RankingPage = () => {
       ) : (
         <div className="RankingPage-list">
           {rankingData.map((user, idx) => (
-            <div key={idx} className="RankingPage-item">
+            <div key={user.email} className="RankingPage-item">
               <span className="RankingPage-rank">{idx + 1}위</span>
               <span className="RankingPage-nickname">{user.nickname}</span>
               <span className="RankingPage-score">{renderScore(user)}점</span>
