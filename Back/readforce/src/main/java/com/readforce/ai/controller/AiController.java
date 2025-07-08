@@ -27,8 +27,8 @@ public class AiController {
 
 	private final AiService aiService;
 	
-	@PostMapping("/generate-test")
-	public ResponseEntity<Map<String, String>> generateTest(
+	@PostMapping("/generate-test-passage")
+	public ResponseEntity<Map<String, String>> generateTestPassage(
 			@RequestParam("language")
 			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 			LanguageEnum language
@@ -36,13 +36,27 @@ public class AiController {
 		
 		aiService.generateTestVocabulary(language);
 		
-		aiService.generateTestQuestion(language);
-		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_SUCCESS
+				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_PASSAGE_SUCCESS
 		));
 		
 	}
+	
+	@PostMapping("/generate-test-question")
+	public ResponseEntity<Map<String, String>> generateTestQuestion(
+			@RequestParam("language")
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language
+	){
+		
+		aiService.generateTestQuestion(language);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_QUESTION_SUCCESS
+		));
+		
+	}
+	
 	
 	@PostMapping("/generate-passage")
 	public ResponseEntity<Map<String, String>> generatePassage(
