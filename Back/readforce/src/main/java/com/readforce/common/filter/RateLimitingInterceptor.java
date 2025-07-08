@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Header;
+import com.readforce.common.enums.HeaderEnum;
 import com.readforce.common.exception.RateLimitExceededException;
 import com.readforce.common.service.RateLimitingService;
 
@@ -52,7 +52,7 @@ public class RateLimitingInterceptor implements HandlerInterceptor {
 	
 	private String getClientIp(HttpServletRequest httpServletRequest) {
 		
-		String xForwardedForHeader = httpServletRequest.getHeader(Header.X_FORWARDED_FOR.getContent());
+		String xForwardedForHeader = httpServletRequest.getHeader(HeaderEnum.X_FORWARDED_FOR.getContent());
 		
 		if(xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {
 			

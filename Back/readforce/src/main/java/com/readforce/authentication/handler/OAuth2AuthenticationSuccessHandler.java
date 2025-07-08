@@ -3,6 +3,7 @@ package com.readforce.authentication.handler;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,12 +20,14 @@ import com.readforce.authentication.dto.OAuth2UserDto;
 import com.readforce.authentication.service.AuthenticationService;
 import com.readforce.authentication.util.JwtUtil;
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Name;
-import com.readforce.common.enums.Prefix;
+import com.readforce.common.enums.NameEnum;
+import com.readforce.common.enums.PrefixEnum;
 import com.readforce.common.exception.JsonException;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
+import com.readforce.result.entity.Result;
+import com.readforce.result.service.ResultService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +43,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 	private final MemberService memberService;
 	private final AttendanceService attendanceService;
 	private final StringRedisTemplate redisTemplate;
+	private final ResultService resultService;
 	
 	@Value("${custom.fronted.social-login-success.exist-member-url}")
 	private String socialLoginSuccessExistMemberUrl;
@@ -59,7 +63,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 		boolean isNewUser = oAuth2UserDto.isNewUser();
 		String email = oAuth2UserDto.getEmail();
 		
-		String existingRefreshToken = Prefix.REFRESH.getContent() + email;
+		String existingRefreshToken = PrefixEnum.REFRESH.getContent() + email;
 		
 		if(redisTemplate.hasKey(existingRefreshToken)) {
 			
@@ -84,7 +88,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 				String socialInfoJson = new ObjectMapper().writeValueAsString(socialInfo);
 				
 				redisTemplate.opsForValue().set(
-						Prefix.SOCIAL_SIGN_UP.getContent() + temporalToken,
+						PrefixEnum.SOCIAL_SIGN_UP.getContent() + temporalToken,
 						socialInfoJson,
 						Duration.ofMinutes(10)
 				);
@@ -96,7 +100,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			}
 			
 			targetUrl = UriComponentsBuilder.fromUriString(socialLoginSuccessNewMemberUrl)
-					.queryParam(Name.TEMPORAL_TOKEN.toString(), temporalToken)
+					.queryParam(NameEnum.TEMPORAL_TOKEN.toString(), temporalToken)
 					.build()
 					.toUriString();
 						
@@ -108,17 +112,27 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			
 			Member member = memberService.getActiveMemberByEmail(email);
 			
+			Optional<Result> memberResult = resultService.getActiveMemberResultByEmailWithOptional(email);
+			
+			if(memberResult.isEmpty()) {
+				
+				Result newResult = resultService.create(member);
+				
+				memberService.createResultMetricsForMember(member, newResult);
+				
+			}
+			
 			String temporalToken = UUID.randomUUID().toString();
 			
 			Map<String, String> tokenMap = Map.of(
-					Name.ACCESS_TOKEN.toString(), accessToken,
-					Name.REFESH_TOKEN.toString(), refreshToken,
-					Name.NICKNAME.toString(), member.getNickname(),
-					Name.SOCIAL_PROVIDER.toString(), member.getSocialProvider()
+					NameEnum.ACCESS_TOKEN.toString(), accessToken,
+					NameEnum.REFRESH_TOKEN.toString(), refreshToken,
+					NameEnum.NICKNAME.toString(), member.getNickname(),
+					NameEnum.SOCIAL_PROVIDER.toString(), member.getSocialProvider()
 			);
 			
 			redisTemplate.opsForValue().set(
-					Prefix.TEMPORAL + temporalToken,
+					PrefixEnum.TEMPORAL + temporalToken,
 					new ObjectMapper().writeValueAsString(tokenMap),
 					Duration.ofMinutes(3)
 			);
@@ -128,7 +142,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			attendanceService.recordAttendance(email);
 			
 			targetUrl = UriComponentsBuilder.fromUriString(socialLoginSuccessExistMemberUrl)
-					.queryParam(Name.TEMPORAL_TOKEN.toString(), temporalToken)
+					.queryParam(NameEnum.TEMPORAL_TOKEN.toString(), temporalToken)
 					.build()
 					.toUriString();
 			

@@ -1,7 +1,8 @@
 package com.readforce.common.enums;
 
-public enum Role {
+public enum OrderByEnum {
 
-	USER, ADMIN
+	ASC,
+	DESC
 	
 }

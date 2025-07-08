@@ -1,13 +1,13 @@
 package com.readforce.common.enums;
 
-public enum Type {
+public enum TypeEnum {
 	
 	POLITICS,
 	ECONOMY,
 	SOCIETY,
 	LIFE_AND_CULTURE,
 	IT_AND_SCIENCE,
-	WORD,
+	WORLD,
 	SPORTS,
 	ENTERTAINMENT,
 	MYSTERY,

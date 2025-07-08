@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,9 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readforce.authentication.dto.OAuthAttributeDto;
 import com.readforce.authentication.exception.AuthenticationException;
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.FileCategory;
-import com.readforce.common.enums.Prefix;
-import com.readforce.common.enums.Status;
+import com.readforce.common.enums.FileCategoryEnum;
+import com.readforce.common.enums.PrefixEnum;
+import com.readforce.common.enums.StatusEnum;
 import com.readforce.common.exception.DuplicationException;
 import com.readforce.common.exception.JsonException;
 import com.readforce.common.exception.ResourceNotFoundException;
@@ -72,11 +71,8 @@ public class MemberService {
 	private final TypeService typeService;
 	private final LevelService levelService;
 	
-	@Value("${file.image.profile.default-image-path}")
-	private String defaultProfileImagePath;
-	
 	@Transactional(readOnly = true)
-	public MemberKeyInformationDto getMemberKeyInformationByEmailAndStatus(String email, Status status) {
+	public MemberKeyInformationDto getMemberKeyInformationByEmailAndStatus(String email, StatusEnum status) {
 		
 		Member member = memberRepository.findByEmailAndStatus(email, status)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
@@ -118,7 +114,7 @@ public class MemberService {
 				
 			});
 			
-		Member member = memberRepository.findByEmailAndStatus(email, Status.ACTIVE)
+		Member member = memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 		
 		member.changeSocialInfo(socialProvider, socialId);
@@ -128,14 +124,14 @@ public class MemberService {
 	@Transactional
 	public Optional<Member> getActiveMemberWithOptional(String email) {
 
-		return memberRepository.findByEmailAndStatus(email, Status.ACTIVE);
+		return memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE);
 				
 	}
 	
 	@Transactional
 	public Member getActiveMemberByEmail(String email) {
 
-		return memberRepository.findByEmailAndStatus(email, Status.ACTIVE)
+		return memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 				
 	}
@@ -157,7 +153,7 @@ public class MemberService {
 	@Transactional
 	public MemberSummaryDto getActiveMemberByEmailWithMemberSummaryDto(String email) {
 
-		Member member = memberRepository.findByEmailAndStatus(email, Status.ACTIVE)
+		Member member = memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 		
 		return MemberSummaryDto.builder()
@@ -172,7 +168,7 @@ public class MemberService {
 	@Transactional
 	public MemberSocialProviderDto getActiveMemberByEmailWithMemberSoicalProviderDto(String email) {
 
-		Member member = memberRepository.findByEmailAndStatus(email, Status.ACTIVE)
+		Member member = memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 
 		return MemberSocialProviderDto.builder()
@@ -207,7 +203,7 @@ public class MemberService {
 	public void signUp(MemberSignUpDto memberSignUpDto) {
 		
 		String checkEmailVerification = 
-				redisTemplate.opsForValue().get(Prefix.EMAIL_VERIFICATION.getContent() + memberSignUpDto.getEmail());
+				redisTemplate.opsForValue().get(PrefixEnum.EMAIL_VERIFICATION.getContent() + memberSignUpDto.getEmail());
 		
 		if(checkEmailVerification == null || !checkEmailVerification.equals(MessageCode.EMAIL_VERIFICATION_SUCCESS)) {
 			
@@ -232,11 +228,11 @@ public class MemberService {
 		
 		createResultMetricsForMember(member, result);
 		
-		redisTemplate.delete(Prefix.EMAIL_VERIFICATION + memberSignUpDto.getEmail());
+		redisTemplate.delete(PrefixEnum.EMAIL_VERIFICATION + memberSignUpDto.getEmail());
 		
 	}
 
-	private void createResultMetricsForMember(Member member, Result result) {
+	public void createResultMetricsForMember(Member member, Result result) {
 		
 		List<Language> languageList = languageService.getAllLanguageList();
 		List<Category> categoryList = categoryService.getAllCategoryList();
@@ -293,7 +289,7 @@ public class MemberService {
 		
 		member.deactivate();
 		
-		redisTemplate.delete(Prefix.REFRESH.getContent() + email);		
+		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);		
 		
 	}
 	
@@ -304,7 +300,7 @@ public class MemberService {
 		log.info("탈퇴 후 30일이 지난 회원 정보를 삭제합니다.");
 		LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 		
-		List<Member> memberToDeleteList = memberRepository.findAllByStatusAndWithdrawAtBefore(Status.PENDING_DELETION, thirtyDaysAgo);
+		List<Member> memberToDeleteList = memberRepository.findAllByStatusAndWithdrawAtBefore(StatusEnum.PENDING_DELETION, thirtyDaysAgo);
 		
 		if(memberToDeleteList.isEmpty()) {
 			
@@ -353,7 +349,7 @@ public class MemberService {
 	@Transactional
 	public void passwordResetFromLink(MemberPasswordResetFromLinkDto memberPasswordResetFromLinkDto) {
 
-		String email = redisTemplate.opsForValue().get(Prefix.PASSWORD_RESET.getContent() + memberPasswordResetFromLinkDto.getTemporalToken());
+		String email = redisTemplate.opsForValue().get(PrefixEnum.PASSWORD_RESET.getContent() + memberPasswordResetFromLinkDto.getTemporalToken());
 		
 		if(email == null) {
 			
@@ -365,7 +361,7 @@ public class MemberService {
 		
 		member.resetPassword(passwordEncoder.encode(memberPasswordResetFromLinkDto.getNewPassword()));
 		
-		redisTemplate.delete(Prefix.PASSWORD_RESET.getContent() + memberPasswordResetFromLinkDto.getTemporalToken());
+		redisTemplate.delete(PrefixEnum.PASSWORD_RESET.getContent() + memberPasswordResetFromLinkDto.getTemporalToken());
 		
 		emailService.sendPasswordChangeNotification(email);
 		
@@ -389,7 +385,7 @@ public class MemberService {
 	@Transactional
 	public void socialSignUp(MemberSocialSignUpDto memberSocialSignUpDto) {
 
-		String socialInfoJson = redisTemplate.opsForValue().get(Prefix.SOCIAL_SIGN_UP.getContent() + memberSocialSignUpDto.getTemporalToken());
+		String socialInfoJson = redisTemplate.opsForValue().get(PrefixEnum.SOCIAL_SIGN_UP.getContent() + memberSocialSignUpDto.getTemporalToken());
 		
 		if(socialInfoJson == null) {
 			
@@ -425,7 +421,11 @@ public class MemberService {
 		
 		memberRepository.save(newMember);
 		
-		redisTemplate.delete(Prefix.SOCIAL_SIGN_UP.getContent() + memberSocialSignUpDto.getTemporalToken());		
+		Result result = resultService.create(newMember);
+		
+		createResultMetricsForMember(newMember, result);
+		
+		redisTemplate.delete(PrefixEnum.SOCIAL_SIGN_UP.getContent() + memberSocialSignUpDto.getTemporalToken());		
 		
 	}
 
@@ -436,13 +436,13 @@ public class MemberService {
 		
 		String oldProfileImagePath = member.getProfileImagePath();
 		
-		String newProfileImagePath = fileService.storeFile(profileImageFile, FileCategory.PROFILE_IMAGE);
+		String newProfileImagePath = fileService.storeFile(profileImageFile, FileCategoryEnum.PROFILE_IMAGE);
 		
 		member.modifyInformation(null, null, newProfileImagePath);
 		
 		if(oldProfileImagePath != null && !oldProfileImagePath.isEmpty()) {
 			
-			fileService.deleteFile(oldProfileImagePath, FileCategory.PROFILE_IMAGE);
+			fileService.deleteFile(oldProfileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 			
 		}
 		
@@ -463,7 +463,7 @@ public class MemberService {
 		
 		member.modifyInformation(null, null, null);
 		
-		fileService.deleteFile(profileImagePath, FileCategory.PROFILE_IMAGE);
+		fileService.deleteFile(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 		
 	}
 
@@ -473,16 +473,20 @@ public class MemberService {
 		Member member = getActiveMemberByEmail(email);
 		String profileImagePath = member.getProfileImagePath();
 		
-		String finalPath = (profileImagePath == null || profileImagePath.isEmpty()) ? defaultProfileImagePath : profileImagePath;
+		if(profileImagePath == null) {
+			
+			throw new ResourceNotFoundException(MessageCode.PROFILE_IMAGE_NOT_FOUND);
+			
+		}
 
-		return fileService.loadFileAsResource(finalPath, FileCategory.PROFILE_IMAGE);
+		return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 
 	}
 
 	@Transactional
 	public void emailExistCheck(String email) {
 
-		memberRepository.findByEmailAndStatus(email, Status.ACTIVE)
+		memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 		.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 		
 	}

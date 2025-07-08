@@ -10,9 +10,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Category;
-import com.readforce.common.enums.Language;
-import com.readforce.common.enums.Prefix;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.PrefixEnum;
 import com.readforce.common.exception.RateLimitExceededException;
 
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class RateLimitingService {
 	
 	public boolean isIpRequestAllowed(String ipAddress) {
 		
-		String key = Prefix.IP_RATE_LIMIT + ipAddress;
+		String key = PrefixEnum.IP_RATE_LIMIT + ipAddress;
 		
 		return isRequestAllowed(key, ipMaxRequest, Duration.ofMinutes(ipPerMinute));
 		
@@ -51,7 +51,7 @@ public class RateLimitingService {
 	
 	public boolean isEmailRequestAllowed(String email) {
 		
-		String key = Prefix.EMAIL_RATE_LIMIT + email;
+		String key = PrefixEnum.EMAIL_RATE_LIMIT + email;
 		
 		return isRequestAllowed(key, emailMaxRequest, Duration.ofMinutes(emailPerMinute));
 		
@@ -79,7 +79,7 @@ public class RateLimitingService {
 		
 	}
 	
-	public void checkDailyChallengeLimit(String email, Category category, Language language) {
+	public void checkDailyChallengeLimit(String email, CategoryEnum category, LanguageEnum language) {
 		
 		String messageCode = null;
 		 
@@ -153,7 +153,7 @@ public class RateLimitingService {
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime midnignt = now.toLocalDate().plusDays(1).atStartOfDay();
 		Duration durationUntilMidnight = Duration.between(now, midnignt);
-		String key = Prefix.CHALLENGE_LIMIT.getContent() + email + ":" + category.toString() + ":" + language.toString();
+		String key = PrefixEnum.CHALLENGE_LIMIT.getContent() + email + ":" + category.toString() + ":" + language.toString();
 		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 		
 		if(valueOperations.get(key) != null) {
@@ -170,7 +170,7 @@ public class RateLimitingService {
 		
 		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 		
-		String key = Prefix.EMAIL_VERIFICATION_ATTEMPT.getContent() + email;
+		String key = PrefixEnum.EMAIL_VERIFICATION_ATTEMPT.getContent() + email;
 		
 		String currentAttemptAsString = valueOperations.get(key);
 		
