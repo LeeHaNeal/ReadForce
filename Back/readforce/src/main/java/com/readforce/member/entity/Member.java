@@ -9,8 +9,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.readforce.common.enums.Role;
-import com.readforce.common.enums.Status;
+import com.readforce.common.enums.RoleEnum;
+import com.readforce.common.enums.StatusEnum;
 import com.readforce.result.entity.Challenge;
 import com.readforce.result.entity.Learning;
 import com.readforce.result.entity.Result;
@@ -61,12 +61,12 @@ public class Member {
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Status status = Status.ACTIVE;
+	private StatusEnum status = StatusEnum.ACTIVE;
 	
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Role role = Role.USER;
+	private RoleEnum role = RoleEnum.USER;
 	
 	private String socialProvider;
 	
@@ -133,7 +133,7 @@ public class Member {
 	
 	public void deactivate() {
 		
-		this.status = Status.PENDING_DELETION;
+		this.status = StatusEnum.PENDING_DELETION;
 		this.withdrawAt = LocalDateTime.now();
 		
 	}

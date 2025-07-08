@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum Prefix {
+public enum PrefixEnum {
 
 	ROLE("ROLE_"),
 	BEARER("Bearer "),
@@ -19,7 +19,7 @@ public enum Prefix {
 	
 	private final String prefix;
 	
-	Prefix(String prefix){
+	PrefixEnum(String prefix){
 		
 		this.prefix = prefix;
 		

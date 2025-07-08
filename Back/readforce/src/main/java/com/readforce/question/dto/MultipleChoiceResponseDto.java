@@ -42,8 +42,8 @@ public class MultipleChoiceResponseDto {
 		this.content = multipleChoice.getPassage().getContent();
 		this.author = multipleChoice.getPassage().getAuthor();
 		this.publicationDate = multipleChoice.getPassage().getPublicationDate();
-		this.category = multipleChoice.getPassage().getCategory().getCategory();
-		this.level = multipleChoice.getPassage().getLevel().getLevel();
+		this.category = multipleChoice.getPassage().getCategory().getCategoryName().name();
+		this.level = multipleChoice.getPassage().getLevel().getLevelNumber();
 		this.questionNo = multipleChoice.getQuestionNo();
 		this.question = multipleChoice.getQuestion();
 		this.choiceList = multipleChoice.getChoiceList().stream()

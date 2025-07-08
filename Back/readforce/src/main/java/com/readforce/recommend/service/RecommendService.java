@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.TypeEnum;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.service.CategoryService;
 import com.readforce.passage.service.LevelService;
@@ -26,11 +29,11 @@ public class RecommendService {
 	private final LearningService learningService;
 	
 	@Transactional(readOnly = true)
-	public MultipleChoiceResponseDto getRecommendQuestion(Member member, String language) {
+	public MultipleChoiceResponseDto getRecommendQuestion(Member member, LanguageEnum language) {
 		
-		String weakCategory = categoryService.findWeakCategory(member, language);
+		CategoryEnum weakCategory = categoryService.findWeakCategory(member, language);
 		
-		String weakType = typeService.findWeakType(member, language, weakCategory);
+		TypeEnum weakType = typeService.findWeakType(member, language, weakCategory);
 		
 		Integer optimalLevel = levelService.findOptimalLevel(member, language, weakCategory, weakType);
 		

@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum Header {
+public enum HeaderEnum {
 
 	X_FORWARDED_FOR("X-Forwarded-For"),
 	AUTHORIZATION("Authorization")
@@ -8,7 +8,7 @@ public enum Header {
 	
 	private final String header;
 	
-	Header(String header){
+	HeaderEnum(String header){
 		
 		this.header = header;
 		

@@ -12,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.readforce.common.enums.Prefix;
-import com.readforce.common.enums.Status;
+import com.readforce.common.enums.PrefixEnum;
+import com.readforce.common.enums.StatusEnum;
 import com.readforce.member.dto.MemberKeyInformationDto;
 import com.readforce.member.service.MemberService;
 
@@ -32,12 +32,12 @@ public class AuthenticationService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		MemberKeyInformationDto memberKeyInformationDto = memberService.getMemberKeyInformationByEmailAndStatus(username, Status.ACTIVE);
+		MemberKeyInformationDto memberKeyInformationDto = memberService.getMemberKeyInformationByEmailAndStatus(username, StatusEnum.ACTIVE);
 				
 		return new User(
 				memberKeyInformationDto.getEmail(), 
 				memberKeyInformationDto.getPassword(), 
-				Collections.singletonList(new SimpleGrantedAuthority(Prefix.ROLE.getContent() + memberKeyInformationDto.getRole().name()))
+				Collections.singletonList(new SimpleGrantedAuthority(PrefixEnum.ROLE.getContent() + memberKeyInformationDto.getRole().name()))
 		);
 		
 	}
@@ -45,7 +45,7 @@ public class AuthenticationService implements UserDetailsService {
 	public void storeRefreshToken(String email, String refreshToken) {
 		
 		redisTemplate.opsForValue().set(
-				Prefix.REFRESH.getContent() + email,
+				PrefixEnum.REFRESH.getContent() + email,
 				refreshToken,
 				Duration.ofMinutes(refreshExpirationTime)				
 		);
@@ -54,13 +54,13 @@ public class AuthenticationService implements UserDetailsService {
 	
 	public String getRefreshToken(String email) {
 		
-		return redisTemplate.opsForValue().get(Prefix.REFRESH.getContent() + email);
+		return redisTemplate.opsForValue().get(PrefixEnum.REFRESH.getContent() + email);
 		
 	}
 	
 	public void deleteRefreshToken(String email) {
 		
-		redisTemplate.delete(Prefix.REFRESH.getContent() + email);
+		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
 		
 	}
 

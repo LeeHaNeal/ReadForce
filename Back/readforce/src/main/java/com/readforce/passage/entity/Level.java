@@ -27,7 +27,7 @@ public class Level {
 	private Long levelNo;
 	
 	@Column(nullable = false, unique = true)
-	private Integer level;
+	private Integer levelNumber;
 	
 	@Column(nullable = false)
 	private Integer paragraphCount;

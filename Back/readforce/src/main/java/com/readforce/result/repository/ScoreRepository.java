@@ -9,24 +9,25 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.readforce.ranking.dto.RankingResponseDto;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.result.entity.Score;
 
 @Repository
 public interface ScoreRepository extends JpaRepository<Score, Long> {
 
 	@Query("""
-			SELECT new com.readforce.ranking.dto.RankingResponseDto(m.nickname, m.email, s.score, c.category, l.language)
+			SELECT s
 			FROM Score s
-			JOIN s.member m
-			JOIN s.category c
-			JOIN s.language l
-			WHERE c.category = :category AND l.language = :language
+			JOIN FETCH s.member m
+			JOIN FETCH s.category c
+			JOIN FETCH s.language l
+			WHERE c.categoryName = :category AND l.languageName = :language
 			ORDER BY s.score DESC			
 			""")
-	List<RankingResponseDto> findTop50ByCategory(
-			@Param("category") String category,
-			@Param("language") String language,
+	List<Score> findTopScoreListByCategoryAndLanguage(
+			@Param("category") CategoryEnum category,
+			@Param("language") LanguageEnum language,
 			Pageable pageable			
 	);
 	

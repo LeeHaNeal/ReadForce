@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Category;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.DuplicationException;
 import com.readforce.passage.entity.Passage;
 import com.readforce.passage.service.LevelService;
@@ -38,7 +39,7 @@ public class TestService {
 	private final LevelService levelService;
 	
 	@Transactional
-	public QuestionTestResponseDto getTestQuestion(String language, String category, Integer level) {
+	public QuestionTestResponseDto getTestQuestion(LanguageEnum language, CategoryEnum category, Integer level) {
 
 		Passage passage = passageService.getTestPassage(language, category, level);
 		
@@ -54,8 +55,8 @@ public class TestService {
 				.content(passage.getContent())
 				.author(passage.getAuthor())
 				.publicationDate(passage.getPublicationDate())
-				.category(passage.getCategory().getCategory())
-				.level(passage.getLevel().getLevel())
+				.category(passage.getCategory().getCategoryName().name())
+				.level(passage.getLevel().getLevelNumber())
 				.questionNo(multipleChoiceDto.getQuestionNo())
 				.question(multipleChoiceDto.getQuestion())
 				.choiceList(multipleChoiceDto.getChoiceList())
@@ -66,42 +67,34 @@ public class TestService {
 
 	@Transactional
 	public QuestionTestResponseDto submitVocabularyResult(TestSubmitRequestDto submitRequestDto) {
-		
-		String testerId = submitRequestDto.getTesterId();
-		Long questionNo = submitRequestDto.getQuestionNo();
-		Integer selectedIndex = submitRequestDto.getSelectedIndex();
-		Long questionSolvingTime = submitRequestDto.getQuestionSolvingTime();
 
-		QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
-		Integer level = questionInfo.getLevel();
-		String category = questionInfo.getCategory();
-		String language = questionInfo.getLanguage();
+		QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(submitRequestDto.getQuestionNo());
 
-		if(isDuplicate(testerId, questionNo)) {
+		if(isDuplicate(submitRequestDto.getTesterId(), submitRequestDto.getQuestionNo())) {
 			
 			throw new DuplicationException(MessageCode.TEST_QUESTION_ALREADY_SOLVED);
 			
 		}
 		
-		markAsSolved(testerId, questionNo);
+		markAsSolved(submitRequestDto.getTesterId(), submitRequestDto.getQuestionNo());
 		
-		boolean isCorrect = multipleChoiceService.checkResult(questionNo, selectedIndex).getIsCorrect();
+		boolean isCorrect = multipleChoiceService.checkResult(submitRequestDto.getQuestionNo(), submitRequestDto.getSelectedIndex()).getIsCorrect();
 		
-		if(questionSolvingTime < 180) {
+		if(submitRequestDto.getQuestionSolvingTime() < 180) {
 			
 			isCorrect = false;
 			
 		}
 		
-		Integer nextLevel = evaluate(level, isCorrect);
+		Integer nextLevel = evaluate(questionInfo.getLevel(), isCorrect);
 
 		if(nextLevel < 0) {
 			
-			return getTestQuestion(language, category, nextLevel);
+			return getTestQuestion(questionInfo.getLanguage(), questionInfo.getCategory(), nextLevel);
 			
 		} else {
 			
-			return getTestQuestion(language, Category.FACTUAL.name(), nextLevel);
+			return getTestQuestion(questionInfo.getLanguage(), CategoryEnum.FACTUAL, nextLevel);
 			
 		}
 		
@@ -116,7 +109,7 @@ public class TestService {
 
 		QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
 		Integer level = questionInfo.getLevel();
-		String language = questionInfo.getLanguage();
+		LanguageEnum language = questionInfo.getLanguage();
 		
 		if(isDuplicate(testerId, questionNo)) {
 			
@@ -136,7 +129,7 @@ public class TestService {
 		
 		if(isCorrect) {
 			
-			return getTestQuestion(language, Category.INFERENTIAL.name(), level);
+			return getTestQuestion(language, CategoryEnum.INFERENTIAL, level);
 			
 		} else {
 			
@@ -149,26 +142,19 @@ public class TestService {
 	@Transactional
 	public QuestionTestResultDto submitInferentialResult(TestSubmitRequestDto submitRequestDto) {
 
-		String testerId = submitRequestDto.getTesterId();
-		Long questionNo = submitRequestDto.getQuestionNo();
-		Integer selectedIndex = submitRequestDto.getSelectedIndex();
-		Long questionSolvingTime = submitRequestDto.getQuestionSolvingTime();
-
-		QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
-		Integer level = questionInfo.getLevel();
-		String language = questionInfo.getLanguage();
+		QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(submitRequestDto.getQuestionNo());
 		
-		if(isDuplicate(testerId, questionNo)) {
+		if(isDuplicate(submitRequestDto.getTesterId(), submitRequestDto.getQuestionNo())) {
 			
 			throw new DuplicationException(MessageCode.TEST_QUESTION_ALREADY_SOLVED);
 			
 		}
 		
-		markAsSolved(testerId, questionNo);
+		markAsSolved(submitRequestDto.getTesterId(), submitRequestDto.getQuestionNo());
 		
-		boolean isCorrect = multipleChoiceService.checkResult(questionNo, selectedIndex).getIsCorrect();
+		boolean isCorrect = multipleChoiceService.checkResult(submitRequestDto.getQuestionNo(), submitRequestDto.getSelectedIndex()).getIsCorrect();
 		
-		if(questionSolvingTime < 120) {
+		if(submitRequestDto.getQuestionSolvingTime() < 180) {
 			
 			isCorrect = false;
 			
@@ -176,16 +162,16 @@ public class TestService {
 		
 		if(isCorrect) {
 			
-			return getTestResult(language, level, true, true);
+			return getTestResult(questionInfo.getLanguage(), questionInfo.getLevel(), true, true);
 			
 		} else {
 			
-			return getTestResult(language, level, true, false);
+			return getTestResult(questionInfo.getLanguage(), questionInfo.getLevel(), true, false);
 		}
 
 	}
 
-	private QuestionTestResultDto getTestResult(String language, Integer level, boolean factualResult, boolean inferentialResult) {
+	private QuestionTestResultDto getTestResult(LanguageEnum language, Integer level, boolean factualResult, boolean inferentialResult) {
 	
 		String vocabularyLevel = levelService.getVocabularyLevelByLevel(level);		
 
@@ -193,7 +179,7 @@ public class TestService {
 				
 	}
 
-	private QuestionTestResultDto generateTestComment(String language, String vocabularyLevel, boolean factualResult, boolean inferentialResult) {
+	private QuestionTestResultDto generateTestComment(LanguageEnum language, String vocabularyLevel, boolean factualResult, boolean inferentialResult) {
 		
 		String testResultComment = "";
 		
