@@ -2,6 +2,7 @@ package com.readforce.ai.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readforce.ai.ApiException;
 import com.readforce.ai.dto.AiGeneratePassageRequestDto;
@@ -79,21 +82,25 @@ public class AiService {
       for(Level level : levelList) {
          
          String prompt = gernerateTestVocabularyPrompt(language, level);
-          
+         System.out.println("프롬프트" + prompt);
          Map<String, Object> requestResult = requestGenerate(prompt);
          
          String content = extractContentFromResponse(requestResult);
-          
-         GeminiGenerateTestPassageResponseDto parsedResult = parsingResponse(content);
-          
-         String author = NameEnum.GEMINI.name();
-          
-         LocalDate publicationDate = LocalDate.now();
-          
-         Category categoryEntity = categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY);
-
-         passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification);
+         System.out.println("컨텐" + content);
+         List<GeminiGenerateTestPassageResponseDto> parsedResultList = parsingResponse(content);
          
+         for(GeminiGenerateTestPassageResponseDto parsedResult : parsedResultList) {
+            
+            String author = NameEnum.GEMINI.name();
+             
+            LocalDate publicationDate = LocalDate.now();
+             
+            Category categoryEntity = categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY);
+
+            passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification);
+            
+         }
+
       }
          
       
@@ -101,13 +108,23 @@ public class AiService {
    }
    
    
-   private GeminiGenerateTestPassageResponseDto parsingResponse(String requestResult) {
+   private List<GeminiGenerateTestPassageResponseDto> parsingResponse(String requestResult) {
 
       try {
          
-         GeminiGenerateTestPassageResponseDto parsedResponse = objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class); 
+         JsonNode rootNode = objectMapper.readTree(requestResult);
          
-         return parsedResponse;
+         if(rootNode.isArray()) {
+            
+            return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageResponseDto>>() {});
+            
+         } else {
+            
+            GeminiGenerateTestPassageResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class);
+            
+            return Collections.singletonList(singleDto);
+            
+         }
          
       } catch(Exception exception) {
          
@@ -152,25 +169,32 @@ public class AiService {
       
          case KOREAN:
             prompt = String.format(
-            		"""
-            	    당신은 한국어 어휘의 전문가입니다.
-            	    '난이도 %d (%s)' 수준의 단어 데이터를 생성해야 합니다.
-
-            	    출력은 반드시 아래와 같은 **순수 JSON 객체 형식의 텍스트**로만 작성해 주세요.
-            	    코드 블럭(```)이나 주석 없이, 다른 문장 없이 순수 JSON만 주세요.
-
-            	    예시:
-            	    {
-            	      "title": "단어",
-            	      "content": "단어의 뜻",
-            	      "level": "난이도 1 (초등 저학년)"
-            	    }
-
-            	    이제 위 형식에 따라 '난이도 %d (%s)' 수준의 단어를 하나 생성해 주세요.
-            	    """,
-            	    level.getLevelNumber(), level.getVocabularyLevel(),
-            	    level.getLevelNumber(), level.getVocabularyLevel()
-            		);
+                  """
+                         당신은 한국어 어휘의 전문가입니다.
+                         '난이도 %d (%s)' 수준의 단어 데이터를 생성해야 합니다.
+   
+                         ## 중요 규칙
+                         - 반드시 **하나의 JSON 객체** 형식으로만 응답해야 합니다.
+                         - 절대로 JSON 배열(리스트) 형식인 `[ ]` 로 감싸서 반환하면 안 됩니다.
+   
+                         ## 올바른 응답 형식 (JSON 객체):
+                         {
+                           "title": "단어",
+                           "content": "단어의 뜻",
+                           "level": "난이도 1 (초등 저학년)"
+                         }
+   
+                         ## 잘못된 응답 형식 (JSON 배열):
+                         [
+                           {
+                             "title": "단어",
+                             "content": "단어의 뜻",
+                             "level": "난이도 1 (초등 저학년)"
+                           }
+                         ]
+   
+                         이제 규칙에 맞춰 '난이도 %d (%s)' 수준의 단어를 생성해 주세요.
+                      """, level.getLevelNumber(), level.getVocabularyLevel(), level.getLevelNumber(), level.getVocabularyLevel());
             break;
          
          default:
@@ -214,9 +238,13 @@ public class AiService {
             
             String content = extractContentFromResponse(requestResult);
             
-            GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(content);
+            List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
             
-            saveMultipleChoiceQuestion(passage, parsedResult);
+            for(GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
+               
+               saveMultipleChoiceQuestion(passage, parsedResult);
+               
+            }
 
          } else {
             
@@ -230,13 +258,17 @@ public class AiService {
                
                String content = extractContentFromResponse(requestResult);
                
-               GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(content);
+               List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
                
-               Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
-               
-               Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification);
-                     
-               saveMultipleChoiceQuestion(newPassage, parsedResult);
+               for(GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
+                  
+                  Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
+                  
+                  Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification);
+                        
+                  saveMultipleChoiceQuestion(newPassage, parsedResult);
+                  
+               }
 
             }
 
@@ -246,12 +278,23 @@ public class AiService {
       
    }
    
-   private GeminiGenerateTestPassageAndQuestionResponseDto parsePassageAndQuestionResponse(String requestResult) {
+   private List<GeminiGenerateTestPassageAndQuestionResponseDto> parsePassageAndQuestionResponse(String requestResult) {
 
       try {
          
-         return objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class);
+         JsonNode rootNode = objectMapper.readTree(requestResult);
          
+         if(rootNode.isArray()) {
+            
+            return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageAndQuestionResponseDto>>() {});
+            
+         } else {
+            
+            GeminiGenerateTestPassageAndQuestionResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class);
+            
+            return Collections.singletonList(singleDto);
+            
+         }
       } catch(Exception exception) {
          
          throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
@@ -268,7 +311,7 @@ public class AiService {
       
       for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
          
-         boolean isCorrect = (i == parsedResult.getCorrectAnswerIndex());
+         boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
          
          String explanationText = isCorrect
                ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.")
@@ -277,7 +320,7 @@ public class AiService {
          Choice choice = Choice.builder()
                .choiceIndex(i)
                .content(parsedResult.getChoiceList().get(i))
-               .isCorrect(i == parsedResult.getCorrectAnswerIndex())
+               .isCorrect(i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()))
                .explanation(explanationText)
                .build();
          
@@ -302,7 +345,7 @@ public class AiService {
       
       for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
          
-         boolean isCorrect = (i == parsedResult.getCorrectAnswerIndex());
+         boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
          
          String explanationText = isCorrect
                ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.")
@@ -311,7 +354,7 @@ public class AiService {
          Choice choice = Choice.builder()
                .choiceIndex(i)
                .content(parsedResult.getChoiceList().get(i))
-               .isCorrect(i == parsedResult.getCorrectAnswerIndex())
+               .isCorrect(i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()))
                .explanation(explanationText)
                .build();
          
@@ -479,7 +522,25 @@ public class AiService {
       
       try {
          
-         return objectMapper.readValue(requestResult, GeminiGeneratePassageResponseDto.class);
+         JsonNode rootNode = objectMapper.readTree(requestResult);
+         
+         if(rootNode.isArray()) {
+            
+            List<GeminiGeneratePassageResponseDto> list = objectMapper.readValue(requestResult, new TypeReference<List<GeminiGeneratePassageResponseDto>>() {});
+            
+            if(!list.isEmpty()) {
+               
+               return list.get(0);
+               
+            }
+            
+            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
+            
+         } else {
+            
+            return objectMapper.readValue(requestResult, GeminiGeneratePassageResponseDto.class);
+            
+         }
          
       } catch(Exception exception) {
          
@@ -522,7 +583,7 @@ public class AiService {
                      1.  **언어:** %s
                      2.  **카테고리:** %s
                      3.  **타입:** %s
-                     4.  **난이도:** 전체 10의 난이도 중 %s
+                     4.  **난이도:** 전체 10의 난이도 중 %d
                          * **어휘:** %s
                          * **문장 구조:** %s
                          * **내용:** 사실에 기반하되, 독자의 흥미를 유발할 수 있도록 구성해 주세요.
@@ -680,21 +741,37 @@ public class AiService {
          
          String content = extractContentFromResponse(requestResult);
          
-         GeminiGenerateQuestionResponseDto parsedResult = parseQuestionResponse(content);
+         List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
                         
-         saveMultipleChoiceQuestion(passage, parsedResult);
+         for(GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
+            
+            saveMultipleChoiceQuestion(passage, parsedResult);
+            
+         }         
 
       }
 
    }
 
 
-   private GeminiGenerateQuestionResponseDto parseQuestionResponse(String requestResult) {
+   private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
       
       try {
          
-         return objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class);
+         JsonNode rootNode = objectMapper.readTree(requestResult);
          
+         if(rootNode.isArray()) {
+            
+            return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+            
+         } else {
+            
+            GeminiGenerateQuestionResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class);
+            
+            return Collections.singletonList(singleDto);
+                  
+         }
+                  
       } catch(Exception exception) {
          
          throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
@@ -755,7 +832,6 @@ public class AiService {
    }
 
 
-<<<<<<< HEAD
    private String extractContentFromResponse(Map<String, Object> response) {
       
       if(response != null && response.containsKey("candidates")) {
@@ -781,18 +857,44 @@ public class AiService {
                      if(firstPart.containsKey("text")) {
                         
                         String text = (String)firstPart.get("text");
-                        if(text.startsWith("```json")) {
+                        
+                        int firstBracket = text.indexOf('{');
+                        int firstSquareBracket = text.indexOf('[');
+                        
+                        if(firstBracket == -1 && firstSquareBracket == -1) {
                            
-                           text = text.substring(7);
-                           
-                        }
-                        if(text.endsWith("```")) {
-                           
-                           text = text.substring(0, text.length() - 3);
+                           return "{}";
                            
                         }
                         
-                        return text.trim();
+                        int startIndex = -1;
+                        
+                        if(firstBracket != -1 && firstSquareBracket != -1) {
+                           
+                           startIndex = Math.min(firstBracket, firstSquareBracket);
+                           
+                        } else if(firstBracket != -1) {
+                           
+                           startIndex = firstBracket;
+                           
+                        } else {
+                           
+                           startIndex = firstSquareBracket;
+                           
+                        }
+                        
+                        int lastBracket = text.lastIndexOf('}');
+                        int lastSquareBracket = text.lastIndexOf(']');
+                        
+                        int endIndex = Math.max(lastBracket, lastSquareBracket);
+                        
+                        if(endIndex == -1) {
+                           
+                           return "{}";
+                           
+                        }
+                        
+                        return text.substring(startIndex, endIndex + 1);
                         
                      }
                      
@@ -803,57 +905,6 @@ public class AiService {
             }
             
          }
-=======
-	private String extractContentFromResponse(Map<String, Object> response) {
-		
-		if(response != null && response.containsKey("candidates")) {
-			
-			List<Map<String, Object>> candidates = (List<Map<String, Object>>)response.get("candidates");
-			
-			if(candidates != null && !candidates.isEmpty()) {
-				
-				Map<String, Object> firstCandidate = candidates.get(0);
-				
-				if(firstCandidate.containsKey("content")) {
-					
-					Map<String, Object> content = (Map<String, Object>)firstCandidate.get("content");
-					
-					if(content.containsKey("parts")) {
-						
-						List<Map<String, Object>> parts = (List<Map<String, Object>>)content.get("parts");
-						
-						if(parts != null && !parts.isEmpty()) {
-							
-							Map<String, Object> firstPart = parts.get(0);
-							
-							if(firstPart.containsKey("text")) {
-								
-								String text = (String)firstPart.get("text");
-								if(text.startsWith("```json")) {
-									
-									text = text.substring(7);
-									
-								}
-								if(text.endsWith("```")) {
-									
-									text = text.substring(0, text.length() - 3);
-									
-								}
-								
-								text = text.replaceAll("\\s+", "");
-								
-								return text;
-								
-							}
-							
-						}
-						
-					}
-			
-				}
-				
-			}
->>>>>>> origin/develop
 
       }
       

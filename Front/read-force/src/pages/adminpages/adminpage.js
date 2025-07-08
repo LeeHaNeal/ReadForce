@@ -8,6 +8,8 @@ const AdminPage = () => {
     const [users, setUsers] = useState([]);
     const [loadingAI, setLoadingAI] = useState(false);
     const [aiMessage, setAiMessage] = useState('');
+    const [loadingPassage, setLoadingPassage] = useState(false);
+    const [loadingQuestion, setLoadingQuestion] = useState(false);
 
     useEffect(() => {
         const nickname = localStorage.getItem("nickname");
@@ -99,6 +101,54 @@ const AdminPage = () => {
         }
     };
 
+    // AI 지문 생성
+    const handleGeneratePassage = async () => {
+        setLoadingPassage(true);
+        try {
+            const res = await fetchWithAuth("/ai/generate-passage", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: "KOREAN",
+                    level: 1,
+                    category: "NEWS",
+                    type: "ECONOMY",
+                    classification: "TEST",
+                }),
+            });
+
+            if (!res.ok) throw new Error("지문 생성 실패");
+
+            const data = await res.json();
+            alert("✅ " + data.message);
+        } catch (err) {
+            console.error(err);
+            alert("❌ 지문 생성 중 오류가 발생했습니다.");
+        } finally {
+            setLoadingPassage(false);
+        }
+    };
+
+    // AI 문제 생성
+    const handleGenerateQuestion = async () => {
+        setLoadingQuestion(true);
+        try {
+            const res = await fetchWithAuth("/ai/generate-question", {
+                method: "POST",
+            });
+
+            if (!res.ok) throw new Error("문제 생성 실패");
+
+            const data = await res.json();
+            alert("✅ " + data.message);
+        } catch (err) {
+            console.error(err);
+            alert("❌ 문제 생성 중 오류가 발생했습니다.");
+        } finally {
+            setLoadingQuestion(false);
+        }
+    };
+
     return (
         <div style={{ padding: "24px" }}>
             <span style={ADMIN_BUTTONS_LIST}>
@@ -109,9 +159,17 @@ const AdminPage = () => {
                 <div>
                     <h2>회원 관리</h2>
                 </div>
-                <div>
+                <div style={{ display: 'flex', gap: '10px' }}>
                     <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateAITest} disabled={loadingAI}>
-                        {loadingAI ? '생성 중...' : 'ai 테스트 문제 생성'}
+                        {loadingAI ? '생성 중...' : 'AI 테스트 문제 생성'}
+                    </button>
+
+                    <button style={ADMIN_AI_BUTTONS} onClick={handleGeneratePassage} disabled={loadingPassage}>
+                        {loadingPassage ? '생성 중...' : 'AI 지문 생성'}
+                    </button>
+
+                    <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
+                        {loadingQuestion ? '생성 중...' : 'AI 문제 생성'}
                     </button>
                 </div>
             </div>
