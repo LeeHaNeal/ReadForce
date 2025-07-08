@@ -10,6 +10,6 @@ import com.readforce.passage.entity.Level;
 @Repository
 public interface LevelRepository extends JpaRepository<Level, Long> {
 
-	Optional<Level> findByLevel(Integer level);
+	Optional<Level> findByLevelNumber(Integer level);
 
 }

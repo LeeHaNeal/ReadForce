@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.entity.Language;
 import com.readforce.passage.repository.LanguageRepository;
@@ -26,9 +27,9 @@ public class LanguageService {
 	}
 
 	@Transactional(readOnly = true)
-	public Language getLangeageByLanguage(String language) {
+	public Language getLangeageByLanguage(LanguageEnum language) {
 
-		return languageRepository.findByLanguage(language)
+		return languageRepository.findByLanguageName(language)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.LANGUAGE_NOT_FOUND));
 
 	}

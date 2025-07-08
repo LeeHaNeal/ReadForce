@@ -84,7 +84,6 @@ file:
       max-size: 5242880
       max-request-size: 5MB
       allowed-mime-types: image/jpeg,image/png,image/gif
-      default-image-path: 4b2d7245-2ca2-45ce-9954-e00f7553014a.png
 custom:
   fronted:
     password-reset-link-url: http://localhost:3000/resetpassword
@@ -102,7 +101,7 @@ rate-limiting:
     max-request: 100
     per-minute: 1
   email-verification:
-    max-request: 20
+    max-request: 100
     per-hour: 1
 gemini:
   api:

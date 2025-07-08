@@ -15,12 +15,12 @@ public final class MessageCode {
 	public static final String VERIFICATION_CODE_NOT_BLANK = "NOT0006";
 	public static final String TEMPORAL_TOKEN_NOT_BLANK = "NOT0007";
 	public static final String REFRESH_TOKEN_NOT_BLANK = "NOT0008";
-	public static final String LANGUAGE_NOT_BLANK = "NOT0009";
-	public static final String CATEGORY_NOT_BLANK = "NOT0010";
-	public static final String TYPE_NOT_BLANK = "NOT0011";
-	public static final String LEVEL_NOT_BLANK = "NOT0012";
-	public static final String ORDER_BY_NOT_BLANK = "NOT0013";
-	public static final String CLASSIFICATION_NOT_BLANK = "NOT0014";
+	public static final String LANGUAGE_NOT_NULL = "NOT0009";
+	public static final String CATEGORY_NOT_NULL = "NOT0010";
+	public static final String TYPE_NOT_NULL = "NOT0011";
+	public static final String LEVEL_NOT_NULL = "NOT0012";
+	public static final String ORDER_BY_NOT_NULL = "NOT0013";
+	public static final String CLASSIFICATION_NOT_NULL = "NOT0014";
 	public static final String PASSAGE_NO_NOT_NULL = "NOT0015";
 	public static final String QUESTION_CLASSIFICATION_NOT_BLANK = "NOT0016";
 	public static final String SELECTED_INDEX_NOT_NULL = "NOT0017";
@@ -74,6 +74,11 @@ public final class MessageCode {
 	public static final String REISSUE_ACCESS_TOKEN_SUCCESS = "SUC0013";
 	public static final String GET_TOKENS_SUCCESS = "SUC0014";
 	public static final String SAVE_MULTIPLE_CHOICE_RESULT_SUCCESS = "SUC0015";
+	public static final String GENERATE_TEST_SUCCESS = "SUC0016";
+	public static final String GENERATE_PASSAGE_SUCCESS = "SUC0017";
+	public static final String GENERATE_QUESTION_SUCCESS = "SUC0018";
+	
+	
 	
 	
 	
@@ -87,6 +92,7 @@ public final class MessageCode {
 	public static final String FILE_DELETE_IO_FAIL = "FAI0007";
 	public static final String VERIFY_VERIFICATION_CODE_FAIL = "FAI0008";
 	public static final String JSON_MAPPING_FAIL = "FAI0009";
+	public static final String GEMINI_API_REQUEST_FAIL = "FAI0010";
 	
 	
 	
@@ -107,7 +113,10 @@ public final class MessageCode {
 	public static final String TYPE_NOT_FOUND = "NOF0015";
 	public static final String RESULT_METRIC_NOT_FOUND = "NOF0016";
 	public static final String OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND = "NOF0017";
-
+	public static final String LEARNING_NOT_FOUND = "NOF0018";
+	public static final String CLASSIFICATION_NOT_FOUND = "NOF0019";
+	public static final String NO_QUESTION_PASSAGE_NOT_FOUND = "NOF0020";
+	
 	
 	
 	

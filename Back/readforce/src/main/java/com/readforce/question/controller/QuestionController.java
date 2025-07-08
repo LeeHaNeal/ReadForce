@@ -9,6 +9,5 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/question")
 @RequiredArgsConstructor
 public class QuestionController {
-	
-	
+
 }

@@ -3,6 +3,7 @@ package com.readforce.file.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
@@ -71,13 +72,24 @@ public class FileController {
 		
 		try {
 			
-			Path filePath = resource.getFile().toPath();
-			contentType = Files.probeContentType(filePath);
+			String filename = resource.getFilename();
 			
-			if(contentType == null) {
+			if(filename == null) {
 				
 				contentType = "application/octet-stream";
-				log.warn("이미지 파일 타입을 결정하지 못했습니다. {}, 기본 타입인 application/octet-stream 타입으로 결정되었습니다.", resource.getFilename());
+				log.warn("파일 이름을 확인할 수 없습니다. 기본 타입으로 설정됩니다.");
+				
+			} else {
+				
+				Path filePath = Paths.get(filename);
+				contentType = Files.probeContentType(filePath);
+				
+				if(contentType == null) {
+					
+					contentType = "application/octet-stream";
+					log.warn("이미지 파일 타입을 결정하지 못했습니다. {}, 기본 타입인 application/octet-stream 타입으로 결정되었습니다.", filename);
+					
+				}
 				
 			}
 			

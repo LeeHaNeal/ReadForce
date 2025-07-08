@@ -3,9 +3,9 @@ package com.readforce.member.dto;
 import java.time.LocalDate;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.validation.ValidBirthday;
+import com.readforce.member.validation.ValidBirthday;
+import com.readforce.member.validation.ValidNickname;
 
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberModifyDto {
 
-	@Size(min = 2, max = 12, message = MessageCode.NICKNAME_SIZE_INVALID)
-	@Pattern(regexp = "^[a-zA-Z가-힣\\d]{2,20}$", message = MessageCode.NICKNAME_PATTERN_INVALID)
+	@Size(min = 2, max = 20, message = MessageCode.NICKNAME_SIZE_INVALID)
+	@ValidNickname
 	private String nickname;
 	
 	@ValidBirthday

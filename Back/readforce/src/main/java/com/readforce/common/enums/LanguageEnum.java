@@ -1,8 +1,9 @@
 package com.readforce.common.enums;
 
-public enum Language {
+public enum LanguageEnum {
 
 	KOREAN,
 	JAPANESE,
 	ENGLISH
+	
 }

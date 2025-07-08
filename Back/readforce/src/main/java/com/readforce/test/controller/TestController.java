@@ -11,15 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Category;
-import com.readforce.common.enums.Language;
-import com.readforce.passage.validation.ValidEnum;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.question.dto.QuestionTestResponseDto;
 import com.readforce.question.dto.QuestionTestResultDto;
 import com.readforce.test.dto.TestSubmitRequestDto;
 import com.readforce.test.service.TestService;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,17 +27,16 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class TestController {
 
-	private TestService testService;
+	private final TestService testService;
 	
 	@GetMapping("/start")
 	public ResponseEntity<QuestionTestResponseDto> start(
 			@RequestParam("language")
-			@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-			@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-			String language
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language
 	){
 		
-		QuestionTestResponseDto startQuestion = testService.getTestQuestion(language, Category.VOCABULARY.name(), 6);
+		QuestionTestResponseDto startQuestion = testService.getTestQuestion(language, CategoryEnum.VOCABULARY, 6);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(startQuestion);
 		
@@ -77,8 +75,6 @@ public class TestController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 		
 	}
-	
-	
-	
+
 	
 }

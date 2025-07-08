@@ -1,5 +1,8 @@
 package com.readforce.question.dto;
 
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,9 +12,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class QuestionLevelAndCategoryAndLanguageDto {
 
-	private String category;
+	private CategoryEnum category;
 	
-	private String language;
+	private LanguageEnum language;
 	
 	private Integer level;
 	

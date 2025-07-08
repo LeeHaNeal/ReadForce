@@ -11,14 +11,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Language;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
-import com.readforce.passage.validation.ValidEnum;
 import com.readforce.question.dto.MultipleChoiceResponseDto;
 import com.readforce.recommend.service.RecommendService;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,9 +32,8 @@ public class RecommendController {
 	@GetMapping("/get-recommend")
 	public ResponseEntity<MultipleChoiceResponseDto> getRecommend(
 			@RequestParam("/language")
-			@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-			@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-			String language,
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
 		

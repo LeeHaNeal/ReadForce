@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.NameEnum;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,12 +27,20 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 			AuthenticationException exception
 	) throws IOException, ServletException {
 		
+		String exceptionMessage = (String)request.getAttribute(NameEnum.EXCEPTION.name());
+		
+		if(exceptionMessage == null) {
+			
+			exceptionMessage = MessageCode.AUTHENTICATION_FAIL;
+			
+		}
+		
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		response.setCharacterEncoding("UTF-8");
 		
 		Map<String, String> body = new HashMap<>();
-		body.put(MessageCode.MESSAGE_CODE, MessageCode.AUTHENTICATION_FAIL);
+		body.put(MessageCode.MESSAGE_CODE, exceptionMessage);
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		String jsonBody = objectMapper.writeValueAsString(body);

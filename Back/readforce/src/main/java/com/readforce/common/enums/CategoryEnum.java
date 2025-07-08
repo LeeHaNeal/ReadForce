@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum Category {
+public enum CategoryEnum {
 	
 	NEWS,
 	NOVEL,

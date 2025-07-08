@@ -21,33 +21,32 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Level {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "level_no")
-    private Long levelNo;
-
-    @Column(name = "level_number", nullable = false, unique = true)
-    private Integer level;
-
-    @Column(nullable = false)
-    private Integer paragraphCount;
-
-    @Column(nullable = false)
-    private String vocabularyLevel;
-
-    @Column(nullable = false)
-    private String sentenceStructure;
-
-    @Column(nullable = false)
-    private String questionType;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime lastModifiedAt;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long levelNo;
+	
+	@Column(nullable = false, unique = true)
+	private Integer levelNumber;
+	
+	@Column(nullable = false)
+	private Integer paragraphCount;
+	
+	@Column(nullable = false)
+	private String vocabularyLevel;
+	
+	@Column(nullable = false)
+	private String sentenceStructure;
+	
+	@Column(nullable = false)
+	private String questionType;
+	
+	@CreatedDate
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+	
+	@LastModifiedDate
+	@Column(nullable = false)
+	private LocalDateTime lastModifiedAt;
+	
 }
-

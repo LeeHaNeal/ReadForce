@@ -51,19 +51,19 @@ const Main = () => {
     return () => clearInterval(interval);
   }, [isPaused, slides]);
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
-        setTop5Data(res.data.slice(0, 5));
-      } catch (err) {
-        console.error("Top5 fetch error", err);
-        setTop5Data([]);
-      }
-    }, 600);
-    return () => clearTimeout(debounceRef.current);
-  }, [selectedLanguage]);
+  // useEffect(() => {
+  //   if (debounceRef.current) clearTimeout(debounceRef.current);
+  //   debounceRef.current = setTimeout(async () => {
+  //     try {
+  //       const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
+  //       setTop5Data(res.data.slice(0, 5));
+  //     } catch (err) {
+  //       console.error("Top5 fetch error", err);
+  //       setTop5Data([]);
+  //     }
+  //   }, 600);
+  //   return () => clearTimeout(debounceRef.current);
+  // }, [selectedLanguage]);
 
   const handleButtonClick = () => {
     if (!currentSlide.buttonLink) return;
