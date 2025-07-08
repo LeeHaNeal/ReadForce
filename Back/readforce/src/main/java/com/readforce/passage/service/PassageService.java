@@ -160,4 +160,19 @@ public class PassageService {
 		
 	}
 
+	@Transactional(readOnly = true)
+	public List<Passage> getNoQuestionPassage() {
+
+		List<Passage> noQuestionPassageList = passageRepository.findNoQuestionPassageList();
+		
+		if(noQuestionPassageList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.NO_QUESTION_PASSAGE_NOT_FOUND);
+			
+		}
+		
+		return noQuestionPassageList;
+		
+	}
+
 }

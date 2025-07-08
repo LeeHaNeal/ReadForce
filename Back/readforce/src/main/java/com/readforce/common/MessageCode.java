@@ -75,6 +75,10 @@ public final class MessageCode {
 	public static final String GET_TOKENS_SUCCESS = "SUC0014";
 	public static final String SAVE_MULTIPLE_CHOICE_RESULT_SUCCESS = "SUC0015";
 	public static final String GENERATE_TEST_SUCCESS = "SUC0016";
+	public static final String GENERATE_PASSAGE_SUCCESS = "SUC0017";
+	public static final String GENERATE_QUESTION_SUCCESS = "SUC0018";
+	
+	
 	
 	
 	
@@ -111,6 +115,7 @@ public final class MessageCode {
 	public static final String OVERALL_CORRECT_ANSWER_RATE_NOT_FOUND = "NOF0017";
 	public static final String LEARNING_NOT_FOUND = "NOF0018";
 	public static final String CLASSIFICATION_NOT_FOUND = "NOF0019";
+	public static final String NO_QUESTION_PASSAGE_NOT_FOUND = "NOF0020";
 	
 	
 	
