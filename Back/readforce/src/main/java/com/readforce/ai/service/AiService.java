@@ -80,9 +80,11 @@ public class AiService {
 			
 			String prompt = gernerateTestVocabularyPrompt(language, level);
 			 
-			String requestResult = requestGenerate(prompt);
+			Map<String, Object> requestResult = requestGenerate(prompt);
+			
+			String content = extractContentFromResponse(requestResult);
 			 
-			GeminiGenerateTestPassageResponseDto parsedResult = parsingResponse(requestResult);
+			GeminiGenerateTestPassageResponseDto parsedResult = parsingResponse(content);
 			 
 			String author = NameEnum.GEMINI.name();
 			 
@@ -103,9 +105,7 @@ public class AiService {
 
 		try {
 			
-			String jsonContent = extractJsonFromResponse(requestResult);
-			
-			GeminiGenerateTestPassageResponseDto parsedResponse = objectMapper.readValue(jsonContent, GeminiGenerateTestPassageResponseDto.class); 
+			GeminiGenerateTestPassageResponseDto parsedResponse = objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class); 
 			
 			return parsedResponse;
 			
@@ -117,25 +117,7 @@ public class AiService {
 
 	}
 
-
-	private String extractJsonFromResponse(String requestResult) {
-
-		int startIndex = requestResult.indexOf("{");
-		int endIndex = requestResult.indexOf("}");
-		
-		if(startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
-			
-			return requestResult.substring(startIndex, endIndex +1);
-			
-		}
-		
-		return "{}";
-	}
-	
-	
-
-
-	private String requestGenerate(String prompt) {
+	private Map<String, Object> requestGenerate(String prompt) {
 
 		HttpHeaders httpHeaders = new HttpHeaders();
 		
@@ -151,9 +133,7 @@ public class AiService {
 		
 		try {
 			
-			String response = restTemplate.postForObject(url, requestEntity, String.class);
-			
-			return response;
+			return restTemplate.postForObject(url, requestEntity, Map.class);
 					
 		} catch(Exception exception){
 			
@@ -223,9 +203,11 @@ public class AiService {
 				
 				String prompt = gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
 
-				String requestResult = requestGenerate(prompt);
+				Map<String, Object> requestResult = requestGenerate(prompt);
 				
-				GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(requestResult);
+				String content = extractContentFromResponse(requestResult);
+				
+				GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(content);
 				
 				saveMultipleChoiceQuestion(passage, parsedResult);
 
@@ -237,9 +219,11 @@ public class AiService {
 							? generateTestFactualPassageAndQuestionPrompt(language, level)
 							: generateTestInferentialPassageAndQuestionPrompt(language, level);
 					
-					String requestResult = requestGenerate(prompt);
+					Map<String, Object> requestResult = requestGenerate(prompt);
 					
-					GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(requestResult);
+					String content = extractContentFromResponse(requestResult);
+					
+					GeminiGenerateTestPassageAndQuestionResponseDto parsedResult = parsePassageAndQuestionResponse(content);
 					
 					Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
 					
@@ -259,9 +243,7 @@ public class AiService {
 
 		try {
 			
-			String jsonContent = extractJsonFromResponse(requestResult);
-			
-			return objectMapper.readValue(jsonContent, GeminiGenerateTestPassageAndQuestionResponseDto.class);
+			return objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class);
 			
 		} catch(Exception exception) {
 			
@@ -458,9 +440,11 @@ public class AiService {
 
 		String prompt = generatePassagePrompt(aiGeneratePassageRequestDto);
 		
-		String requestResult = requestGenerate(prompt);
+		Map<String, Object> requestResult = requestGenerate(prompt);
 		
-		GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(requestResult);
+		String content = extractContentFromResponse(requestResult);
+		
+		GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
 		
 		String author = NameEnum.GEMINI.name();
 		 
@@ -488,9 +472,7 @@ public class AiService {
 		
 		try {
 			
-			String jsonContent = extractJsonFromResponse(requestResult);
-			
-			return objectMapper.readValue(jsonContent, GeminiGeneratePassageResponseDto.class);
+			return objectMapper.readValue(requestResult, GeminiGeneratePassageResponseDto.class);
 			
 		} catch(Exception exception) {
 			
@@ -687,9 +669,11 @@ public class AiService {
 			
 			String prompt = generateQuestionPrompt(passage);
 			
-			String requestResult = requestGenerate(prompt);
+			Map<String, Object> requestResult = requestGenerate(prompt);
 			
-			GeminiGenerateQuestionResponseDto parsedResult = parseQuestionResponse(requestResult);
+			String content = extractContentFromResponse(requestResult);
+			
+			GeminiGenerateQuestionResponseDto parsedResult = parseQuestionResponse(content);
 								
 			saveMultipleChoiceQuestion(passage, parsedResult);
 
@@ -702,9 +686,7 @@ public class AiService {
 		
 		try {
 			
-			String jsonContent = extractJsonFromResponse(requestResult);
-			
-			return objectMapper.readValue(jsonContent, GeminiGenerateQuestionResponseDto.class);
+			return objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class);
 			
 		} catch(Exception exception) {
 			
@@ -766,7 +748,47 @@ public class AiService {
 	}
 
 
-	
+	private String extractContentFromResponse(Map<String, Object> response) {
+		
+		if(response != null && response.containsKey("candidates")) {
+			
+			List<Map<String, Object>> candidates = (List<Map<String, Object>>)response.get("candidates");
+			
+			if(candidates != null && !candidates.isEmpty()) {
+				
+				Map<String, Object> firstCandidate = candidates.get(0);
+				
+				if(firstCandidate.containsKey("content")) {
+					
+					Map<String, Object> content = (Map<String, Object>)firstCandidate.get("content");
+					
+					if(content.containsKey("parts")) {
+						
+						List<Map<String, Object>> parts = (List<Map<String, Object>>)content.get("parts");
+						
+						if(parts != null && !parts.isEmpty()) {
+							
+							Map<String, Object> firstPart = parts.get(0);
+							
+							if(firstPart.containsKey("text")) {
+								
+								return (String) firstPart.get("text");
+								
+							}
+							
+						}
+						
+					}
+			
+				}
+				
+			}
+
+		}
+		
+		return "{}";
+		
+	}
 
 
 
