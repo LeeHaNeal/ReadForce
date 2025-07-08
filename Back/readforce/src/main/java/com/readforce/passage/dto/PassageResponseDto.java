@@ -3,17 +3,16 @@ package com.readforce.passage.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.readforce.common.enums.Classification;
+import com.readforce.common.enums.ClassificationEnum;
+import com.readforce.passage.entity.Passage;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class PassageResponseDto {
 
 	private Long passageNo;
@@ -36,6 +35,21 @@ public class PassageResponseDto {
 	
 	private String language;
 
-	private Classification classification;
+	private ClassificationEnum classification;
+	
+	public PassageResponseDto(Passage passage) {
+		
+		this.passageNo = passage.getPassageNo();
+		this.title = passage.getTitle();
+		this.content = passage.getContent();
+		this.author = passage.getAuthor();
+		this.publicationDate = passage.getPublicationDate();
+		this.createdAt = passage.getCreatedAt();
+		this.category = passage.getCategory().getCategoryName().name();
+		this.type = passage.getType().getTypeName().name();
+		this.level = passage.getLevel().getLevelNumber();
+		this.language = passage.getLanguage().getLanguageName().name();	
+		
+	}
 
 }

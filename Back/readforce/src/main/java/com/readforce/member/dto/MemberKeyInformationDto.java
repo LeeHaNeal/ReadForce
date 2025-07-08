@@ -1,6 +1,6 @@
 package com.readforce.member.dto;
 
-import com.readforce.common.enums.Role;
+import com.readforce.common.enums.RoleEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +15,6 @@ public class MemberKeyInformationDto {
 	
 	private final String password;
 	
-	private final Role role;
+	private final RoleEnum role;
 	
 }

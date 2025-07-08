@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Category;
-import com.readforce.common.enums.Language;
-import com.readforce.passage.validation.ValidEnum;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.ranking.dto.RankingResponseDto;
 import com.readforce.result.service.ScoreService;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,13 +30,11 @@ public class RankingController {
 	@GetMapping("/get-ranking-list")
 	public ResponseEntity<List<RankingResponseDto>> getRankingList(
 			@RequestParam("category")
-			@NotBlank(message = MessageCode.CATEGORY_NOT_BLANK)
-			@ValidEnum(enumClass = Category.class, message = MessageCode.CATEGORY_INVALID)
-			String category,
+			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+			CategoryEnum category,
 			@RequestParam("language")
-			@NotBlank(message = MessageCode.LANGUAGE_NOT_BLANK)
-			@ValidEnum(enumClass = Language.class, message = MessageCode.LANGUAGE_INVALID)
-			String language
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language
 	){
 		
 		List<RankingResponseDto> rankingList = scoreService.getTop50ByCategory(category, language);

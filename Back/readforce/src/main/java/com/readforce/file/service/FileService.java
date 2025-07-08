@@ -18,8 +18,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.FileCategory;
-import com.readforce.common.enums.Name;
+import com.readforce.common.enums.FileCategoryEnum;
+import com.readforce.common.enums.NameEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.file.exception.FileException;
 
@@ -37,11 +37,7 @@ public class FileService {
 	private Long profileImageMaxFileSize;
 	
 	@Value("#{'${file.image.profile.allowed-mime-types}'.split(',')}")
-	private List<String> profileImageAllowedMimeTypeList;
-	
-	@Value("${file.image.profile.default-image-path}")
-	private String profileDefaultImagePath;
-	
+	private List<String> profileImageAllowedMimeTypeList;	
 	
 	private Path getPath(String uploadDir) {
 		
@@ -104,11 +100,11 @@ public class FileService {
 		
 	}
 	
-	public Resource loadFileAsResource(String fileName, FileCategory fileCategory) {
+	public Resource loadFileAsResource(String fileName, FileCategoryEnum fileCategory) {
 		
-		Map<Name, Object> fileInformationMap = getFileInformationFromFileCategory(fileCategory);
+		Map<NameEnum, Object> fileInformationMap = getFileInformationFromFileCategory(fileCategory);
 		
-		String uploadDir = (String) fileInformationMap.get(Name.UPLOAD_DIR);
+		String uploadDir = (String) fileInformationMap.get(NameEnum.UPLOAD_DIR);
 		
 		try {
 			
@@ -137,11 +133,11 @@ public class FileService {
 		
 	}
 	
-	public void deleteFile(String fileName, FileCategory fileCategory) {
+	public void deleteFile(String fileName, FileCategoryEnum fileCategory) {
 		
-		Map<Name, Object> fileInformationMap = getFileInformationFromFileCategory(fileCategory);
+		Map<NameEnum, Object> fileInformationMap = getFileInformationFromFileCategory(fileCategory);
 		
-		String uploadDir = (String) fileInformationMap.get(Name.UPLOAD_DIR);
+		String uploadDir = (String) fileInformationMap.get(NameEnum.UPLOAD_DIR);
 		
 		try {
 			
@@ -160,13 +156,13 @@ public class FileService {
 		
 	}
 
-	public String storeFile(MultipartFile multipartFile, FileCategory fileCategory) {
+	public String storeFile(MultipartFile multipartFile, FileCategoryEnum fileCategory) {
 		
-		Map<Name, Object> fileInformationMap = getFileInformationFromFileCategory(fileCategory);
+		Map<NameEnum, Object> fileInformationMap = getFileInformationFromFileCategory(fileCategory);
 		
-		String uploadDir = (String) fileInformationMap.get(Name.UPLOAD_DIR);
-		Long maxFileSize = (Long) fileInformationMap.get(Name.MAX_FILE_SIZE);
-		List<String> fileTypeList = (List<String>) fileInformationMap.get(Name.FILE_TYPE_LIST);
+		String uploadDir = (String) fileInformationMap.get(NameEnum.UPLOAD_DIR);
+		Long maxFileSize = (Long) fileInformationMap.get(NameEnum.MAX_FILE_SIZE);
+		List<String> fileTypeList = (List<String>) fileInformationMap.get(NameEnum.FILE_TYPE_LIST);
 				
 		validateFile(multipartFile, maxFileSize, fileTypeList);
 		
@@ -186,16 +182,16 @@ public class FileService {
 
 	}
 	
-	private Map<Name, Object> getFileInformationFromFileCategory(FileCategory fileCategory) {
+	private Map<NameEnum, Object> getFileInformationFromFileCategory(FileCategoryEnum fileCategory) {
 
-		Map<Name, Object> fileInformationMap = new HashMap<>();
+		Map<NameEnum, Object> fileInformationMap = new HashMap<>();
 		
 		switch(fileCategory) {
 			
 			case PROFILE_IMAGE:
-				fileInformationMap.put(Name.UPLOAD_DIR, profileImageUploadDir);
-				fileInformationMap.put(Name.MAX_FILE_SIZE, profileImageMaxFileSize);
-				fileInformationMap.put(Name.FILE_TYPE_LIST, profileImageAllowedMimeTypeList);
+				fileInformationMap.put(NameEnum.UPLOAD_DIR, profileImageUploadDir);
+				fileInformationMap.put(NameEnum.MAX_FILE_SIZE, profileImageMaxFileSize);
+				fileInformationMap.put(NameEnum.FILE_TYPE_LIST, profileImageAllowedMimeTypeList);
 				break;
 				
 			default:

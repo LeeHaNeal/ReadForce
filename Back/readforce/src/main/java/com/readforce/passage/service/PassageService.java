@@ -2,6 +2,7 @@ package com.readforce.passage.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
+import com.readforce.common.enums.ClassificationEnum;
+import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.OrderByEnum;
+import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.entity.Category;
@@ -28,11 +34,11 @@ public class PassageService {
 	private final PassageRepository passageRepository;
 	
 	@Transactional(readOnly = true)
-	public List<PassageResponseDto> getPassageListByLanguageAndCategory(String orderBy, String language, String classification, String category) {
+	public List<PassageResponseDto> getPassageListByLanguageAndCategory(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category) {
 
-		Sort sort = Sort.by(Sort.Direction.fromString(orderBy), "createdAt");
+		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
-		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_Category(language, classification, category, sort);
+		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategory(language, classification, category, sort);
 		
 		if(passageList.isEmpty()) {
 			
@@ -40,16 +46,18 @@ public class PassageService {
 			
 		}
 		
-		return passageList;
+		return passageList.stream()
+				.map(PassageResponseDto::new)
+				.collect(Collectors.toList());				
 		
 	}
 
 	@Transactional(readOnly = true)
-	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndType(String orderBy, String language, String classification, String category, String type) {
+	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndType(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category, TypeEnum type) {
 
-		Sort sort = Sort.by(Sort.Direction.fromString(orderBy), "createdAt");
+		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
-		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_type(language, classification, category, type, sort);
+		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndType(language, classification, category, type, sort);
 
 		if(passageList.isEmpty()) {
 			
@@ -57,16 +65,18 @@ public class PassageService {
 			
 		}
 		
-		return passageList;
+		return passageList.stream()
+				.map(PassageResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 
 	@Transactional(readOnly = true)
-	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndTypeAndLevel(String orderBy, String language, String classification, String category, String type, Integer level) {
+	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndTypeAndLevel(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category, TypeEnum type, Integer level) {
 		
-		Sort sort = Sort.by(Sort.Direction.fromString(orderBy), "createdAt");
+		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
-		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_typeAndLevel_level(language, classification, category, type, level, sort);
+		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndTypeAndLevel(language, classification, category, type, level, sort);
 
 		if(passageList.isEmpty()) {
 			
@@ -74,14 +84,16 @@ public class PassageService {
 			
 		}
 		
-		return passageList;
+		return passageList.stream()
+				.map(PassageResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 
 	@Transactional(readOnly = true)
-	public Passage getTestPassage(String language, String category, Integer level) {
+	public Passage getTestPassage(LanguageEnum language, CategoryEnum category, Integer level) {
 		
-		long count = passageRepository.countByLanguage_LanguageAndCategory_CategoryAndLevel_Level(language, category, level);
+		long count = passageRepository.countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumber(language, category, level);
 		
 		int randomIndex = (int)(Math.random() * count);
 		
@@ -100,14 +112,14 @@ public class PassageService {
 	}
 
 	public List<Long> getPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(
-			String language,
-			String classification, 
-			String category, 
-			String type, 
+			LanguageEnum language,
+			ClassificationEnum classification, 
+			CategoryEnum category, 
+			TypeEnum type, 
 			Integer level
 	) {
 
-		return passageRepository.findPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(
+		return passageRepository.findPassageNoByLanguageAndClassificationAndCategoryAndTypeAndLevel(
 				language, classification, category, type, level
 		);
 		

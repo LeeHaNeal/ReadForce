@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 
 import com.readforce.authentication.exception.AuthenticationException;
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.ExpireTime;
-import com.readforce.common.enums.Name;
-import com.readforce.common.enums.Prefix;
+import com.readforce.common.enums.ExpireTimeEnum;
+import com.readforce.common.enums.NameEnum;
+import com.readforce.common.enums.PrefixEnum;
 import com.readforce.common.service.RateLimitingService;
 
 import lombok.RequiredArgsConstructor;
@@ -90,15 +90,15 @@ public class EmailService {
 				email,
 				SIGN_UP_MESSAGE,
 				createVerificationCode(),
-				ExpireTime.DEFAULT.getTime(),
-				Prefix.SIGN_UP.getContent()				
+				ExpireTimeEnum.DEFAULT.getTime(),
+				PrefixEnum.SIGN_UP.getContent()				
 		);
 		
 	}
 	
 	public void verifyVerificationCodeForSignUp(String email, String code) {
 		
-		verifyVerificationCode(email, code, Prefix.SIGN_UP.getContent());
+		verifyVerificationCode(email, code, PrefixEnum.SIGN_UP.getContent());
 		
 	}
 	
@@ -110,12 +110,12 @@ public class EmailService {
 		String text = 
 				DEFAULT_MESSAGE + "\n" +
 				"비밀번호를 재설정 하시려면 아래의 링크를 눌러주세요.\n" +
-				passwordResetUrl + "?" + Name.TEMPORAL_TOKEN.name() + temporalToken;
+				passwordResetUrl + "?" + NameEnum.TEMPORAL_TOKEN.name() + temporalToken;
 		
 		redisTemplate.opsForValue().set(
-				Prefix.PASSWORD_RESET.getContent() + temporalToken,
+				PrefixEnum.PASSWORD_RESET.getContent() + temporalToken,
 				email,
-				Duration.ofMinutes(ExpireTime.DEFAULT.getTime())
+				Duration.ofMinutes(ExpireTimeEnum.DEFAULT.getTime())
 		);
 		
 		SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
@@ -146,9 +146,9 @@ public class EmailService {
 	public void markEmailAsVerified(String email) {
 		
 		redisTemplate.opsForValue().set(
-				Prefix.EMAIL_VERIFICATION.getContent() + email,
+				PrefixEnum.EMAIL_VERIFICATION.getContent() + email,
 				MessageCode.EMAIL_VERIFICATION_SUCCESS,
-				Duration.ofMinutes(ExpireTime.MARK_EMAIL_AS_VERIFIED.getTime())
+				Duration.ofMinutes(ExpireTimeEnum.MARK_EMAIL_AS_VERIFIED.getTime())
 		);
 		
 	}	

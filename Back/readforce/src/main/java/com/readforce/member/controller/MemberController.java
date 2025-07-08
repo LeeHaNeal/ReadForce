@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Name;
+import com.readforce.common.enums.NameEnum;
 import com.readforce.member.dto.MemberModifyDto;
 import com.readforce.member.dto.MemberPasswordResetDto;
 import com.readforce.member.dto.MemberPasswordResetFromLinkDto;
@@ -86,7 +86,7 @@ public class MemberController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				MessageCode.MESSAGE_CODE, MessageCode.MEMBER_MODIFY_SUCCESS,
-				Name.NICKNAME.name(), nickname				
+				NameEnum.NICKNAME.name(), nickname				
 		));
 		
 	}

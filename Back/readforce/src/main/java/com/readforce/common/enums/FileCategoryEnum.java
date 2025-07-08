@@ -1,6 +1,6 @@
 package com.readforce.common.enums;
 
-public enum FileCategory {
+public enum FileCategoryEnum {
 
 	PROFILE_IMAGE
 	

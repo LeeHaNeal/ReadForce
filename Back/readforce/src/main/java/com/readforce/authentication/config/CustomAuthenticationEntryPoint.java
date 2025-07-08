@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.readforce.common.MessageCode;
-import com.readforce.common.enums.Name;
+import com.readforce.common.enums.NameEnum;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 			AuthenticationException exception
 	) throws IOException, ServletException {
 		
-		String exceptionMessage = (String)request.getAttribute(Name.EXCEPTION.name());
+		String exceptionMessage = (String)request.getAttribute(NameEnum.EXCEPTION.name());
 		
 		if(exceptionMessage == null) {
 			
