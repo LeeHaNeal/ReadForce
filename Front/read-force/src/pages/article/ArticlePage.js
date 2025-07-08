@@ -1,34 +1,64 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UniversalList from '../../components/universal/UniversalList';
-import {
-  fetchNewsListByLanguage,
-  fetchNewsListByLanguageAndLevel,
-  fetchNewsListByLanguageAndLevelAndCategory
-} from '../../api/newsApi';
+import { fetchPassageList } from '../../api/newsApi';
 import debounce from 'lodash/debounce';
 import NewsCategory from '../../components/NewsCategory';
 
+// Level 매핑
 const reverseLevelMap = {
-  '1': 'LEVEL_1',
-  '2': 'LEVEL_2',
-  '3': 'LEVEL_3',
-  '4': 'LEVEL_4',
-  '5': 'LEVEL_5',
-  '6': 'LEVEL_6',
-  '7': 'LEVEL_7',
-  '8': 'LEVEL_8',
-  '9': 'LEVEL_9',
-  '10': 'LEVEL_10',
+  '1': 1,
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+  '9': 9,
+  '10': 10,
 };
 
+// ✅ CategoryEnum 매핑
 const reverseCategoryMap = {
-  '정치': 'POLITICS',
-  '경제': 'ECONOMY',
-  '사회': 'SOCIETY',
-  '생활/문화': 'CULTURE',
-  'IT/과학': 'SCIENCE',
-  '기타': 'ETC',
+  '뉴스': 'NEWS',
+  '소설': 'NOVEL',
+  '동화': 'FAIRY_TALE',
+};
+
+// ✅ TypeEnum 매핑 (category 별)
+const reverseTypeMap = {
+  '뉴스': {
+    '정치': 'POLITICS',
+    '경제': 'ECONOMY',
+    '사회': 'SOCIETY',
+    '생활/문화': 'LIFE_AND_CULTURE',
+    'IT/과학': 'IT_AND_SCIENCE',
+    '세계': 'WORLD',
+    '스포츠': 'SPORTS',
+    '연예': 'ENTERTAINMENT',
+  },
+  '소설': {
+    '추리/미스테리': 'MYSTERY',
+    '과학': 'SCIENCE_FICTION',
+    '판타지': 'FANTASY',
+    '로맨스': 'ROMANCE',
+    '역사': 'HISTORICAL',
+    '모험': 'ADVENTURE',
+    '스릴러': 'THRILLER',
+  },
+  '동화': {
+    '환상': 'FANTASY',
+    '생활': 'SLICE_OF_LIFE',
+    '전래': 'TRADITIONAL',
+    '정보': 'INFORMATIONAL',
+  },
+};
+
+const defaultSubType = {
+  '뉴스': '정치',
+  '소설': '추리/미스테리',
+  '동화': '환상',
 };
 
 const ArticlePage = () => {
@@ -36,8 +66,10 @@ const ArticlePage = () => {
   const [newsItems, setNewsItems] = useState([]);
   const [language] = useState('KOREAN');
   const [level, setLevel] = useState('');
-  const [category, setCategory] = useState('');
-  const [order_by, setOrderBy] = useState('latest');
+  const [category, setCategory] = useState('뉴스');   // 기본값: 뉴스
+  const [subType, setSubType] = useState(defaultSubType['뉴스']); // 기본 서브타입
+  const [orderBy, setOrderBy] = useState('latest');
+  const [classification] = useState('NORMAL');
 
   const handleSolve = (item) => {
     navigate(`/question/${item.news_no}`, {
@@ -47,15 +79,9 @@ const ArticlePage = () => {
 
   const fetchNews = useCallback(async (params) => {
     try {
-      if (!params.level && !params.category) {
-        return await fetchNewsListByLanguage({ language: params.language, order_by: params.order_by });
-      } else if (params.level && !params.category) {
-        return await fetchNewsListByLanguageAndLevel({ language: params.language, level: params.level, order_by: params.order_by });
-      } else {
-        return await fetchNewsListByLanguageAndLevelAndCategory({ language: params.language, level: params.level, category: params.category, order_by: params.order_by });
-      }
+      return await fetchPassageList(params);
     } catch (err) {
-      console.error('뉴스 목록 불러오기 실패:', err);
+      console.error('지문 목록 불러오기 실패:', err);
       return [];
     }
   }, []);
@@ -66,15 +92,30 @@ const ArticlePage = () => {
   }, 300), [fetchNews]);
 
   const fetchData = useCallback(() => {
-    const apiLevel = reverseLevelMap[level] || '';
-    const apiCategory = reverseCategoryMap[category] || '';
-    debouncedFetch({ language, level: apiLevel, category: apiCategory, order_by });
-  }, [debouncedFetch, language, level, category, order_by]);
+    const apiLevel = reverseLevelMap[level] || undefined;
+    const apiCategory = reverseCategoryMap[category] || 'NEWS';
+    const apiType = reverseTypeMap[category]?.[subType] || 'INFORMATIONAL';
+
+    debouncedFetch({
+      language,
+      classification,
+      category: apiCategory,
+      type: apiType,
+      level: apiLevel,
+      orderBy
+    });
+  }, [debouncedFetch, language, classification, category, subType, level, orderBy]);
 
   useEffect(() => {
     fetchData();
     return () => debouncedFetch.cancel();
   }, [fetchData, debouncedFetch]);
+
+  // 카테고리 변경 시 서브타입도 기본값으로 리셋
+  const handleCategoryChange = (newCategory) => {
+    setCategory(newCategory);
+    setSubType(defaultSubType[newCategory]); 
+  };
 
   return (
     <div className="page-container">
@@ -84,10 +125,13 @@ const ArticlePage = () => {
         level={level}
         setLevel={setLevel}
         category={category}
-        setCategory={setCategory}
-        order_by={order_by}
+        setCategory={handleCategoryChange}
+        subType={subType}
+        setSubType={setSubType}
+        order_by={orderBy}
         setOrderBy={setOrderBy}
         categoryOptions={NewsCategory}
+        subTypeOptions={Object.keys(reverseTypeMap[category])} // 카테고리별 서브타입 표시
         onSolve={handleSolve}
       />
     </div>
