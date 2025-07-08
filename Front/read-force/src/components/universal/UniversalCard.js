@@ -1,13 +1,7 @@
 import './css/UniversalCard.css';
 import React, { useEffect } from 'react';
 
-const levelMap = {
-  BEGINNER: '초급',
-  INTERMEDIATE: '중급',
-  ADVANCED: '고급',
-};
-
-const categoryMap = {
+const typeMap = {
   POLITICS: '정치',
   ECONOMY: '경제',
   SOCIETY: '사회',
@@ -26,8 +20,8 @@ const UniversalCard = React.memo(({ data, onSolve }) => {
     console.log("받은 데이터 확인:", data);
   }, []);
 
-  const koreanLevel = levelMap[data.level] || data.level;
-  const koreanCategory = categoryMap[data.category] || data.category;
+  const level = data.level;
+  const type = typeMap[data.type] || data.type;
 
   return (
     <div className="UniversalCard-card">
@@ -38,15 +32,13 @@ const UniversalCard = React.memo(({ data, onSolve }) => {
             - {data.literature_paragraph_no}
           </span>
         </h3>
-        <span className={`UniversalCard-badge UniversalCard-${koreanLevel}`}>
-          {koreanLevel}
-        </span>
+        <span className={`UniversalCard-badge level-${level}`}>{level}단계</span>
       </div>
 
       <p className="UniversalCard-content">{data.content}</p>
 
       <div className="UniversalCard-footer">
-        <p className="UniversalCard-category"># {koreanCategory}</p>
+        <p className="UniversalCard-category"># {type}</p>
         <button
           onClick={() => onSolve && onSolve(data)}
           className="UniversalCard-button"

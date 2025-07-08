@@ -2,7 +2,7 @@ import React from 'react';
 import './css/UniversalFilterBar.css';
 import Select from 'react-select';
 
-const UniversalFilterBar = ({ level, setLevel, category, setCategory, order_by, setOrderBy, categoryOptions }) => {
+const UniversalFilterBar = ({ level, setLevel, type, setType, orderBy, setOrderBy, typeOptions }) => {
 
   const levelOptions = [
     { value: '', label: '모두'},
@@ -16,13 +16,13 @@ const UniversalFilterBar = ({ level, setLevel, category, setCategory, order_by, 
     <div className="UniversalFilterBar-layout">
       <div className="UniversalFilterBar-left">
         <button
-          className={`UniversalFilterBar-sort-button ${order_by === 'latest' ? 'active' : ''}`}
+          className={`UniversalFilterBar-sort-button ${orderBy === 'latest' ? 'active' : ''}`}
           onClick={() => setOrderBy('latest')}
         >
           · 최신순
         </button>
         <button
-          className={`UniversalFilterBar-sort-button ${order_by === 'oldest' ? 'active' : ''}`}
+          className={`UniversalFilterBar-sort-button ${orderBy === 'oldest' ? 'active' : ''}`}
           onClick={() => setOrderBy('oldest')}
         >
           · 오래된순
@@ -31,11 +31,11 @@ const UniversalFilterBar = ({ level, setLevel, category, setCategory, order_by, 
 
       <div className="UniversalFilterBar-center">
         <div className="category-hashtags">
-          {categoryOptions.slice(1).map((opt) => (
+          {typeOptions.slice(1).map((opt) => (
             <span
               key={opt.value}
-              className={`category-tag ${category === opt.value ? 'active' : ''}`}
-              onClick={() => setCategory(category === opt.value ? '' : opt.value)}
+              className={`category-tag ${type === opt.value ? 'active' : ''}`}
+              onClick={() => setType(type === opt.value ? '' : opt.value)}
             >
               #{opt.label}
             </span>

@@ -7,19 +7,19 @@ import './css/UniversalList.css';
 const UniversalList = ({
   items = [],
   level, setLevel,
-  category, setCategory,
-  order_by, setOrderBy,
-  categoryOptions = [],
+  type, setType,
+  orderBy, setOrderBy,
+  typeOptions = [],
   onSolve
 }) => {
   const filteredItems = items.filter((item) => {
     const matchLevel = level ? item.level === level : true;
-    const matchCategory = category ? item.category === category : true;
-    return matchLevel && matchCategory;
+    const matchType = type ? item.type === type : true;
+    return matchLevel && matchType;
   });
 
   const sorted = [...filteredItems].sort((a, b) =>
-    order_by === 'latest'
+    orderBy === 'latest'
       ? new Date(b.publishedAt) - new Date(a.publishedAt)
       : new Date(a.publishedAt) - new Date(b.publishedAt)
   );
@@ -46,11 +46,11 @@ const UniversalList = ({
       <UniversalFilterBar 
         level={level}
         setLevel={setLevel}
-        order_by={order_by}
+        orderBy={orderBy}
         setOrderBy={setOrderBy}
-        category={category}
-        setCategory={setCategory}
-        categoryOptions={categoryOptions}
+        type={type}
+        setType={setType}
+        typeOptions={typeOptions}
       />
 
       <div className="UniversalList-list">

@@ -34,7 +34,7 @@ const NovelPage = () => {
   const type = 'NOVEL'; 
   const [level, setLevel] = useState('');
   const [category, setCategory] = useState('');
-  const [order_by, setOrderBy] = useState('latest');
+  const [orderBy, setOrderBy] = useState('latest');
   const navigate = useNavigate();
 
   const handleSolve = (item) => {
@@ -47,7 +47,7 @@ const NovelPage = () => {
         type,
         level: params.level,
         category: params.category,
-        order_by: params.order_by,
+        orderBy: params.orderBy,
       });
     } catch (err) {
       console.error('소설 목록 불러오기 실패:', err);
@@ -66,9 +66,9 @@ const NovelPage = () => {
     debouncedFetch({
       level: apiLevel,
       category: apiCategory,
-      order_by,
+      orderBy,
     });
-  }, [debouncedFetch, level, category, order_by]);
+  }, [debouncedFetch, level, category, orderBy]);
 
   useEffect(() => {
     fetchData();
@@ -85,7 +85,7 @@ const NovelPage = () => {
         setLevel={setLevel}
         category={category}
         setCategory={setCategory}
-        order_by={order_by}
+        orderBy={orderBy}
         setOrderBy={setOrderBy}
         categoryOptions={novelCategoryOptions}
         onSolve={handleSolve}

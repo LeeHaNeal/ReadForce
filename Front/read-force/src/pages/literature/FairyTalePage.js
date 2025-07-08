@@ -32,7 +32,7 @@ const FairyTalePage = () => {
   const type = 'FAIRYTALE'; 
   const [level, setLevel] = useState('');
   const [category, setCategory] = useState('');
-  const [order_by, setOrderBy] = useState('latest');
+  const [orderBy, setOrderBy] = useState('latest');
 
   const navigate = useNavigate(); 
 
@@ -46,7 +46,7 @@ const FairyTalePage = () => {
         type,
         level: params.level,
         category: params.category,
-        order_by: params.order_by,
+        orderBy: params.orderBy,
       });
     } catch (err) {
       console.error('동화 목록 불러오기 실패:', err);
@@ -65,9 +65,9 @@ const FairyTalePage = () => {
     debouncedFetch({
       level: apiLevel,
       category: apiCategory,
-      order_by,
+      orderBy,
     });
-  }, [debouncedFetch, level, category, order_by]);
+  }, [debouncedFetch, level, category, orderBy]);
 
   useEffect(() => {
     fetchData();
@@ -84,7 +84,7 @@ const FairyTalePage = () => {
         setLevel={setLevel}
         category={category}
         setCategory={setCategory}
-        order_by={order_by}
+        orderBy={orderBy}
         setOrderBy={setOrderBy}
         categoryOptions={fairytaleCategoryOptions}
         onSolve={handleSolve} 
