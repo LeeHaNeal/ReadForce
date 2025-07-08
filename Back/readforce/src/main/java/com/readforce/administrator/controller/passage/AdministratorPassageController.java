@@ -12,7 +12,7 @@
 //
 //	@PostMapping("/upload-novel")
 //	public ResponseEntity<Map<String, String>> uploadNovel(
-//			
+//			@RequestBody AdministratorUploadNovelRequestDto dministratorUploadNovelRequestDto
 //			
 //	)
 //	
