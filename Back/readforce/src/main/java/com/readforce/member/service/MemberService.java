@@ -230,7 +230,7 @@ public class MemberService {
 		
 		createResultMetricsForMember(member, result);
 		
-		redisTemplate.delete(PrefixEnum.EMAIL_VERIFICATION + memberSignUpDto.getEmail());
+		redisTemplate.delete(PrefixEnum.EMAIL_VERIFICATION.getContent() + memberSignUpDto.getEmail());
 		
 	}
 
