@@ -41,14 +41,4 @@ public class Category {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;	
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryNo;
-
-    @Column(name = "category_name", nullable = false)  // ✅ 수정 포인트
-    private String category;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 }
