@@ -25,7 +25,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			SELECT p 
 			FROM Passage p 
 			JOIN FETCH p.category c 
-			JOIN FETCH p.type t 
+			LEFT JOIN FETCH p.type t 
 			JOIN FETCH p.level l
 			JOIN FETCH p.language lang
 			JOIN FETCH p.classification cl
