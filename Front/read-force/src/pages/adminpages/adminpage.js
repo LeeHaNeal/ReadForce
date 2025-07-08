@@ -113,7 +113,7 @@ const AdminPage = () => {
                     level: 1,
                     category: "NEWS",
                     type: "ECONOMY",
-                    classification: "TEST",
+                    classification: "NORMAL",
                 }),
             });
 
