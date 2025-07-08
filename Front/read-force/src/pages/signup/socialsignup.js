@@ -107,7 +107,7 @@ export default function Socialsignup() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          temporal_token: tempToken,
+          temporalToken: tempToken,
           nickname,
           birthday,
         }),

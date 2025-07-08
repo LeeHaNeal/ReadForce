@@ -58,6 +58,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			Authentication authentication
 	) throws IOException, ServletException {
 		
+		System.out.println("11111111111111111111111111111111");
+		
 		OAuth2UserDto oAuth2UserDto = (OAuth2UserDto) authentication.getPrincipal();
 		
 		boolean isNewUser = oAuth2UserDto.isNewUser();
@@ -74,7 +76,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 		String targetUrl;
 		
 		if(isNewUser) {
-			
+			System.out.println("2222222222222222222222222222");
+				
 			String temporalToken = UUID.randomUUID().toString();
 			
 			Map<String, String> socialInfo = Map.of(
@@ -104,7 +107,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 					.build()
 					.toUriString();
 						
-		} else {
+		} else {System.out.println("3333333333333333333333333333333333");
+		
 			
 			final UserDetails userDetails = authenticationService.loadUserByUsername(email);
 			final String accessToken = jwtUtil.generateAccessToken(userDetails);
@@ -136,6 +140,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 					new ObjectMapper().writeValueAsString(tokenMap),
 					Duration.ofMinutes(3)
 			);
+			
+			System.out.println("Successhandler:    "+temporalToken);
 			
 			authenticationService.storeRefreshToken(email, refreshToken);
 			
