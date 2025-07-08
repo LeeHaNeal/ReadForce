@@ -37,11 +37,13 @@ import com.readforce.passage.entity.Classification;
 import com.readforce.passage.entity.Language;
 import com.readforce.passage.entity.Level;
 import com.readforce.passage.entity.Passage;
+import com.readforce.passage.entity.Type;
 import com.readforce.passage.service.CategoryService;
 import com.readforce.passage.service.ClassificationService;
 import com.readforce.passage.service.LanguageService;
 import com.readforce.passage.service.LevelService;
 import com.readforce.passage.service.PassageService;
+import com.readforce.passage.service.TypeService;
 import com.readforce.question.entity.Choice;
 import com.readforce.question.entity.MultipleChoice;
 import com.readforce.question.service.MultipleChoiceService;
@@ -62,6 +64,7 @@ public class AiService {
 	private final ClassificationService classificationService;
 	private final QuestionService questionService;
 	private final MultipleChoiceService multipleChoiceService;
+	private final TypeService typeService;
 	
 	@Value("${gemini.api.key}")
 	private String geminiApiKey;
@@ -97,7 +100,7 @@ public class AiService {
 				 
 				Category categoryEntity = categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY);
 
-				passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification);
+				passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification, null);
 				
 			}
 
@@ -264,7 +267,7 @@ public class AiService {
 						
 						Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
 						
-						Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification);
+						Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification, null);
 								
 						saveMultipleChoiceQuestion(newPassage, parsedResult);
 						
@@ -502,6 +505,8 @@ public class AiService {
 		 
 		Category category = categoryService.getCategoryByCategory(aiGeneratePassageRequestDto.getCategory());
 
+		Type type = typeService.getTypeByType(aiGeneratePassageRequestDto.getType());
+		
 		passageService.savePassage(
 				parsedResult.getTitle(), 
 				parsedResult.getContent(), 
@@ -510,7 +515,8 @@ public class AiService {
 				category, 
 				level, 
 				language, 
-				classification
+				classification,
+				type
 		);
 		
 		
