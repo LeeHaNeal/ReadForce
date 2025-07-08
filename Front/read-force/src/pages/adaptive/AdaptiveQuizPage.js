@@ -12,10 +12,10 @@ const AdaptiveQuizPage = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await fetchWithAuth('/adaptive/get-question');
+        const res = await fetchWithAuth('/recommend/get-recommend?language=korean');
         const data = await res.json();
 
-        // 데이터가 없거나 이상하면 더미 보여주기
+        // 정상 데이터가 없을 경우 더미 데이터 출력
         if (!data || !data.question) {
           console.warn('문제 없음: 더미 데이터로 대체');
           setQuiz({
@@ -55,7 +55,7 @@ const AdaptiveQuizPage = () => {
 
   if (!quiz) return <div className="page-container">로딩 중...</div>;
 
-  const options = quiz.options || []; 
+  const options = quiz.options || [];
 
   const handleSubmit = () => {
     if (!selected) return;
@@ -66,7 +66,7 @@ const AdaptiveQuizPage = () => {
       state: {
         isCorrect: correct,
         explanation: quiz.explanation || "해설 없음",
-        next: '/adaptive-learning/start', 
+        next: '/adaptive-learning/start',
       },
     });
   };
