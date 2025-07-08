@@ -205,6 +205,8 @@ public class MemberService {
 		String checkEmailVerification = 
 				redisTemplate.opsForValue().get(PrefixEnum.EMAIL_VERIFICATION.getContent() + memberSignUpDto.getEmail());
 		
+		System.out.println("sysjkjhkghnbmvhnmbmvnn2342342342    " + memberSignUpDto.getEmail());
+		
 		if(checkEmailVerification == null || !checkEmailVerification.equals(MessageCode.EMAIL_VERIFICATION_SUCCESS)) {
 			
 			throw new AuthenticationException(MessageCode.EMAIL_VERIFICATION_REQUIRED);
@@ -228,7 +230,7 @@ public class MemberService {
 		
 		createResultMetricsForMember(member, result);
 		
-		redisTemplate.delete(PrefixEnum.EMAIL_VERIFICATION + memberSignUpDto.getEmail());
+		redisTemplate.delete(PrefixEnum.EMAIL_VERIFICATION.getContent() + memberSignUpDto.getEmail());
 		
 	}
 

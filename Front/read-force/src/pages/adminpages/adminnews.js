@@ -33,7 +33,7 @@ const AdminNews = () => {
         if (!window.confirm("뉴스를 생성하시겠습니까? 총 54문제가 생성됩니다")) return;
 
         try {
-            const res = await fetchWithAuth("/admin/generate-creative-news", {
+            const res = await fetchWithAuth("/ai/generate-creative-news", {   // <== 수정
                 method: "POST"
             });
 
@@ -67,12 +67,12 @@ const AdminNews = () => {
         }
     };
 
-    // 문제 생성
+    // 뉴스 퀴즈 생성
     const handleGenerateNewsQuiz = async () => {
         if (!window.confirm("뉴스 퀴즈를 생성하시겠습니까?\n(뉴스에 해당 문제 없는 경우만 생성됩니다)")) return;
 
         try {
-            const res = await fetchWithAuth("/admin/generate-creative-news-quiz", {
+            const res = await fetchWithAuth("/ai/generate-creative-news-quiz", {   // <== 수정
                 method: "POST"
             });
 
@@ -114,7 +114,6 @@ const AdminNews = () => {
                     {newsList.map((news) => (
                         <tr key={news.news_no}>
                             <td style={tdStyle}>{news.news_no}</td>
-                            {/* <td style={tdStyle}>{news.title}</td> */}
                             <td
                                 style={{
                                     cursor: "pointer", color: "blue", border: "1px solid #ddd",
@@ -166,7 +165,7 @@ const backbtn = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer"
-}
+};
 
 const LEVEL_LABELS = {
     BEGINNER: "초급",

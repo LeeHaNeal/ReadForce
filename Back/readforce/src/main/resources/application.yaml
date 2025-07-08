@@ -17,7 +17,7 @@ spring:
         show_sql: true
         format_sql: true
         hbm2ddl:
-          auto: none
+          auto: update
   data:
     redis:
       host: localhost
@@ -38,6 +38,7 @@ spring:
   jwt:
     secret: ${JWT_SECRET_KEY}
     access-expiration-time: 300000 # 5분
+#    access-expiration-time: 5000 # 5
     refresh-expiration-time: 86400000 # 1일
   security:
     oauth2:

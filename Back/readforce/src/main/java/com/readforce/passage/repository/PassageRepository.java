@@ -114,5 +114,19 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 	
 	long countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumber(LanguageEnum language, CategoryEnum category, Integer level);
 
+	@Query("""
+			SELECT p
+			FROM Passage p 
+			LEFT JOIN FETCH p.category
+			LEFT JOIN FETCH p.type
+			LEFT JOIN FETCH p.level
+			LEFT JOIN FETCH p.classification
+			LEFT JOIN Question q ON p.passageNo = q.passage.passageNo
+			WHERE q.passage.passageNo IS NULL
+	""")
+	List<Passage> findNoQuestionPassageList();
+	
+	
+	
 
 }

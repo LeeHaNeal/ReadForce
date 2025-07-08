@@ -42,6 +42,9 @@ public class Choice {
 	@Column(nullable = false)
 	private Boolean isCorrect;
 	
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String explanation;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "multiple_choice_no", nullable = false)
 	private MultipleChoice multipleChoice;

@@ -15,6 +15,7 @@ import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.service.PassageService;
 import com.readforce.question.dto.QuestionLevelAndCategoryAndLanguageDto;
+import com.readforce.question.entity.MultipleChoice;
 import com.readforce.question.entity.Question;
 import com.readforce.question.repository.QuestionRepository;
 
@@ -70,6 +71,9 @@ public class QuestionService {
 	}
 	
 
-
+	  @Transactional
+	    public MultipleChoice saveMultipleChoice(MultipleChoice multipleChoice) {
+	        return questionRepository.save(multipleChoice);
+	    }
 
 }
