@@ -798,7 +798,9 @@ public class AiService {
 									
 								}
 								
-								return text.trim();
+								text = text.replaceAll("\\s+", "");
+								
+								return text;
 								
 							}
 							

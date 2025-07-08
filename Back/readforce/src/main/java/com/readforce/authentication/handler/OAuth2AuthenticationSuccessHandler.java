@@ -132,7 +132,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			);
 			
 			redisTemplate.opsForValue().set(
-					PrefixEnum.TEMPORAL + temporalToken,
+					PrefixEnum.TEMPORAL.getContent() + temporalToken,
 					new ObjectMapper().writeValueAsString(tokenMap),
 					Duration.ofMinutes(3)
 			);
