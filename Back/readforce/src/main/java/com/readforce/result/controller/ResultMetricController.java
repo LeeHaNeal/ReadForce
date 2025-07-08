@@ -14,7 +14,7 @@ public class ResultMetricController {
 
 	private final ResultMetricService resultMetricService;
 	
-	@GetMapping("/get-category-correct-answer-rate")
-	public ResponseEntity
+//	@GetMapping("/get-category-correct-answer-rate")
+//	public ResponseEntity
 	
 }

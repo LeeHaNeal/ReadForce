@@ -31,10 +31,9 @@ public class Classification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long classificationNo;
-	
-	@Enumerated(EnumType.STRING)
+
 	@Column(nullable = false)
-	private com.readforce.common.enums.Classification classification;
+	private String classification;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)

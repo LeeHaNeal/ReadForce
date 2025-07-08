@@ -2,6 +2,10 @@ package com.readforce.passage.repository;
 
 import java.util.List;
 
+import com.readforce.common.enums.Category;
+import com.readforce.common.enums.Classification;
+import com.readforce.common.enums.Language;
+import com.readforce.common.enums.Type;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -41,8 +45,8 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND c.category = :category
 	""")
 	List<PassageResponseDto> findByLanguage_LanguageAndClassification_ClassificationAndCategory_Category(
-			@Param("language") String language, 
-			@Param("classification") String classification, 
+			@Param("language") String language,
+			@Param("classification") String classification,
 			@Param("category") String category,
 			Sort sort
 	);
@@ -75,10 +79,10 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND t.type = :type
 	""")
 	List<PassageResponseDto> findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_type(
-			@Param("language") String language, 
-			@Param("classification") String classification, 
-			@Param("category") String category,
-			@Param("type") String type, 
+			@Param("language") Language language,
+			@Param("classification") Classification classification,
+			@Param("category") Category category,
+			@Param("type") Type type,
 			Sort sort
 	);
 
@@ -109,10 +113,10 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND l.level = :level
 	""")
 	List<PassageResponseDto> findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_typeAndLevel_level(
-			@Param("language") String language, 
-			@Param("classification") String classification, 
-			@Param("category") String category,
-			@Param("type") String type,
+			@Param("language") Language language,
+			@Param("classification") Classification classification,
+			@Param("category") Category category,
+			@Param("type") Type type,
 			@Param("level") Integer level,
 			Sort sort
 	);
@@ -138,10 +142,10 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND l.level = :level
 			""")
 	List<Long> findPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(
-			@Param("language") String language, 
-			@Param("classification") String classification, 
-			@Param("category") String category,
-			@Param("type") String type,
+			@Param("language") String language,
+			@Param("classification") Classification classification,
+			@Param("category") Category category,
+			@Param("type") Type type,
 			@Param("level") Integer level
 	);
 

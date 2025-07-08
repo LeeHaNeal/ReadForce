@@ -63,7 +63,10 @@ public class SecurityConfig {
 				            "/email/send-password-reset-link",
 				            "/ranking/get-ranking-list",
 				            "/test/**",
-				            "/oauth2/**"							
+				            "/oauth2/**",
+							"/passage/**",
+							"**"
+
 					)
 					.permitAll()
 					.anyRequest()

@@ -1,7 +1,12 @@
 package com.readforce.passage.service;
 
 import java.util.List;
+import java.util.Locale;
 
+import com.readforce.common.enums.Category;
+import com.readforce.common.enums.Classification;
+import com.readforce.common.enums.Language;
+import com.readforce.common.enums.Type;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -44,7 +49,7 @@ public class PassageService {
 
 		Sort sort = Sort.by(Sort.Direction.fromString(orderBy), "createdAt");
 		
-		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_type(language, classification, category, type, sort);
+		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_type(Language.valueOf(language.toUpperCase()), Classification.valueOf(classification.toUpperCase()), Category.valueOf(category.toUpperCase()), Type.valueOf(type.toUpperCase()), sort);
 
 		if(passageList.isEmpty()) {
 			
@@ -61,7 +66,7 @@ public class PassageService {
 		
 		Sort sort = Sort.by(Sort.Direction.fromString(orderBy), "createdAt");
 		
-		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_typeAndLevel_level(language, classification, category, type, level, sort);
+		List<PassageResponseDto> passageList = passageRepository.findByLanguage_LanguageAndClassification_ClassificationAndCategory_CategoryAndType_typeAndLevel_level(Language.valueOf(language.toUpperCase()), Classification.valueOf(classification.toUpperCase()), Category.valueOf(category.toUpperCase()), Type.valueOf(type.toUpperCase()), level, sort);
 
 		if(passageList.isEmpty()) {
 			
@@ -103,7 +108,7 @@ public class PassageService {
 	) {
 
 		return passageRepository.findPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(
-				language, classification, category, type, level
+				language, Classification.valueOf(classification.toUpperCase()), Category.valueOf(category.toUpperCase()), Type.valueOf(type.toUpperCase()), level
 		);
 		
 	}
