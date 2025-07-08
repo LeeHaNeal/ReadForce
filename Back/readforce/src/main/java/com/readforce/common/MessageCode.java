@@ -83,6 +83,7 @@ public final class MessageCode {
 	
 	
 	
+	
 	public static final String AUTHENTICATION_FAIL = "FAI0001";
 	public static final String JSON_PROCESSING_FAIL = "FAI0002";
 	public static final String DIRECTORY_CREATION_FAIL = "FAI0003";

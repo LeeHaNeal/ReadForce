@@ -8,13 +8,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.ai.dto.AiGeneratePassageRequestDto;
-import com.readforce.ai.dto.AiGenerateTestRequestDto;
 import com.readforce.ai.service.AiService;
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.LanguageEnum;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,12 +29,12 @@ public class AiController {
 	
 	@PostMapping("/generate-test-passage")
 	public ResponseEntity<Map<String, String>> generateTestPassage(
-		@RequestBody AiGenerateTestRequestDto aiGenerateTestRequestDto
+			@RequestParam("language")
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language
 	){
 		
-		aiService.generateTestVocabulary(aiGenerateTestRequestDto.getLanguage());
-		
-		
+		aiService.generateTestVocabulary(language);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_PASSAGE_SUCCESS
@@ -42,11 +44,12 @@ public class AiController {
 	
 	@PostMapping("/generate-test-question")
 	public ResponseEntity<Map<String, String>> generateTestQuestion(
-		@RequestBody AiGenerateTestRequestDto aiGenerateTestRequestDto
+			@RequestParam("language")
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language
 	){
 		
-		
-		aiService.generateTestQuestion(aiGenerateTestRequestDto.getLanguage());
+		aiService.generateTestQuestion(language);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_QUESTION_SUCCESS
@@ -54,11 +57,12 @@ public class AiController {
 		
 	}
 	
+	
 	@PostMapping("/generate-passage")
 	public ResponseEntity<Map<String, String>> generatePassage(
 			@RequestBody AiGeneratePassageRequestDto aiGeneratePassageRequestDto
 	){
-		System.out.println("11111111111111111111111111");
+		
 		aiService.generatePassage(aiGeneratePassageRequestDto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
