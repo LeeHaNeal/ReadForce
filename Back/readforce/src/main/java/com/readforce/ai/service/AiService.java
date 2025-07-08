@@ -755,6 +755,7 @@ public class AiService {
    }
 
 
+<<<<<<< HEAD
    private String extractContentFromResponse(Map<String, Object> response) {
       
       if(response != null && response.containsKey("candidates")) {
@@ -802,6 +803,57 @@ public class AiService {
             }
             
          }
+=======
+	private String extractContentFromResponse(Map<String, Object> response) {
+		
+		if(response != null && response.containsKey("candidates")) {
+			
+			List<Map<String, Object>> candidates = (List<Map<String, Object>>)response.get("candidates");
+			
+			if(candidates != null && !candidates.isEmpty()) {
+				
+				Map<String, Object> firstCandidate = candidates.get(0);
+				
+				if(firstCandidate.containsKey("content")) {
+					
+					Map<String, Object> content = (Map<String, Object>)firstCandidate.get("content");
+					
+					if(content.containsKey("parts")) {
+						
+						List<Map<String, Object>> parts = (List<Map<String, Object>>)content.get("parts");
+						
+						if(parts != null && !parts.isEmpty()) {
+							
+							Map<String, Object> firstPart = parts.get(0);
+							
+							if(firstPart.containsKey("text")) {
+								
+								String text = (String)firstPart.get("text");
+								if(text.startsWith("```json")) {
+									
+									text = text.substring(7);
+									
+								}
+								if(text.endsWith("```")) {
+									
+									text = text.substring(0, text.length() - 3);
+									
+								}
+								
+								text = text.replaceAll("\\s+", "");
+								
+								return text;
+								
+							}
+							
+						}
+						
+					}
+			
+				}
+				
+			}
+>>>>>>> origin/develop
 
       }
       
