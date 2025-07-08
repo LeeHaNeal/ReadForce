@@ -6,6 +6,10 @@ import Flex from 'react-calendar/dist/Flex.js';
 const AdminPage = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
+    const [loadingAI, setLoadingAI] = useState(false);
+    const [aiMessage, setAiMessage] = useState('');
+    const [loadingPassage, setLoadingPassage] = useState(false);
+    const [loadingQuestion, setLoadingQuestion] = useState(false);
 
     useEffect(() => {
         const nickname = localStorage.getItem("nickname");
@@ -74,13 +78,101 @@ const AdminPage = () => {
         );
     };
 
+    const handleGenerateAITest = async () => {
+        setLoadingAI(true);
+        try {
+            const res = await fetchWithAuth("/ai/generate-test", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: "KOREAN", // ENGLISH 등도 가능
+                }),
+            });
+
+            if (!res.ok) throw new Error("AI 문제 생성 실패");
+
+            const data = await res.json();
+            alert("✅ " + data.message);
+        } catch (err) {
+            console.error(err);
+            alert("❌ 문제 생성 중 오류가 발생했습니다.");
+        } finally {
+            setLoadingAI(false);
+        }
+    };
+
+    // AI 지문 생성
+    const handleGeneratePassage = async () => {
+        setLoadingPassage(true);
+        try {
+            const res = await fetchWithAuth("/ai/generate-passage", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: "KOREAN",
+                    level: 1,
+                    category: "NEWS",
+                    type: "ECONOMY",
+                    classification: "TEST",
+                }),
+            });
+
+            if (!res.ok) throw new Error("지문 생성 실패");
+
+            const data = await res.json();
+            alert("✅ " + data.message);
+        } catch (err) {
+            console.error(err);
+            alert("❌ 지문 생성 중 오류가 발생했습니다.");
+        } finally {
+            setLoadingPassage(false);
+        }
+    };
+
+    // AI 문제 생성
+    const handleGenerateQuestion = async () => {
+        setLoadingQuestion(true);
+        try {
+            const res = await fetchWithAuth("/ai/generate-question", {
+                method: "POST",
+            });
+
+            if (!res.ok) throw new Error("문제 생성 실패");
+
+            const data = await res.json();
+            alert("✅ " + data.message);
+        } catch (err) {
+            console.error(err);
+            alert("❌ 문제 생성 중 오류가 발생했습니다.");
+        } finally {
+            setLoadingQuestion(false);
+        }
+    };
+
     return (
         <div style={{ padding: "24px" }}>
             <span style={ADMIN_BUTTONS_LIST}>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/adminnews")}>뉴스 관리</button>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminliterature')}>문학 관리</button>
             </span>
-            <h2>회원 관리</h2>
+            <div style={ADMIN_TITLE}>
+                <div>
+                    <h2>회원 관리</h2>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateAITest} disabled={loadingAI}>
+                        {loadingAI ? '생성 중...' : 'AI 테스트 문제 생성'}
+                    </button>
+
+                    <button style={ADMIN_AI_BUTTONS} onClick={handleGeneratePassage} disabled={loadingPassage}>
+                        {loadingPassage ? '생성 중...' : 'AI 지문 생성'}
+                    </button>
+
+                    <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
+                        {loadingQuestion ? '생성 중...' : 'AI 문제 생성'}
+                    </button>
+                </div>
+            </div>
             <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
                 <thead>
                     <tr>
@@ -176,6 +268,23 @@ const thStyle = {
 const tdStyle = {
     border: "1px solid #ddd",
     padding: "8px",
+};
+
+const ADMIN_TITLE = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "16px"
+};
+
+const ADMIN_AI_BUTTONS = {
+    marginBottom: "16px",
+    padding: "8px 16px",
+    backgroundColor: "#007BFF",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer"
 };
 
 export default AdminPage;

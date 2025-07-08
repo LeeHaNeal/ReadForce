@@ -11,7 +11,7 @@ const fetchWithAuth = async (url, options = {}) => {
   });
 
   if (res.status === 401 && refreshToken) {
-    const refreshRes = await fetch(`/auth/reissue-refresh-token?refresh_token=${encodeURIComponent(refreshToken)}`, {
+    const refreshRes = await fetch(`/authentication/reissue-refresh-token?refresh_token=${encodeURIComponent(refreshToken)}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded' 
@@ -24,7 +24,7 @@ const fetchWithAuth = async (url, options = {}) => {
       localStorage.setItem('token', data.ACCESS_TOKEN);
       localStorage.setItem('refresh_token', data.REFRESH_TOKEN);
 
-      // 🔁 재요청
+      // 재요청
       res = await fetch(url, {
         ...options,
         headers: {

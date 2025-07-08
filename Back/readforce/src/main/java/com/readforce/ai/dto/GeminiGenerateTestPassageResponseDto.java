@@ -15,6 +15,6 @@ public class GeminiGenerateTestPassageResponseDto {
 	
 	private String content;
 	
-	private int level;
+	private String level;
 	
 }
