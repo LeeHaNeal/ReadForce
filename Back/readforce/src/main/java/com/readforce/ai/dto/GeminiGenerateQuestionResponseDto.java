@@ -18,7 +18,7 @@ public class GeminiGenerateQuestionResponseDto {
 	
 	private List<String> choiceList;
 	
-	private Integer correctAnswerIndex;
+	private String correctAnswerIndex;
 	
 	private Map<String, String> explanation;
 	
