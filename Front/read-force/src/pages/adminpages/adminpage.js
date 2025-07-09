@@ -18,6 +18,9 @@ const AdminPage = () => {
     const [type, setType] = useState("ECONOMY");
     const [classification, setClassification] = useState("NORMAL");
 
+    const [loadingTestPassage, setLoadingTestPassage] = useState(false);
+    const [loadingTestQuestion, setLoadingTestQuestion] = useState(false);
+
     useEffect(() => {
         const nickname = localStorage.getItem("nickname");
         if (nickname !== "관리자") {
@@ -86,7 +89,7 @@ const AdminPage = () => {
     };
 
     const handleGenerateTestPassage = async () => {
-        setLoadingAI(true);
+        setLoadingTestPassage(true);
         try {
             const res = await fetchWithAuth("/ai/generate-test-passage?language=KOREAN", {
                 method: "POST",
@@ -100,12 +103,12 @@ const AdminPage = () => {
             console.error(err);
             alert("❌ 지문 생성 중 오류가 발생했습니다.");
         } finally {
-            setLoadingAI(false);
+            setLoadingTestPassage(false);
         }
     };
 
     const handleGenerateTestQuestion = async () => {
-        setLoadingAI(true);
+        setLoadingTestQuestion(true);
         try {
             const res = await fetchWithAuth("/ai/generate-test-question?language=KOREAN", {
                 method: "POST",
@@ -119,7 +122,7 @@ const AdminPage = () => {
             console.error(err);
             alert("❌ 문제 생성 중 오류가 발생했습니다.");
         } finally {
-            setLoadingAI(false);
+            setLoadingTestQuestion(false);
         }
     };
 
@@ -263,20 +266,16 @@ const AdminPage = () => {
                         <h2>회원 관리</h2>
                     </div>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateTestPassage} disabled={loadingAI}>
-                            {loadingAI ? '지문 생성 중...' : '테스트 - 지문 생성'}
+                        <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateTestPassage} disabled={loadingTestPassage}>
+                            {loadingTestPassage ? '지문 생성 중...' : '테스트 - 지문 생성'}
                         </button>
-                        <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateTestQuestion} disabled={loadingAI}>
-                            {loadingAI ? '문제 생성 중...' : '테스트 - 문제 생성'}
+                        <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateTestQuestion} disabled={loadingTestQuestion}>
+                            {loadingTestQuestion ? '문제 생성 중...' : '테스트 - 문제 생성'}
                         </button>
                         {/* <button style={ADMIN_AI_BUTTONS} onClick={handleGeneratePassage} disabled={loadingPassage}>
                         {loadingPassage ? '생성 중...' : '지문 생성'}
                     </button> */}
-                        <button
-                            style={ADMIN_AI_BUTTONS}
-                            onClick={() => setShowPassageModal(true)}
-                            disabled={loadingPassage}
-                        >
+                        <button style={ADMIN_AI_BUTTONS} onClick={() => setShowPassageModal(true)} disabled={loadingPassage}>
                             {loadingPassage ? '생성 중...' : '지문 생성'}
                         </button>
                         <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
