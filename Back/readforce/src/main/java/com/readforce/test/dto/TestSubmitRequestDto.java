@@ -28,4 +28,7 @@ public class TestSubmitRequestDto {
 	
 	@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 	private LanguageEnum language;
+	
+	private Integer level;
+	
 }

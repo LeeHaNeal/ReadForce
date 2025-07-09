@@ -80,7 +80,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(submitRequestDto.getQuestionNo(), submitRequestDto.getSelectedIndex()).getIsCorrect();
 		
-		if(submitRequestDto.getQuestionSolvingTime() < 180) {
+		if(submitRequestDto.getQuestionSolvingTime() > 180) {
 			
 			isCorrect = false;
 			
@@ -121,7 +121,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(questionNo, selectedIndex).getIsCorrect();
 		
-		if(questionSolvingTime < 120) {
+		if(questionSolvingTime > 180) {
 			
 			isCorrect = false;
 			
@@ -154,7 +154,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(submitRequestDto.getQuestionNo(), submitRequestDto.getSelectedIndex()).getIsCorrect();
 		
-		if(submitRequestDto.getQuestionSolvingTime() < 180) {
+		if(submitRequestDto.getQuestionSolvingTime() > 180) {
 			
 			isCorrect = false;
 			
