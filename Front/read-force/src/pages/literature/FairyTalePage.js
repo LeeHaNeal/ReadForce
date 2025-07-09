@@ -1,10 +1,8 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import debounce from 'lodash/debounce';
-
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import UniversalList from '../../components/universal/UniversalList';
-import { fetchLiteratureParagraphList } from '../../api/literatureApi';
-import { fairytaleCategoryOptions } from '../../components/LiteratureCategory';
+import { debouncedFetchPassageList } from '../../api/passageApi';
+import { fairytaleTypeOptions } from '../../components/TypeOptions';
 
 const reverseLevelMap = {
   '1': 'LEVEL_1',
@@ -28,53 +26,45 @@ const reverseCategoryMap = {
 };
 
 const FairyTalePage = () => {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
-  const type = 'FAIRYTALE'; 
+  const [language] = useState('KOREAN');
+  const classification = 'NORMAL';
+  const category = 'FAIRY_TALE';
+
+  const [type, setType] = useState('');
   const [level, setLevel] = useState('');
-  const [category, setCategory] = useState('');
   const [orderBy, setOrderBy] = useState('latest');
-
-  const navigate = useNavigate(); 
-
-  const handleSolve = (item) => {
-    navigate(`/literature-quiz/${item.literature_paragraph_no}`);
-  };
-
-  const fetchItems = useCallback(async (params) => {
-    try {
-      return await fetchLiteratureParagraphList({
-        type,
-        level: params.level,
-        category: params.category,
-        orderBy: params.orderBy,
-      });
-    } catch (err) {
-      console.error('동화 목록 불러오기 실패:', err);
-      return [];
-    }
-  }, []);
-
-  const debouncedFetch = useMemo(() => debounce(async (params) => {
-    const data = await fetchItems(params);
-    setItems(data);
-  }, 300), [fetchItems]);
 
   const fetchData = useCallback(() => {
     const apiLevel = reverseLevelMap[level] || '';
-    const apiCategory = reverseCategoryMap[category] || '';
-    debouncedFetch({
-      level: apiLevel,
-      category: apiCategory,
-      orderBy,
-    });
-  }, [debouncedFetch, level, category, orderBy]);
+    const apiType = reverseCategoryMap[type] || '';
+
+    debouncedFetchPassageList(
+      {
+        language,
+        classification,
+        category,
+        type: apiType,
+        level: apiLevel,
+        orderBy,
+      },
+      (data) => {
+        setItems(data);
+      }
+    );
+  }, [language, classification, category, type, level, orderBy]);
 
   useEffect(() => {
     fetchData();
     return () => {
-      debouncedFetch.cancel();
+      debouncedFetchPassageList.cancel();
     };
-  }, [fetchData, debouncedFetch]);
+  }, [fetchData]);
+
+  const handleSolve = (item) => {
+    navigate(`/literature-quiz/${item.passage_no}`);
+  };
 
   return (
     <div className="page-container">
@@ -82,12 +72,12 @@ const FairyTalePage = () => {
         items={items}
         level={level}
         setLevel={setLevel}
-        category={category}
-        setCategory={setCategory}
+        type={type}
+        setType={setType}
         orderBy={orderBy}
         setOrderBy={setOrderBy}
-        categoryOptions={fairytaleCategoryOptions}
-        onSolve={handleSolve} 
+        typeOptions={fairytaleTypeOptions}
+        onSolve={handleSolve}
       />
     </div>
   );

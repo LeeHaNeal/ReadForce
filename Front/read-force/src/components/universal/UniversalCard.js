@@ -10,15 +10,12 @@ const typeMap = {
   ETC: '기타',
   MYSTERY: '추리',
   HISTORY: '역사',
-  CLASSIC: '고전',
-  MODERN: '근대',
-  CHILDREN: '동화',
 };
 
 const UniversalCard = React.memo(({ data, onSolve }) => {
   useEffect(() => {
     console.log("받은 데이터 확인:", data);
-  }, []);
+  }, [data]);
 
   const level = data.level;
   const type = typeMap[data.type] || data.type;
