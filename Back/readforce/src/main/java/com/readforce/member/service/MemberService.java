@@ -269,7 +269,7 @@ public class MemberService {
 
 		Member member = getActiveMemberByEmail(email);
 		
-		if(memberModifyDto.getNickname() != null && memberModifyDto.getNickname().isEmpty()) {
+		if(memberModifyDto.getNickname() != null && !memberModifyDto.getNickname().isEmpty()) {
 			
 			nicknameCheck(memberModifyDto.getNickname());
 			
