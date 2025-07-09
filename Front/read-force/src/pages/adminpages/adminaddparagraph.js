@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import fetchWithAuth from "../../utils/fetchWithAuth";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminAddParagraph = () => {
     const { literatureNo } = useParams();
@@ -23,20 +23,16 @@ const AdminAddParagraph = () => {
             content,
         };
         console.log("literatureNo:", literatureNo);
-console.log("body:", body);
+        console.log("body:", body);
 
         try {
-            const res = await fetchWithAuth("/admin/add-literature-paragraph", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            });
+            await axiosInstance.post("/admin/add-literature-paragraph", body);
 
-            if (!res.ok) throw new Error("문단 추가 실패");
             alert("문단이 성공적으로 추가되었습니다!");
             navigate(`/adminpage/adminliterature/${literatureNo}`);
         } catch (err) {
-            alert(err.message);
+            console.error(err);
+            alert("문단 추가 중 오류 발생: " + err.message);
         }
     };
 

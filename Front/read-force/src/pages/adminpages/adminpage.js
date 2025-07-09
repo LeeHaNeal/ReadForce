@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import fetchWithAuth from '../../utils/fetchWithAuth';
 import axiosInstance from '../../api/axiosInstance';
-import Flex from 'react-calendar/dist/Flex.js';
+// import Flex from 'react-calendar/dist/Flex.js';
 
 const AdminPage = () => {
     const navigate = useNavigate();
