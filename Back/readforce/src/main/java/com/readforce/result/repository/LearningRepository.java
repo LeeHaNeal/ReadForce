@@ -2,12 +2,15 @@ package com.readforce.result.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.OptionalDouble;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.member.entity.Member;
 import com.readforce.result.entity.Learning;
 
@@ -85,6 +88,35 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 	""")
 	List<Learning> findFavoritLearningByMember_Email(
 			@Param("email") String email
+	);
+
+	@Query("""
+			SELECT l.question.questionNo
+			FROM Learning l
+			WHERE l.isCorrect = false
+			AND l.question.passage.language.languageName = :language
+			GROUP BY l.question.questionNo
+			ORDER BY COUNT(l.learningNo) DESC
+	""")	
+	List<Long> findMostIncorrectQuestionNosByLanguage(
+			@Param("language") LanguageEnum language, 
+			@Param("pageable") PageRequest pageable
+	);
+
+	OptionalDouble findFirstByQuestion_QuestionNoOrderByCreatedAtDesc(Long questionNo);
+
+	@Query("""
+			SELECT l 
+			FROM Learning l
+			WHERE l.question.questionNo IN :questionNoList
+			AND l.createdAt = (
+					SELECT MAX(subL.createdAt)
+					FROM Learning subL
+					WHERE subL.questionNo = l.question.questionNo
+			
+	""")
+	List<Learning> findLatestLearningListForQuestionNoList(
+			@Param("questionNoList") List<Long> questionNoList
 	);
 	
 }
