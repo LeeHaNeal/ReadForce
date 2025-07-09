@@ -23,9 +23,6 @@ const UniversalCard = React.memo(({ data, onSolve, typeOptions = [] }) => {
       <div className="UniversalCard-header">
         <h3 className="UniversalCard-title">
           {data.title}
-          <span className="UniversalCard-subtitle">
-            - {data.literature_paragraph_no}
-          </span>
         </h3>
         <span className={`UniversalCard-badge UniversalCard-${levelLabel}`}>
           {level}단계

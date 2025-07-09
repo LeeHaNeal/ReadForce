@@ -40,7 +40,7 @@ const FairyTalePage = () => {
 
   const handleSolve = (item) => {
     navigate(`/fairytale/quiz/${item.passageNo}`, {
-      state: { article: item }
+      state: { passage: item }
     });
   };
 

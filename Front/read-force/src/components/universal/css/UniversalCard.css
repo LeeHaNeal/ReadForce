@@ -23,12 +23,7 @@
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 8px;
-}
-
-.UniversalCard-subtitle {
-  font-weight: normal;
-  font-size: 0.9rem;
-  color: #888;
+  margin-left: 10px;
 }
 
 .UniversalCard-content {
@@ -38,7 +33,9 @@
   max-height: calc(1.5em * 3);
   color: #555;
   font-size: 15px;
-  margin: 8px 0 0 0;
+  margin: 12px 0 0 0;
+  margin-top: 20px;
+  margin-left: 10px;
   max-width: calc(100% - 160px);
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -101,6 +98,7 @@
   align-items: flex-end;
   margin-top: auto;
   padding-top: 16px;
+  margin-left: 10px;
 }
 
 @media (max-width: 480px) {
