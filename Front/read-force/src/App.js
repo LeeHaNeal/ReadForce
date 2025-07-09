@@ -61,7 +61,9 @@ function App() {
           <Route path="/article/quiz/:id" element={<UniversalQuestionPage />} />
           <Route path="/novel/quiz/:id" element={<UniversalQuestionPage />} />
           <Route path="/fairytale/quiz/:id" element={<UniversalQuestionPage />} />
-          <Route path="/question-result" element={<UniversalResultPage />} />
+          <Route path="/article/result" element={<UniversalResultPage />} />
+          <Route path="/novel/result" element={<UniversalResultPage />} />
+          <Route path="/fairytale/result" element={<UniversalResultPage />} />
           <Route path="/signup/signupchoice" element={<SignupChoice />} />
           <Route path="/signup" element={<SignupWithEmail />} />
           <Route path="/signup/emailverifypage" element={<EmailVerifyPage />} />

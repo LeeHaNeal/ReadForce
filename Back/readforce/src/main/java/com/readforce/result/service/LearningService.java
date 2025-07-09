@@ -3,12 +3,15 @@ package com.readforce.result.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
@@ -219,6 +222,30 @@ public class LearningService {
 		}
 		
 		return favoritLearningList.stream()
+				.map(QuestionSummaryResponseDto::new)
+				.collect(Collectors.toList());
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<QuestionSummaryResponseDto> getMostIncorrectQuestions(LanguageEnum language, Integer number) {
+
+		List<Long> topIdList = learningRepository.findMostIncorrectQuestionNosByLanguage(language, PageRequest.of(0, number));
+		
+		if(topIdList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.LEARNING_NOT_FOUND);
+			
+		}
+		
+		List<Learning> latestLearningList = learningRepository.findLatestLearningListForQuestionNoList(topIdList);
+		
+		return topIdList.stream()
+				.map(id -> latestLearningList.stream()
+						.filter(l -> l.getQuestion().getQuestionNo().equals(id))
+						.findFirst()
+						.orElse(null))
+				.filter(Objects::nonNull)
 				.map(QuestionSummaryResponseDto::new)
 				.collect(Collectors.toList());
 		
