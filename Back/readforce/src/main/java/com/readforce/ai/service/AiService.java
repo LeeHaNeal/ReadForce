@@ -944,40 +944,6 @@ public class AiService {
 		
 	}
 
-	@Transactional
-	public void generateChallengePassages() {
-		
-		List<Language> languageList= languageService.getAllLanguageList();
-		
-		List<Category> categoryList = categoryService.getAllCategoryList();
-		
-		List<Level> levelList = levelService.getAllLevelList();
-		
-		Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.CHALLENGE);
-		
-		for(Language language : languageList) {
-			
-			for(Category category : categoryList) {
-				
-				for(Level level : levelList) {
-					
-					String prompt = generateChallengePassagePrompt(
-							
-					)
-							
-							
-							
-					}
-					
-					
-				}
-				
-				
-			}
-			
-		}
-		
-	}
 
 
 
