@@ -32,9 +32,9 @@ public class Language {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long languageNo;
-	
+
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "varchar(255)")
 	private LanguageEnum languageName;
 	
 	@CreatedDate

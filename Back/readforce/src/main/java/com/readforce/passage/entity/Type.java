@@ -32,9 +32,9 @@ public class Type {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long typeNo;
-	
+
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "varchar(255)")
 	private TypeEnum typeName;
 	
 	@CreatedDate
