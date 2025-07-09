@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import fetchWithAuth from "../../utils/fetchWithAuth";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminNews = () => {
     const navigate = useNavigate();
@@ -11,14 +11,8 @@ const AdminNews = () => {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const res = await fetchWithAuth("/admin/get-all-news-list", {
-                    method: "POST",
-                });
-
-                if (!res.ok) throw new Error("뉴스 불러오기 실패");
-
-                const data = await res.json();
-                setNewsList(data);
+                const res = await axiosInstance.post("/admin/get-all-news-list");
+                setNewsList(res.data);
             } catch (err) {
                 console.error(err);
                 alert("뉴스 목록을 불러오는 데 실패했습니다.");
@@ -33,14 +27,8 @@ const AdminNews = () => {
         if (!window.confirm("뉴스를 생성하시겠습니까? 총 54문제가 생성됩니다")) return;
 
         try {
-            const res = await fetchWithAuth("/ai/generate-creative-news", {   // <== 수정
-                method: "POST"
-            });
-
-            if (!res.ok) throw new Error("뉴스 생성 실패");
-
-            const data = await res.json();
-            alert("뉴스 생성 완료: " + data.messageCode);
+            const res = await axiosInstance.post("/ai/generate-creative-news");
+            alert("뉴스 생성 완료: " + res.data.messageCode);
         } catch (err) {
             console.error(err);
             alert("뉴스 생성에 실패했습니다.");
@@ -53,13 +41,7 @@ const AdminNews = () => {
         if (!confirmDelete) return;
 
         try {
-            const res = await fetchWithAuth(`/admin/delete-news-and-news-quiz-by-news-no?news_no=${newsNo}`, {
-                method: "DELETE"
-            });
-
-            if (!res.ok) throw new Error("뉴스 삭제 실패");
-
-            // 삭제 후 리스트에서 제거
+            await axiosInstance.delete(`/admin/delete-news-and-news-quiz-by-news-no?news_no=${newsNo}`);
             setNewsList((prev) => prev.filter((news) => news.news_no !== newsNo));
         } catch (err) {
             console.error(err);
@@ -72,14 +54,8 @@ const AdminNews = () => {
         if (!window.confirm("뉴스 퀴즈를 생성하시겠습니까?\n(뉴스에 해당 문제 없는 경우만 생성됩니다)")) return;
 
         try {
-            const res = await fetchWithAuth("/ai/generate-creative-news-quiz", {   // <== 수정
-                method: "POST"
-            });
-
-            if (!res.ok) throw new Error("뉴스 퀴즈 생성 실패");
-
-            const data = await res.json();
-            alert("뉴스 퀴즈 생성 완료: " + data.messageCode);
+            const res = await axiosInstance.post("/ai/generate-creative-news-quiz");
+            alert("뉴스 퀴즈 생성 완료: " + res.data.messageCode);
         } catch (err) {
             console.error(err);
             alert("뉴스 퀴즈 생성에 실패했습니다.");
