@@ -90,7 +90,7 @@ const ProfileEditPage = () => {
     if (birthday && isBirthdayValid) infoPayload.birthday = birthday;
 
     if (Object.keys(infoPayload).length > 0) {
-      updates.push(axiosInstance.patch('/member/modify-info', infoPayload));
+      updates.push(axiosInstance.patch('/member/modify', infoPayload));
     }
 
     if (selectedFile) {
@@ -107,7 +107,9 @@ const ProfileEditPage = () => {
       const responses = await Promise.all(updates);
       const modifyResponse = responses.find((res) => res?.data?.NICK_NAME);
       if (modifyResponse) {
-        localStorage.setItem('nickname', modifyResponse.data.NICK_NAME);
+        const newNickname = modifyResponse.data.NICK_NAME;
+        localStorage.setItem('nickname', newNickname);
+        window.dispatchEvent(new Event('nicknameUpdated')); // ✅ Header에게 알려줌
       }
       alert('회원정보가 수정되었습니다.');
       window.location.href = '/';
@@ -118,7 +120,7 @@ const ProfileEditPage = () => {
 
   const handleWithdraw = async () => {
     try {
-      await axiosInstance.delete('/member/withdraw-member');
+      await axiosInstance.delete('/member/withdraw');
       localStorage.clear();
       alert('탈퇴 완료되었습니다.');
       window.location.href = '/';
@@ -142,9 +144,8 @@ const ProfileEditPage = () => {
       const res = await axiosInstance.post('/auth/get-social-account-link-token');
       const state = res.data.STATE;
       const redirectUri = `http://localhost:8080/oauth2/authorization/${provider}?state=${state}`;
-      console.log(state);
       window.location.href = redirectUri;
-    } catch (err) {
+    } catch {
       alert('SNS 연동 요청 실패');
     }
   };

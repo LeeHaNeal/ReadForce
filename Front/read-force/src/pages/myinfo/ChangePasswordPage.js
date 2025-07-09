@@ -40,9 +40,9 @@ const ChangePasswordPage = () => {
     if (!isPasswordValid || !isConfirmPasswordValid) return;
 
     try {
-      await axiosInstance.patch('/member/password-reset-by-site', {
-        old_password: currentPassword,
-        new_password: password,
+      await axiosInstance.patch('/member/password-reset', {
+        oldPassword: currentPassword,
+        newPassword: password,
       });
       alert('비밀번호가 성공적으로 변경되었습니다.');
       window.location.href = '/';

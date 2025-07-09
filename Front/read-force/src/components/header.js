@@ -7,17 +7,26 @@ const Header = () => {
   const [selectedLang, setSelectedLang] = useState('한국어');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [nickname, setNickname] = useState('');
-  const navigate = useNavigate();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+  const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
-  const provider = localStorage.getItem("provider"); 
+  const provider = localStorage.getItem("provider");
 
+  // ✅ 닉네임 초기 설정 및 업데이트 이벤트 수신
   useEffect(() => {
-    if (isLoggedIn) {
-      const storedNickname = localStorage.getItem("nickname");
-      setNickname(storedNickname || "사용자");
-    }
+    const storedNickname = localStorage.getItem("nickname");
+    setNickname(storedNickname || "사용자");
+
+    const handleNicknameUpdate = () => {
+      const updatedNickname = localStorage.getItem("nickname");
+      setNickname(updatedNickname || "사용자");
+    };
+
+    window.addEventListener("nicknameUpdated", handleNicknameUpdate);
+    return () => {
+      window.removeEventListener("nicknameUpdated", handleNicknameUpdate);
+    };
   }, [isLoggedIn]);
 
   const handleLangSelect = (lang) => {
@@ -28,30 +37,32 @@ const Header = () => {
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
 
-    try {const res = await fetch("/authentication/sign-out", {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await res.json();
-    const kakaoLogoutUrl = result.KAKAO_SIGN_OUT_URL;
+    try {
+      const res = await fetch("/authentication/sign-out", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await res.json();
+      const kakaoLogoutUrl = result.KAKAO_SIGN_OUT_URL;
 
-    localStorage.clear();
-    setShowUserMenu(false);
+      localStorage.clear();
+      setShowUserMenu(false);
 
-    if (kakaoLogoutUrl) {
-      window.location.href = kakaoLogoutUrl;
-    } else {
+      if (kakaoLogoutUrl) {
+        window.location.href = kakaoLogoutUrl;
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("로그아웃 중 오류 발생:", error);
+      localStorage.clear();
+      setShowUserMenu(false);
       navigate("/");
     }
-  } catch (error) {
-    console.error("로그아웃 중 오류 발생:", error);
-    localStorage.clear();
-    setShowUserMenu(false);
-    navigate("/");
-  }
-};
+  };
+
   return (
     <header className="header">
       <div className="page-container header-inner">
@@ -63,23 +74,21 @@ const Header = () => {
           </h1>
         </div>
 
-      <div className="header-center">
-        <nav className="nav">
-          <Link to="/article" className="nav-item">기사</Link>
-          <Link to="/literature/novel" className="nav-item">소설</Link>
-          <Link to="/literature/fairytale" className="nav-item">동화</Link>
-          <Link to="/challenge" className="nav-item">문해력 도전</Link>
-          <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
-        </nav>
-      </div>
+        <div className="header-center">
+          <nav className="nav">
+            <Link to="/article" className="nav-item">기사</Link>
+            <Link to="/literature/novel" className="nav-item">소설</Link>
+            <Link to="/literature/fairytale" className="nav-item">동화</Link>
+            <Link to="/challenge" className="nav-item">문해력 도전</Link>
+            <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+          </nav>
+        </div>
 
-      <div className="hamburger" onClick={() => setShowMobileMenu(prev => !prev)}>☰</div>
+        <div className="hamburger" onClick={() => setShowMobileMenu(prev => !prev)}>☰</div>
+
         <div className="header-right auth-buttons">
           <div className="lang-selector">
-            <button
-              className="lang-button"
-              onClick={() => setShowLangMenu(!showLangMenu)}
-            >
+            <button className="lang-button" onClick={() => setShowLangMenu(!showLangMenu)}>
               {selectedLang} ▼
             </button>
             {showLangMenu && (
@@ -128,17 +137,16 @@ const Header = () => {
       </div>
 
       {showMobileMenu && (
-      <div className="mobile-menu">
-        <nav className='nav'>
-          <Link to="/article" className="nav-item">기사</Link>
-          <Link to="literature/novel" className="nav-item">소설</Link>
-          <Link to="literature/fairytale" className="nav-item">동화</Link>
-          <Link to="challenge" className="nav-item">문해력 도전</Link>
-          <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
-        </nav>
-      </div>
-    )}
-
+        <div className="mobile-menu">
+          <nav className='nav'>
+            <Link to="/article" className="nav-item">기사</Link>
+            <Link to="/literature/novel" className="nav-item">소설</Link>
+            <Link to="/literature/fairytale" className="nav-item">동화</Link>
+            <Link to="/challenge" className="nav-item">문해력 도전</Link>
+            <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
