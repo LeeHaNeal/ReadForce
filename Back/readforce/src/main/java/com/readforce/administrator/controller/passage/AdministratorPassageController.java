@@ -33,7 +33,7 @@ public class AdministratorPassageController {
             @RequestParam("type") TypeEnum type,
             @RequestParam("level") Integer level
     ) {
-        // DTO 생성
+      
         AdministratorUploadPassageRequestDto requestDto = AdministratorUploadPassageRequestDto.builder()
                 .file(file)
                 .title(title)
@@ -45,7 +45,7 @@ public class AdministratorPassageController {
                 .level(level)
                 .build();
 
-        // 서비스 호출
+       
         passageService.uploadPassage(requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of(

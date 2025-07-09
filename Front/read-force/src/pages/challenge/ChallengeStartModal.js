@@ -11,12 +11,13 @@ const ChallengeStartModal = ({ onClose }) => {
 
   const handleStartClick = () => {
     if (category === 'NEWS') {
-      navigate(`/challenge/quiz?classification=NEWS&language=${language}`);
+      navigate(`/challenge/quiz?language=${language}&category=NEWS`);
     } else {
-      navigate(`/challenge/quiz?classification=LITERATURE&type=${literatureType}`);
+      navigate(`/challenge/quiz?language=${language}&category=${literatureType}`);
     }
     onClose();
-  };
+};
+
 
   return (
     <div className="ChallengeStartModal-overlay">
@@ -24,7 +25,7 @@ const ChallengeStartModal = ({ onClose }) => {
         <h2 className="ChallengeStartModal-title">도전 유형 선택</h2>
 
         <div className="ChallengeStartModal-category">
-          <button className={category === 'NEWS' ? 'selected' : ''} onClick={() => setCategory('NEWS')}>뉴스</button>
+          <button className={category === 'NEWS' ? 'selected' : ''} onClick={() => setCategory('NEWS')}>기사</button>
           <button className={category === 'LITERATURE' ? 'selected' : ''} onClick={() => setCategory('LITERATURE')}>문학</button>
         </div>
 

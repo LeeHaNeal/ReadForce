@@ -33,108 +33,84 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
-	
-	private LevelService levelService;
-	private PassageService passageService;
-	private MultipleChoiceService multipleChoiceService;
-	private QuestionService questionService;
-	private ScoreService scoreService;
-	private CategoryService categoryService;
-	private LanguageService languageService;
-	
-	@Transactional
-	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
-		
-		List<MultipleChoiceResponseDto> resultList = new ArrayList<>();
-		
-		List<Level> allLevelList = levelService.getAllLevelList();
-		
-		for(Level level : allLevelList) {
-			
-			List<Passage> randomPassageList = passageService.getChallengePassageList(language, category, level.getLevelNumber());
-			
-			for(Passage passage : randomPassageList) {
-				
-				List<MultipleChoiceResponseDto> multipleChoiceDtoList = multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
 
-				if(!multipleChoiceDtoList.isEmpty()) {
-					
-					MultipleChoiceResponseDto multipleChoiceDto = multipleChoiceDtoList.get(0);
-					
-					resultList.add(multipleChoiceDto);
-					
-				}
-				
-			}
-			
-		}
-		
-		if(resultList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
-			
-		}
-	
-		return resultList;
-		
-	}
+    private final LevelService levelService;
+    private final PassageService passageService;
+    private final MultipleChoiceService multipleChoiceService;
+    private final QuestionService questionService;
+    private final ScoreService scoreService;
+    private final CategoryService categoryService;
+    private final LanguageService languageService;
 
-	@Transactional
-	public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
+    /**
+     * 챌린지 문제 리스트 조회
+     */
+    @Transactional(readOnly = true)
+    public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
 
-		double totalScore = 0.0;
-		
-		final long MAX_TIME_SECONDS = 1800;
-		
-		for(Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
-			
-			for(Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
-				
-				Long questionNo = entry.getKey();
-				Integer selectedIndex = entry.getValue();
-				
-				QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
-				
-				boolean isCorrect = checkResult.getIsCorrect();
-				
-				if(isCorrect) {
-					
-					QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
+        List<MultipleChoiceResponseDto> resultList = new ArrayList<>();
+        List<Level> allLevelList = levelService.getAllLevelList();
 
-					Level level = levelService.getLevelByLevel(questionInfo.getLevel());
-					
-					double baseScore = level.getLevelNumber() * 4;
-					
-					totalScore += baseScore;
-					
-				}
-				
-			}
-			
-		}
-		
-		long solvingTime = requestDto.getTotalQuestionSolvingTime();
-		if(solvingTime < MAX_TIME_SECONDS) {
-			
-			double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
-			
-			totalScore += timeBonus;
-			
-		}
-		
-		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-		
-		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-		
-		scoreService.createScore(
-				member,
-				totalScore,
-				category,
-				language
-		);
-		
-		return totalScore;
-		
-	}
+        for (Level level : allLevelList) {
+            List<Passage> randomPassageList = passageService.getChallengePassageList(language, category, level.getLevelNumber());
+
+            for (Passage passage : randomPassageList) {
+                List<MultipleChoiceResponseDto> multipleChoiceDtoList = multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
+
+                if (!multipleChoiceDtoList.isEmpty()) {
+                    // 지문 하나당 하나의 문제만 사용
+                    MultipleChoiceResponseDto multipleChoiceDto = multipleChoiceDtoList.get(0);
+                    resultList.add(multipleChoiceDto);
+                }
+            }
+        }
+
+        if (resultList.isEmpty()) {
+            throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
+        }
+
+        return resultList;
+    }
+
+    /**
+     * 챌린지 결과 제출 및 점수 계산
+     */
+    @Transactional
+    public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
+
+        double totalScore = 0.0;
+        final long MAX_TIME_SECONDS = 1800; // 최대 보너스 시간 기준 (30분)
+
+        for (Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
+            for (Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
+
+                Long questionNo = entry.getKey();
+                Integer selectedIndex = entry.getValue();
+
+                QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
+
+                if (checkResult.getIsCorrect()) {
+                    QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
+                    Level level = levelService.getLevelByLevel(questionInfo.getLevel());
+                    totalScore += level.getLevelNumber() * 4; // 정답 시 점수
+                }
+            }
+        }
+
+        // 시간 보너스 계산
+        long solvingTime = requestDto.getTotalQuestionSolvingTime();
+        if (solvingTime < MAX_TIME_SECONDS) {
+            double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
+            totalScore += timeBonus;
+        }
+
+        // 점수 저장
+        Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+        Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+
+        scoreService.createScore(member, totalScore, category, language);
+
+        return totalScore;
+    }
 
 }
