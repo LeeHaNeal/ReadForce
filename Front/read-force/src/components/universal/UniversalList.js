@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import UniversalFilterBar from './UniversalFilterBar';
 import UniversalCard from './UniversalCard';
 import './css/UniversalList.css';
@@ -7,19 +6,19 @@ import './css/UniversalList.css';
 const UniversalList = ({
   items = [],
   level, setLevel,
-  category, setCategory,
-  order_by, setOrderBy,
-  categoryOptions = [],
+  type, setType,
+  orderBy, setOrderBy,
+  typeOptions = [],
   onSolve
 }) => {
   const filteredItems = items.filter((item) => {
-    const matchLevel = level ? item.level === level : true;
-    const matchCategory = category ? item.category === category : true;
-    return matchLevel && matchCategory;
+    const matchLevel = level ? item.level === parseInt(level) : true;
+    const matchType = type ? item.type === type : true;
+    return matchLevel && matchType;
   });
 
   const sorted = [...filteredItems].sort((a, b) =>
-    order_by === 'latest'
+    orderBy === 'latest'
       ? new Date(b.publishedAt) - new Date(a.publishedAt)
       : new Date(a.publishedAt) - new Date(b.publishedAt)
   );
@@ -46,19 +45,20 @@ const UniversalList = ({
       <UniversalFilterBar 
         level={level}
         setLevel={setLevel}
-        order_by={order_by}
+        orderBy={orderBy}
         setOrderBy={setOrderBy}
-        category={category}
-        setCategory={setCategory}
-        categoryOptions={categoryOptions}
+        type={type}
+        setType={setType}
+        typeOptions={typeOptions}
       />
 
       <div className="UniversalList-list">
         {paginated.length > 0 ? paginated.map((item, index) => (
           <UniversalCard
-            key={item.id ?? item.new_passage_no ?? item.news_no ?? `unique-${index}`}
+            key={item.id ?? item.new_passageNo ?? item.news_no ?? `unique-${index}`}
             data={item}
             onSolve={onSolve}
+            typeOptions={typeOptions}
           />
         )) : (
           <div className="UniversalList-no-articles">게시물이 없습니다.</div>

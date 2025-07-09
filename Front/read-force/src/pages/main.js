@@ -178,15 +178,14 @@ const Main = () => {
           
           <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
-            {wrongArticles.length === 0 ? (
+            {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
             ) : (
+              Array.isArray(wrongArticles) &&
               wrongArticles.map((quiz, index) => (
                 <div className="article" key={index}>
                   <div className="flag">
-                    {quiz.news_quiz_no
-                      ? "📰" 
-                      : "📚"} 
+                    {quiz.news_quiz_no ? "📰" : "📚"}
                   </div>
                   <div>
                     <div className="title">{quiz.question_text}</div>

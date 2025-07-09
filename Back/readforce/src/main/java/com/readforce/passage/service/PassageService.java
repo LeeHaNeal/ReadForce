@@ -68,6 +68,7 @@ public class PassageService {
 
 		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
+
 		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndType(language, classification, category, type, sort);
 
 		if(passageList.isEmpty()) {
@@ -87,7 +88,9 @@ public class PassageService {
 		
 		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
+
 		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndTypeAndLevel(language, classification, category, type, level, sort);
+
 
 		if(passageList.isEmpty()) {
 			
@@ -136,8 +139,10 @@ public class PassageService {
 			Integer level
 	) {
 
+
 		return passageRepository.findPassageNoByLanguageAndClassificationAndCategoryAndTypeAndLevel(
 				language, classification, category, type, level
+
 		);
 		
 	}

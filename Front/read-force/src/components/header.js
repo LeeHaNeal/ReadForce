@@ -1,6 +1,6 @@
 import './header.css';
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 const Header = () => {
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -12,6 +12,9 @@ const Header = () => {
 
   const isLoggedIn = !!localStorage.getItem("token");
   const provider = localStorage.getItem("provider"); 
+
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -65,11 +68,12 @@ const Header = () => {
 
       <div className="header-center">
         <nav className="nav">
-          <Link to="/article" className="nav-item">기사</Link>
-          <Link to="/literature/novel" className="nav-item">소설</Link>
-          <Link to="/literature/fairytale" className="nav-item">동화</Link>
-          <Link to="/challenge" className="nav-item">문해력 도전</Link>
-          <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+          <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+          <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
+          <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
+          <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
+          <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
+
         </nav>
       </div>
 
@@ -130,11 +134,12 @@ const Header = () => {
       {showMobileMenu && (
       <div className="mobile-menu">
         <nav className='nav'>
-          <Link to="/article" className="nav-item">기사</Link>
-          <Link to="literature/novel" className="nav-item">소설</Link>
-          <Link to="literature/fairytale" className="nav-item">동화</Link>
-          <Link to="challenge" className="nav-item">문해력 도전</Link>
-          <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+          <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+          <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
+          <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
+          <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
+          <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
+
         </nav>
       </div>
     )}
