@@ -2,10 +2,6 @@ package com.readforce.passage.repository;
 
 import java.util.List;
 
-import com.readforce.common.enums.Category;
-import com.readforce.common.enums.Classification;
-import com.readforce.common.enums.Language;
-import com.readforce.common.enums.Type;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

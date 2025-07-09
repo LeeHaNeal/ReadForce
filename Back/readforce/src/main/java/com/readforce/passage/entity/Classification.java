@@ -33,8 +33,8 @@ public class Classification {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long classificationNo;
 
-	@Column(nullable = false)
-
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, columnDefinition = "varchar(255)")
 	private ClassificationEnum classificationName;
 	
 	@CreatedDate

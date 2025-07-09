@@ -4,10 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.readforce.common.enums.Category;
-import com.readforce.common.enums.Classification;
-import com.readforce.common.enums.Language;
-import com.readforce.common.enums.Type;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
