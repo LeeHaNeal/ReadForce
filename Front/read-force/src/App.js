@@ -29,7 +29,7 @@ import AdminNewsDetail from './pages/adminpages/adminnewsdetail';
 // import AdminNewsQuizList from './pages/adminpages/adminnewsquizlist';
 import AdminLiterature from './pages/adminpages/adminliterature';
 import AdminLiteratureDetail from './pages/adminpages/adminliteraturedetail';
-import AdminLiteratureAdd from './pages/adminpages/adminliteratureadd';
+// import AdminLiteratureAdd from './pages/adminpages/adminliteratureadd';
 import AdminAddParagraph from './pages/adminpages/adminaddparagraph';
 import AdminUserInfo from './pages/adminpages/adminuserinifo';
 import AdminUserAttendance from './pages/adminpages/adminuserattendance';
@@ -113,8 +113,11 @@ function App() {
           {/* <Route path="/adminpage/adminnews/adminnewsquizlist" element={<AdminNewsQuizList />} /> */}
           <Route path="/adminpage/adminliterature" element={<AdminLiterature />} />
           <Route path="/adminpage/adminliterature/:literatureNo" element={<AdminLiteratureDetail />} />
+          {/* <Route path="/adminpage/adminliterature/:literatureNo/add-paragraph" element={<AdminAddParagraph />} /> */}
+          <Route path="/adminpage/adminliterature/add-paragraph" element={<AdminAddParagraph />} />
           <Route path="/adminpage/adminliterature/:literatureNo/add-paragraph" element={<AdminAddParagraph />} />
-          <Route path="/adminpage/adminliterature/adminliteratureadd" element={<AdminLiteratureAdd />} />
+
+          {/* <Route path="/adminpage/adminliterature/adminliteratureadd" element={<AdminLiteratureAdd />} /> */}
           <Route path="/adminpage/adminuserinfo/:email" element={<AdminUserInfo />} />
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
           <Route path="/question-result" element={<ArticleResultPage />} />
