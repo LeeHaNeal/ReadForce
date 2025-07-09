@@ -39,7 +39,7 @@ const ArticlePage = () => {
 
   const handleSolve = (item) => {
     navigate(`/article/quiz/${item.passageNo}`, {
-      state: { article: item }
+      state: { passage: item }
     });
   };
 

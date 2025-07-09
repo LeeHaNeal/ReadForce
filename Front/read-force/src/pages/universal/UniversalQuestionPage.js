@@ -61,12 +61,18 @@ const UniversalQuestionPage = () => {
 
   const handleSubmit = async (finalAnswers) => {
     try {
-      // 필요시 정답 제출 API 호출 (지금은 생략)
-      navigate('/question-result', {
+      const categoryPath = passage.category === 'NEWS'
+        ? 'article'
+        : passage.category === 'NOVEL'
+        ? 'novel'
+        : 'fairytale';
+
+      navigate(`/${categoryPath}/result`, {
         state: {
           passage,
           total: finalAnswers.length,
           answers: finalAnswers,
+          category: passage.category
         },
       });
     } catch (err) {
