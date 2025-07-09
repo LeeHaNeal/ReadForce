@@ -14,8 +14,6 @@ const categoryMap = {
 const orderByMap = {
   'latest': 'DESC',
   'oldest': 'ASC',
-  'DESC': 'DESC',
-  'ASC': 'ASC',
 };
 
 // passage API 단일화

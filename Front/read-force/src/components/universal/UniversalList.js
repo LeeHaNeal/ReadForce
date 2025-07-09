@@ -4,6 +4,13 @@ import UniversalFilterBar from './UniversalFilterBar';
 import UniversalCard from './UniversalCard';
 import './css/UniversalList.css';
 
+// category 한글 → 영어 변환 매핑
+const reverseCategoryMap = {
+  '뉴스': 'NEWS',
+  '소설': 'NOVEL',
+  '동화': 'FAIRY_TALE',
+};
+
 const UniversalList = ({
   items = [],
   level, setLevel,
@@ -12,16 +19,20 @@ const UniversalList = ({
   categoryOptions = [],
   onSolve
 }) => {
+  // 카테고리 매핑 적용해서 비교
+  const apiCategory = reverseCategoryMap[category] || category;
+
   const filteredItems = items.filter((item) => {
     const matchLevel = level ? item.level === level : true;
-    const matchCategory = category ? item.category === category : true;
+    const matchCategory = category ? item.category === apiCategory : true;
     return matchLevel && matchCategory;
   });
 
+  // publicationDate 기준 정렬
   const sorted = [...filteredItems].sort((a, b) =>
     order_by === 'latest'
-      ? new Date(b.publishedAt) - new Date(a.publishedAt)
-      : new Date(a.publishedAt) - new Date(b.publishedAt)
+      ? new Date(b.publicationDate) - new Date(a.publicationDate)
+      : new Date(a.publicationDate) - new Date(b.publicationDate)
   );
 
   const itemsPerPage = 5;

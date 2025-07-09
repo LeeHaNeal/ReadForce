@@ -37,59 +37,51 @@ public class PassageService {
 	@Transactional(readOnly = true)
 	public List<PassageResponseDto> getPassageListByLanguageAndCategory(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category) {
 
-		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
-		
-		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategory(language, classification, category, sort);
-		
-		if(passageList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-			
-		}
-		
-		return passageList.stream()
-				.map(PassageResponseDto::new)
-				.collect(Collectors.toList());				
-		
+	    Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
+
+	    List<Passage> passageList = passageRepository.findByLanguageAndClassificationAndCategory(language, classification, category, sort);
+
+	    if (passageList.isEmpty()) {
+	        throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+	    }
+
+	    return passageList.stream()
+	            .map(PassageResponseDto::new)
+	            .collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
 	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndType(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category, TypeEnum type) {
 
-		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
-		
-		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndType(language, classification, category, type, sort);
+	    Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 
-		if(passageList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-			
-		}
-		
-		return passageList.stream()
-				.map(PassageResponseDto::new)
-				.collect(Collectors.toList());
-		
+	    List<Passage> passageList = passageRepository.findByLanguageAndClassificationAndCategoryAndType(language, classification, category, type, sort);
+
+	    if (passageList.isEmpty()) {
+	        throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+	    }
+
+	    return passageList.stream()
+	            .map(PassageResponseDto::new)
+	            .collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
 	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndTypeAndLevel(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category, TypeEnum type, Integer level) {
-		
-		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
-		
-		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndTypeAndLevel(language, classification, category, type, level, sort);
 
-		if(passageList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-			
-		}
-		
-		return passageList.stream()
-				.map(PassageResponseDto::new)
-				.collect(Collectors.toList());
-		
+	    Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
+
+	    List<Passage> passageList = passageRepository.findByLanguageAndClassificationAndCategoryAndTypeAndLevel(language, classification, category, type, level, sort);
+
+	    if (passageList.isEmpty()) {
+	        throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+	    }
+
+	    return passageList.stream()
+	            .map(PassageResponseDto::new)
+	            .collect(Collectors.toList());
 	}
+
 
 	@Transactional(readOnly = true)
 	public Passage getTestPassage(LanguageEnum language, CategoryEnum category, Integer level) {

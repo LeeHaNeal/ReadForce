@@ -31,7 +31,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND cl.classificationName = :classification
 			AND c.categoryName = :category
 	""")
-	List<Passage> findByLanguageAndCategoryAndCategory(
+	List<Passage> findByLanguageAndClassificationAndCategory(
 			@Param("language") LanguageEnum language, 
 			@Param("classification") ClassificationEnum classification, 
 			@Param("category") CategoryEnum category,
@@ -51,7 +51,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND c.categoryName = :category
 			AND t.typeName = :type
 	""")
-	List<Passage> findByLanguageAndCategoryAndCategoryAndType(
+	List<Passage> findByLanguageAndClassificationAndCategoryAndType(
 			@Param("language") LanguageEnum language, 
 			@Param("classification") ClassificationEnum classification, 
 			@Param("category") CategoryEnum category,
@@ -73,7 +73,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND t.typeName = :type
 			AND l.levelNumber = :level
 	""")
-	List<Passage> findByLanguageAndCategoryAndCategoryAndTypeAndLevel(
+	List<Passage> findByLanguageAndClassificationAndCategoryAndTypeAndLevel(
 			@Param("language") LanguageEnum language, 
 			@Param("classification") ClassificationEnum classification, 
 			@Param("category") CategoryEnum category,
@@ -103,7 +103,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			@Param("type") TypeEnum type,
 			@Param("level") Integer level
 	);
-	
+
 	long countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumber(LanguageEnum language, CategoryEnum category, Integer level);
 
 	@Query("""
@@ -117,8 +117,5 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			WHERE q.passage.passageNo IS NULL
 	""")
 	List<Passage> findNoQuestionPassageList();
-	
-	
-	
-
 }
+
