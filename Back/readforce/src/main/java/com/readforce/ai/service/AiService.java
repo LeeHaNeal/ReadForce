@@ -938,6 +938,13 @@ public class AiService {
 		
 	}
 
+	@Transactional
+	public void generateChallengeQuestions() {
+		
+		
+	}
+
+
 
 
 

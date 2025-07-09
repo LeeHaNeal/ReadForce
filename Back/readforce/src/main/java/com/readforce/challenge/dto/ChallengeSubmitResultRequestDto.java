@@ -22,8 +22,8 @@ public class ChallengeSubmitResultRequestDto {
 	@NotNull(message = MessageCode.SELECTED_INDEX_LIST_NOT_NULL)
 	private List<Map<Long, Integer>> selecetedIndexList;
 	
-	@NotNull(message = MessageCode.QUESTION_SOLVING_TIME_LIST_NOT_NULL)
-	private List<Map<Long, Long>> questionSolvingTimeList;
+	@NotNull(message = MessageCode.TOTAL_QUESTION_SOLVING_TIME_NOT_NULL)
+	private Long totalQuestionSolvingTime;
 	
 	@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 	private LanguageEnum language;

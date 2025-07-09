@@ -13,11 +13,14 @@ public class ChoiceDto {
 	
 	private final Boolean isCorrect;
 	
+	private final String explanation;
+	
 	public ChoiceDto(Choice choice) {
 		
 		this.choiceIndex = choice.getChoiceIndex();
 		this.content = choice.getContent();
 		this.isCorrect = choice.getIsCorrect();
+		this.explanation = choice.getExplanation();
 		
 	}
 	

@@ -264,7 +264,7 @@ public class PassageService {
 				language,
 				category,
 				level,
-				ClassificationEnum.CHALLANGE		
+				ClassificationEnum.CHALLENGE		
 		);
 		
 		if(passageNoList.isEmpty()) {
@@ -302,6 +302,22 @@ public class PassageService {
 		return passageList.stream()
 				.map(PassageResponseDto::new)
 				.collect(Collectors.toList());	
+
+	}
+
+	@Transactional(readOnly = true)
+	public List<Passage> getNormalPassages(
+			LanguageEnum languageName,
+			CategoryEnum categoryName, 
+			Integer levelNumber
+	) {
+		
+		return passageRepository.findByLanguageAndCategoryAndLevelAndClassification(
+				languageName, 
+				categoryName, 
+				levelNumber, 
+				ClassificationEnum.NORMAL, 
+				PageRequest.of(0, Integer.MAX_VALUE)).getContent();
 
 	}
 
