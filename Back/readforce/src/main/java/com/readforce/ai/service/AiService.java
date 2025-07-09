@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -50,7 +51,8 @@ import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.question.service.QuestionService;
 
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiService {
@@ -138,30 +140,45 @@ public class AiService {
 	}
 
 	private Map<String, Object> requestGenerate(String prompt) {
+	    HttpHeaders httpHeaders = new HttpHeaders();
+	    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-		HttpHeaders httpHeaders = new HttpHeaders();
-		
-		httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-		
-		Map<String, Object> part = Map.of("text", prompt);
-		Map<String, Object> content = Map.of("parts", List.of(part));
-		Map<String, Object> body = Map.of("contents", List.of(content));
-		
-		HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
-		
-		String url = geminiApiUrl + "?key=" + geminiApiKey;
-		
-		try {
-			
-			return restTemplate.postForObject(url, requestEntity, Map.class);
-					
-		} catch(Exception exception){
-			
-			throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
-			
-		}
+	    Map<String, Object> part = Map.of("text", prompt);
+	    Map<String, Object> content = Map.of("parts", List.of(part));
+	    Map<String, Object> body = Map.of("contents", List.of(content));
 
+	    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
+
+	    String url = geminiApiUrl + "?key=" + geminiApiKey;
+
+	    int maxRetries = 3;
+	    long retryDelayMillis = 9000L;
+
+	    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+	        try {
+	            return restTemplate.postForObject(url, requestEntity, Map.class);
+	        } catch (HttpServerErrorException.ServiceUnavailable ex) {
+	            log.warn("Gemini API 503 에러 발생 (시도 {}/{}). {}초 후 재시도합니다. 에러 메시지: {}",
+	                    attempt, maxRetries, retryDelayMillis / 1000, ex.getMessage());
+	            try {
+	                Thread.sleep(retryDelayMillis);
+	            } catch (InterruptedException ie) {
+	                Thread.currentThread().interrupt();
+	                log.error("재시도 대기 중 인터럽트 발생", ie);
+	                throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
+	            }
+	        } catch (Exception ex) {
+	            log.error("Gemini API 호출 실패. 요청 URL: {}, 요청 본문: {}, 에러: {}",
+	                    url.replace(geminiApiKey, "****"), body, ex.getMessage(), ex);
+	            throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
+	        }
+	    }
+
+	    log.error("Gemini API 503 오류가 {}회 발생하여 요청 실패 처리합니다.", maxRetries);
+	    throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
 	}
+
+
 
 
 	private String gernerateTestVocabularyPrompt(Language language, Level level) {
