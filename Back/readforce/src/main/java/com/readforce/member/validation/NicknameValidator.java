@@ -14,7 +14,7 @@ public class NicknameValidator implements ConstraintValidator<ValidNickname, Str
 
 		if(nickname == null) {
 			
-			return false;
+			return true;
 			
 		}
 		

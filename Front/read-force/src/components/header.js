@@ -6,34 +6,27 @@ const Header = () => {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLang, setSelectedLang] = useState('한국어');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "사용자");
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem("token");
-  const provider = localStorage.getItem("provider");
-
-<<<<<<< HEAD
-  // ✅ 닉네임 초기 설정 및 업데이트 이벤트 수신
-=======
   const location = useLocation();
   const currentPath = location.pathname;
 
->>>>>>> develop
+  const isLoggedIn = !!localStorage.getItem("token");
+  const provider = localStorage.getItem("social_provider");
+
   useEffect(() => {
-    const storedNickname = localStorage.getItem("nickname");
-    setNickname(storedNickname || "사용자");
-
-    const handleNicknameUpdate = () => {
-      const updatedNickname = localStorage.getItem("nickname");
-      setNickname(updatedNickname || "사용자");
+    const updateNickname = () => {
+      const storedNickname = localStorage.getItem("nickname");
+      setNickname(storedNickname || "사용자");
     };
 
-    window.addEventListener("nicknameUpdated", handleNicknameUpdate);
+    window.addEventListener("nicknameUpdated", updateNickname);
     return () => {
-      window.removeEventListener("nicknameUpdated", handleNicknameUpdate);
+      window.removeEventListener("nicknameUpdated", updateNickname);
     };
-  }, [isLoggedIn]);
+  }, []);
 
   const handleLangSelect = (lang) => {
     setSelectedLang(lang);
@@ -80,30 +73,17 @@ const Header = () => {
           </h1>
         </div>
 
-<<<<<<< HEAD
         <div className="header-center">
           <nav className="nav">
-            <Link to="/article" className="nav-item">기사</Link>
-            <Link to="/literature/novel" className="nav-item">소설</Link>
-            <Link to="/literature/fairytale" className="nav-item">동화</Link>
-            <Link to="/challenge" className="nav-item">문해력 도전</Link>
-            <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+            <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
+            <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
+            <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
+            <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
           </nav>
         </div>
 
         <div className="hamburger" onClick={() => setShowMobileMenu(prev => !prev)}>☰</div>
-=======
-      <div className="header-center">
-        <nav className="nav">
-          <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
-          <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
-          <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
-          <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
-          <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
-
-        </nav>
-      </div>
->>>>>>> develop
 
         <div className="header-right auth-buttons">
           <div className="lang-selector">
@@ -129,14 +109,11 @@ const Header = () => {
                 <div className="user-dropdown">
                   <div onClick={() => { setShowUserMenu(false); navigate("/mypage"); }}>마이페이지</div>
                   <div onClick={() => { setShowUserMenu(false); navigate("/profile-edit"); }}>회원정보 수정</div>
-
-                  {/* ✅ 일반 회원만 노출 */}
                   {(!provider || provider === '') && (
                     <div onClick={() => { setShowUserMenu(false); navigate("/change-password"); }}>
                       비밀번호 수정
                     </div>
                   )}
-
                   {nickname === "관리자" && (
                     <div onClick={() => { setShowUserMenu(false); navigate("/adminpage"); }}>
                       관리자 페이지
@@ -156,31 +133,16 @@ const Header = () => {
       </div>
 
       {showMobileMenu && (
-<<<<<<< HEAD
         <div className="mobile-menu">
-          <nav className='nav'>
-            <Link to="/article" className="nav-item">기사</Link>
-            <Link to="/literature/novel" className="nav-item">소설</Link>
-            <Link to="/literature/fairytale" className="nav-item">동화</Link>
-            <Link to="/challenge" className="nav-item">문해력 도전</Link>
-            <Link to="/adaptive-learning" className="nav-item">적응력 학습</Link>
+          <nav className="nav">
+            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+            <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
+            <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
+            <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
+            <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
           </nav>
         </div>
       )}
-=======
-      <div className="mobile-menu">
-        <nav className='nav'>
-          <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
-          <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
-          <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
-          <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
-          <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
-
-        </nav>
-      </div>
-    )}
-
->>>>>>> develop
     </header>
   );
 };

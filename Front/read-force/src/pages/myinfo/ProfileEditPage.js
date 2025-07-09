@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import kakaoIcon from '../../assets/image/kakao.png';
-import naverIcon from '../../assets/image/naver.png';
 import googleIcon from '../../assets/image/google.png';
-// 기본 프로필 이미지를 import 합니다.
-import defaultProfileImage from '../../assets/image/default-profile.png'; 
+import defaultProfileImage from '../../assets/image/default-profile.png';
 import './EditProfilePage.css';
 
 const ProfileEditPage = () => {
@@ -13,31 +11,26 @@ const ProfileEditPage = () => {
   const [isNicknameValid, setIsNicknameValid] = useState(null);
   const [birthday, setBirthday] = useState('');
   const [birthdayMessage, setBirthdayMessage] = useState('');
-  const [isBirthdayValid, setIsBirthdayValid] = useState(null);
-
-  // import한 기본 이미지 변수를 사용합니다.
-  const DEFAULT_PROFILE_IMAGE_PATH = defaultProfileImage; 
-  const [profileImageUrl, setProfileImageUrl] = useState(DEFAULT_PROFILE_IMAGE_PATH);
+  const [isBirthdayValid, setIsBirthdayValid] = useState(true);
+  const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    fetchProfileImage();
-  }, []);
-
-  const fetchProfileImage = async () => {
+  const fetchProfileImage = useCallback(async () => {
     try {
       const res = await axiosInstance.get('/file/get-profile-image', {
         responseType: 'blob',
       });
       const url = URL.createObjectURL(res.data);
       setProfileImageUrl(url);
-    } catch (err) {
-      console.error('프로필 이미지 불러오기 실패:', err);
-      // 404 Not Found 또는 다른 오류 시 기본 이미지로 설정
-      setProfileImageUrl(DEFAULT_PROFILE_IMAGE_PATH);
+    } catch {
+      setProfileImageUrl(defaultProfileImage);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProfileImage();
+  }, [fetchProfileImage]);
 
   const checkNicknameDuplicate = async (nickname) => {
     try {
@@ -90,6 +83,17 @@ const ProfileEditPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (nickname && !isNicknameValid) {
+      alert('닉네임 형식이 잘못되었거나 중복입니다. 다시 확인해주세요.');
+      return;
+    }
+
+    if (birthday && !isBirthdayValid) {
+      alert('생년월일 형식이 잘못되었습니다.');
+      return;
+    }
+
     const updates = [];
     const infoPayload = {};
 
@@ -112,9 +116,9 @@ const ProfileEditPage = () => {
 
     try {
       const responses = await Promise.all(updates);
-      const modifyResponse = responses.find((res) => res?.data?.NICK_NAME);
+      const modifyResponse = responses.find((res) => res?.data?.NICKNAME);
       if (modifyResponse) {
-        const newNickname = modifyResponse.data.NICK_NAME;
+        const newNickname = modifyResponse.data.NICKNAME;
         localStorage.setItem('nickname', newNickname);
         window.dispatchEvent(new Event('nicknameUpdated'));
       }
@@ -139,7 +143,7 @@ const ProfileEditPage = () => {
   const handleImageDelete = async () => {
     try {
       await axiosInstance.delete('/file/delete-profile-image');
-      setProfileImageUrl(DEFAULT_PROFILE_IMAGE_PATH);
+      setProfileImageUrl(defaultProfileImage);
       setSelectedFile(null);
       alert('프로필 이미지가 삭제되었습니다.');
     } catch {
@@ -165,31 +169,21 @@ const ProfileEditPage = () => {
         <div className="form-group">
           <label>회원 이미지</label>
           <div className="profile-image-box">
-            <img 
-              src={profileImageUrl} 
-              alt="프로필 이미지" 
-              className="profile-image" 
-            />
+            <img src={profileImageUrl} alt="프로필 이미지" className="profile-image" />
             <input
               type="file"
               accept="image/jpeg,image/png,image/gif"
               onChange={(e) => {
                 const file = e.target.files[0];
-                if (file) {
-                  if (file.size > 5 * 1024 * 1024) {
-                    alert('이미지 용량은 5MB 이하여야 합니다.');
-                    return;
-                  }
+                if (file && file.size <= 5 * 1024 * 1024) {
                   setSelectedFile(file);
                   setProfileImageUrl(URL.createObjectURL(file));
+                } else {
+                  alert('이미지 용량은 5MB 이하여야 합니다.');
                 }
               }}
             />
-            <button
-              type="button"
-              className="remove-image-button"
-              onClick={handleImageDelete}
-            >
+            <button type="button" className="remove-image-button" onClick={handleImageDelete}>
               이미지 삭제
             </button>
           </div>
@@ -247,9 +241,6 @@ const ProfileEditPage = () => {
           <div className="social-login">
             <button type="button" className="social-btn" onClick={() => openSocialRedirect('kakao')}>
               <img src={kakaoIcon} alt="카카오" />
-            </button>
-            <button type="button" className="social-btn" onClick={() => openSocialRedirect('naver')}>
-              <img src={naverIcon} alt="네이버" />
             </button>
             <button type="button" className="social-btn" onClick={() => openSocialRedirect('google')}>
               <img src={googleIcon} alt="구글" />
