@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -269,7 +270,7 @@ public class PassageService {
 				language,
 				category,
 				level,
-				ClassificationEnum.CHALLANGE		
+				ClassificationEnum.CHALLENGE		
 		);
 		
 		if(passageNoList.isEmpty()) {
@@ -308,6 +309,29 @@ public class PassageService {
 				.map(PassageResponseDto::new)
 				.collect(Collectors.toList());	
 
+	}
+
+	@Transactional(readOnly = true)
+	public List<Passage> getNormalPassages(
+			LanguageEnum languageName,
+			CategoryEnum categoryName, 
+			Integer levelNumber
+	) {
+		
+		return passageRepository.findByLanguageAndCategoryAndLevelAndClassification(
+				languageName, 
+				categoryName, 
+				levelNumber, 
+				ClassificationEnum.NORMAL, 
+				PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Passage> getAllPassagesByClassification(ClassificationEnum classificationName){
+		
+		return passageRepository.findAllByClassification_ClassificationName(classificationName, Pageable.unpaged()).getContent();
+		
 	}
 
 }

@@ -187,6 +187,8 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			@Param("level") Integer level, 
 			Sort sort
 	);
+
+	Page<Passage> findAllByClassification_ClassificationName(ClassificationEnum classificationName, Pageable pageable);
 	
 	
 	

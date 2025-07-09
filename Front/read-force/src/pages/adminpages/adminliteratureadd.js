@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import fetchWithAuth from "../../utils/fetchWithAuth";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminLiteratureAdd = () => {
   const [title, setTitle] = useState("");
@@ -9,13 +9,10 @@ const AdminLiteratureAdd = () => {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetchWithAuth("/admin/add-literature", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, type })
+      const res = await axiosInstance.post("/admin/add-literature", {
+        title,
+        type
       });
-
-      if (!res.ok) throw new Error("문학 추가 실패");
 
       alert("문학이 추가되었습니다!");
       navigate("/adminpage/adminliterature");
