@@ -264,7 +264,7 @@ public class PassageService {
 				language,
 				category,
 				level,
-				ClassificationEnum.CHALLANGE		
+				ClassificationEnum.CHALLENGE		
 		);
 		
 		if(passageNoList.isEmpty()) {

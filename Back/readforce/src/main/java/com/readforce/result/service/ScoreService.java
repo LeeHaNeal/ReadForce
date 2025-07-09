@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.member.entity.Member;
+import com.readforce.passage.entity.Category;
+import com.readforce.passage.entity.Language;
 import com.readforce.ranking.dto.RankingResponseDto;
 import com.readforce.result.entity.Score;
 import com.readforce.result.repository.ScoreRepository;
@@ -24,10 +26,13 @@ public class ScoreService {
 	private final ScoreRepository scoreRepository;
 	
 	@Transactional
-	public void createScore(Member member) {
+	public void createScore(Member member, Double totalScore, Category category, Language language) {
 		
 		Score score = Score.builder()
+				.score(totalScore)
 				.member(member)
+				.category(category)
+				.language(language)
 				.build();
 		
 		scoreRepository.save(score);
