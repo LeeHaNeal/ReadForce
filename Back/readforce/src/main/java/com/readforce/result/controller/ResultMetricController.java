@@ -29,7 +29,7 @@ public class ResultMetricController {
 
 	private final ResultMetricService resultMetricService;
 	private final ResultService resultService;
-	
+
 	@GetMapping("/get-category-correct-answer-rate")
 	public ResponseEntity<Map<String, Double>> getCategoryCorrectAnswerRate(
 			@AuthenticationPrincipal UserDetails userDetails

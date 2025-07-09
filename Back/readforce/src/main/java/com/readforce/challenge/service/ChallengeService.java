@@ -159,11 +159,11 @@ public class ChallengeService {
 				
 				for(Level level : levelList) {
 					
-					List<Passage> passageList = passageService.getNormalPassages(
-							language.getLanguageName(),
-							category.getCategoryName(),
-							level.getLevelNumber()
-					);
+					List<Passage> passageList = new ArrayList<>(passageService.getNormalPassages(
+							language.getLanguageName(), 
+							category.getCategoryName(), 
+							level.getLevelNumber()							
+					));
 					
 					Collections.shuffle(passageList);
 					
@@ -177,6 +177,29 @@ public class ChallengeService {
 				}
 				
 			}
+			
+		}
+		
+	}
+	
+	@Transactional
+	public void resetWeeklyChallenge() {
+		
+		revertExistingChallengesToNormal();
+		
+		updateToChallengePassages();		
+		
+	}
+	
+	private void revertExistingChallengesToNormal() {
+		
+		List<Passage> existingChallenges = passageService.getAllPassagesByClassification(ClassificationEnum.CHALLENGE);
+		
+		if(!existingChallenges.isEmpty()) {
+			
+			Classification normalClassification = classificationService.getClassificationByClassfication(ClassificationEnum.NORMAL);
+			
+			existingChallenges.forEach(passage -> passage.chageClassification(normalClassification));
 			
 		}
 		

@@ -8,10 +8,15 @@
   flex-direction: column;
   justify-content: space-between;
   height: 200px;
+  position: relative; /* 배지 absolute 위치를 위해 필요 */
 }
 
 .UniversalCard-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.UniversalCard-header {
+  position: relative;
 }
 
 .UniversalCard-title {
@@ -46,7 +51,8 @@
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: bold;
   cursor: pointer;
   align-self: flex-end;
   text-decoration: none;
@@ -56,13 +62,16 @@
   background-color: #666;
 }
 
+/* 오른쪽 상단 배지 위치 */
 .UniversalCard-badge {
-  display: inline-block;
-  padding: 8px 14px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 9px 16px;
+  font-size: 15px;
+  font-weight: bold;
   border-radius: 12px;
-  margin-left: auto;
-  margin-bottom: 8px;
-  margin-top: 4px;
+  margin: 0;
 }
 
 .UniversalCard-초급 {
@@ -116,8 +125,8 @@
   }
 
   .UniversalCard-badge {
-    padding: 6px 10px;
-    font-size: 13px;
+    padding: 5px 10px;
+    font-size: 12px;
   }
 
   .UniversalCard-category {

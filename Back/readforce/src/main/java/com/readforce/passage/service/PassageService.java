@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.readforce.administrator.dto.AdministratorUploadPassageRequestDto;
 import com.readforce.common.MessageCode;
@@ -30,7 +30,6 @@ import com.readforce.passage.entity.Passage;
 import com.readforce.passage.entity.Type;
 import com.readforce.passage.repository.PassageRepository;
 
-import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -69,6 +68,7 @@ public class PassageService {
 
 		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
+
 		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndType(language, classification, category, type, sort);
 
 		if(passageList.isEmpty()) {
@@ -88,7 +88,9 @@ public class PassageService {
 		
 		Sort sort = Sort.by(Sort.Direction.fromString(orderBy.name()), "createdAt");
 		
+
 		List<Passage> passageList = passageRepository.findByLanguageAndCategoryAndCategoryAndTypeAndLevel(language, classification, category, type, level, sort);
+
 
 		if(passageList.isEmpty()) {
 			
@@ -137,8 +139,10 @@ public class PassageService {
 			Integer level
 	) {
 
+
 		return passageRepository.findPassageNoByLanguageAndClassificationAndCategoryAndTypeAndLevel(
 				language, classification, category, type, level
+
 		);
 		
 	}
@@ -216,44 +220,24 @@ public class PassageService {
 
 	@Transactional
 	public void uploadPassage(AdministratorUploadPassageRequestDto requestDto) {
-
-		MultipartFile file = requestDto.getFile();
 		
-		try {
-			
-			List<String> paragraphList = fileService.parseFileToParagraphList(file);
-			
-			Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-			Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-			Level level = levelService.getLevelByLevel(requestDto.getLevel());
-			Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
-			Type type = typeService.getTypeByType(requestDto.getType());
-			
-			for(String paragraph : paragraphList) {
-				
-				if(!paragraph.isBlank()) {
-					
-					savePassage(
-							requestDto.getTitle(),
-							paragraph.trim(),
-							requestDto.getAuthor(),
-							LocalDate.now(),
-							category,
-							level,
-							language,
-							classification,
-							type
-					);				
-					
-				}
-				
-			}
-			
-		} catch (java.io.IOException e) {
-
-			throw new IOException(MessageCode.UPLOAD_PASSAGE_FAIL);
-			
-		}
+		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+		Level level = levelService.getLevelByLevel(requestDto.getLevel());
+		Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
+		Type type = typeService.getTypeByType(requestDto.getType());
+		
+		savePassage(
+				requestDto.getTitle(),
+				requestDto.getContent(),
+				requestDto.getAuthor(),
+				LocalDate.now(),
+				category,
+				level,
+				language,
+				classification,
+				type
+		);
 		
 	}
 
@@ -319,6 +303,13 @@ public class PassageService {
 				ClassificationEnum.NORMAL, 
 				PageRequest.of(0, Integer.MAX_VALUE)).getContent();
 
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Passage> getAllPassagesByClassification(ClassificationEnum classificationName){
+		
+		return passageRepository.findAllByClassification_ClassificationName(classificationName, Pageable.unpaged()).getContent();
+		
 	}
 
 }

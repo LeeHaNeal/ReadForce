@@ -1,33 +1,22 @@
 import './css/UniversalCard.css';
 import React, { useEffect } from 'react';
 
-const levelMap = {
-  BEGINNER: '초급',
-  INTERMEDIATE: '중급',
-  ADVANCED: '고급',
-};
+const UniversalCard = React.memo(({ data, onSolve, typeOptions = [] }) => {
+  const getTypeLabel = (value) => {
+    const trimmed = value?.trim();
+    const found = typeOptions.find(opt => opt.value === trimmed);
+    return found ? found.label : trimmed;
+  };
 
-const categoryMap = {
-  POLITICS: '정치',
-  ECONOMY: '경제',
-  SOCIETY: '사회',
-  CULTURE: '생활/문화',
-  SCIENCE: 'IT/과학',
-  ETC: '기타',
-  MYSTERY: '추리',
-  HISTORY: '역사',
-  CLASSIC: '고전',
-  MODERN: '근대',
-  CHILDREN: '동화',
-};
+  const getLevelLabel = (level) => {
+    if (level <= 3) return '초급';
+    if (level <= 6) return '중급';
+    return '고급';
+  };
 
-const UniversalCard = React.memo(({ data, onSolve }) => {
-  useEffect(() => {
-    console.log("받은 데이터 확인:", data);
-  }, []);
-
-  const koreanLevel = levelMap[data.level] || data.level;
-  const koreanCategory = categoryMap[data.category] || data.category;
+  const type = getTypeLabel(data.type);
+  const level = data.level;
+  const levelLabel = getLevelLabel(level);
 
   return (
     <div className="UniversalCard-card">
@@ -38,15 +27,15 @@ const UniversalCard = React.memo(({ data, onSolve }) => {
             - {data.literature_paragraph_no}
           </span>
         </h3>
-        <span className={`UniversalCard-badge UniversalCard-${koreanLevel}`}>
-          {koreanLevel}
+        <span className={`UniversalCard-badge UniversalCard-${levelLabel}`}>
+          {level}단계
         </span>
       </div>
 
       <p className="UniversalCard-content">{data.content}</p>
 
       <div className="UniversalCard-footer">
-        <p className="UniversalCard-category"># {koreanCategory}</p>
+        <p className="UniversalCard-category"># {type}</p>
         <button
           onClick={() => onSolve && onSolve(data)}
           className="UniversalCard-button"
@@ -57,5 +46,6 @@ const UniversalCard = React.memo(({ data, onSolve }) => {
     </div>
   );
 });
+
 
 export default UniversalCard;
