@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import fetchWithAuth from "../../utils/fetchWithAuth";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminUserInfo = () => {
     const navigate = useNavigate();
@@ -32,11 +33,10 @@ const AdminUserInfo = () => {
     // 회원 정보 가져오기
     const fetchUserInfo = async () => {
         try {
-            const res = await fetchWithAuth(`/admin/get-member-info-object?email=${email}`);
-            if (!res.ok) throw new Error("회원 정보 조회 실패");
-
-            const data = await res.json();
-            setUser(data);
+            const res = await axiosInstance.get(`/admin/get-member-info-object`, {
+                params: { email }
+            });
+            setUser(res.data);
         } catch (err) {
             console.error(err);
             alert("회원 정보를 불러오는 데 실패했습니다.");
@@ -46,12 +46,11 @@ const AdminUserInfo = () => {
     // 포인트 정보 가져오기
     const fetchPointInfo = async () => {
         try {
-            const res = await fetchWithAuth(`/admin/get-member-point-object?email=${email}`);
-            if (!res.ok) throw new Error("포인트 정보 조회 실패");
-            const data = await res.json();
-            console.log("✅ 백엔드 응답 확인:", data);
-
-            setPointInfo(data);
+            const res = await axiosInstance.get(`/admin/get-member-point-object`, {
+                params: { email }
+            });
+            console.log("✅ 백엔드 응답 확인:", res.data);
+            setPointInfo(res.data);
         } catch (err) {
             console.error(err);
             alert("포인트 정보를 불러오는 데 실패했습니다.");
@@ -61,9 +60,10 @@ const AdminUserInfo = () => {
     // 뉴스 퀴즈 풀이 기록 가져오기
     const fetchNewsQuizAttempts = async () => {
         try {
-            const res = await fetchWithAuth(`/admin/get-member-news-quiz-attempt-list?email=${email}`);
-            const data = await res.json();
-            setNewsQuizAttempts(data);
+            const res = await axiosInstance.get(`/admin/get-member-news-quiz-attempt-list`, {
+                params: { email }
+            });
+            setNewsQuizAttempts(res.data);
         } catch (err) {
             console.error("뉴스 퀴즈 응시 기록 오류:", err);
         }
@@ -72,9 +72,10 @@ const AdminUserInfo = () => {
     // 문학 퀴즈 풀이 기록 가져오기
     const fetchLiteratureQuizAttempts = async () => {
         try {
-            const res = await fetchWithAuth(`/admin/get-member-literature-quiz-attempt-list?email=${email}`);
-            const data = await res.json();
-            setLiteratureQuizAttempts(data);
+            const res = await axiosInstance.get(`/admin/get-member-literature-quiz-attempt-list`, {
+                params: { email }
+            });
+            setLiteratureQuizAttempts(res.data);
         } catch (err) {
             console.error("문학 퀴즈 응시 기록 오류:", err);
         }
@@ -82,7 +83,6 @@ const AdminUserInfo = () => {
 
     useEffect(() => {
         fetchUserInfo();
-        // fetchAttendanceList();
         fetchPointInfo();
         fetchNewsQuizAttempts();
         fetchLiteratureQuizAttempts();
@@ -93,19 +93,11 @@ const AdminUserInfo = () => {
     // 포인트 정보 수정
     const handlePointUpdate = async () => {
         try {
-            const res = await fetchWithAuth(`/admin/increment-point`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email,
-                    category: selectedCategory,
-                    delta: pointDelta
-                })
+            await axiosInstance.patch(`/admin/increment-point`, {
+                email,
+                category: selectedCategory,
+                delta: pointDelta
             });
-            if (!res.ok) throw new Error("점수 수정 실패");
-
             alert("수정 완료!");
             setShowModal(false);
             fetchPointInfo();
@@ -121,20 +113,15 @@ const AdminUserInfo = () => {
         if (!confirmed) return;
 
         try {
-            const res = await fetchWithAuth(`/admin/delete-news-quiz-attempt?email=${email}&news_quiz_no=${newsQuizNo}`, {
-                method: 'DELETE',
+            const res = await axiosInstance.delete(`/admin/delete-news-quiz-attempt`, {
+                params: { email, news_quiz_no: newsQuizNo }
             });
-
-            const data = await res.json();
-            alert(data.message || "삭제 성공!");
-
+            alert(res.data.message || "삭제 성공!");
         } catch (err) {
             console.error("삭제 실패", err);
             alert("삭제 중 오류 발생");
         }
-
         await fetchNewsQuizAttempts();
-
     };
 
     // 문학 퀴즈 풀이 기록 삭제
@@ -143,23 +130,15 @@ const AdminUserInfo = () => {
         if (!confirmed) return;
 
         try {
-            const res = await fetchWithAuth(
-                `/admin/delete-literature-quiz-attempt?email=${email}&literature_quiz_no=${literatureQuizNo}`, // ✅ 수정됨
-                {
-                    method: 'DELETE',
-                }
-            );
-
-            const data = await res.json();
-            alert(data.message || "삭제 성공!");
-
-            // 삭제 성공 후 목록 갱신하려면 여기에 다시 fetchLiteratureQuizAttempts() 호출도 가능
+            const res = await axiosInstance.delete(`/admin/delete-literature-quiz-attempt`, {
+                params: { email, literature_quiz_no: literatureQuizNo }
+            });
+            alert(res.data.message || "삭제 성공!");
         } catch (err) {
             console.error("삭제 실패", err);
             alert("삭제 중 오류 발생");
         }
-
-        await fetchLiteratureQuizAttempts(); // 아까 useEffect에서 만든 함수
+        await fetchLiteratureQuizAttempts();
     };
 
     // 뉴스 퀴즈 풀이 기록 추가
@@ -170,21 +149,12 @@ const AdminUserInfo = () => {
                 news_quiz_no: Number(newQuizNo),
                 selected_option_index: selectedOptionIndex,
             };
-
-            const res = await fetchWithAuth("/admin/add-news-quiz-attempt", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await res.json();
-            alert(data.message || "추가 완료!");
-
-            // 상태 초기화 및 닫기
+            const res = await axiosInstance.post("/admin/add-news-quiz-attempt", payload);
+            alert(res.data.message || "추가 완료!");
             setNewQuizNo("");
             setSelectedOptionIndex(0);
             setShowAddModal(false);
-            await fetchNewsQuizAttempts(); // 목록 갱신
+            await fetchNewsQuizAttempts();
         } catch (err) {
             console.error("추가 실패", err);
             alert("추가 중 오류 발생");
@@ -194,20 +164,12 @@ const AdminUserInfo = () => {
     // 문학 퀴즈 풀이 기록 추가
     const handleAddLiteratureQuizAttempt = async () => {
         try {
-            const response = await fetchWithAuth("/admin/add-literature-quiz-attempt", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email, // or 관리용 임시값
-                    literature_quiz_no: Number(newLiteratureQuizNo),
-                    selected_option_index: selectedLiteratureOptionIndex,
-                    // is_correct: isLiteratureCorrect,
-                }),
-            });
-
-            if (!response.ok) throw new Error("응답 실패");
+            const payload = {
+                email,
+                literature_quiz_no: Number(newLiteratureQuizNo),
+                selected_option_index: selectedLiteratureOptionIndex,
+            };
+            await axiosInstance.post("/admin/add-literature-quiz-attempt", payload);
             alert("문학 퀴즈 응시 기록이 추가되었습니다.");
             setShowAddLiteratureModal(false);
             await fetchLiteratureQuizAttempts();

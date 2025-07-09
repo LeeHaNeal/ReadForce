@@ -37,8 +37,8 @@ spring:
             required: true
   jwt:
     secret: ${JWT_SECRET_KEY}
-    access-expiration-time: 300000 # 5분
-#    access-expiration-time: 5000 #5
+#    access-expiration-time: 300000 # 5분
+    access-expiration-time: 60000 #5
     refresh-expiration-time: 86400000 # 1일
   security:
     oauth2:

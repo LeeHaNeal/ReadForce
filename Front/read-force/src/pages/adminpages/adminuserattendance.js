@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import fetchWithAuth from "../../utils/fetchWithAuth";
+import axiosInstance from "../../api/axiosInstance";
 
 const AdminUserAttendance = () => {
     const navigate = useNavigate();
@@ -13,10 +14,10 @@ const AdminUserAttendance = () => {
     // 출석 정보 가져오기
     const fetchAttendanceList = async () => {
         try {
-            const res = await fetchWithAuth(`/admin/get-member-attendance-list?email=${email}`);
-            if (!res.ok) throw new Error("출석 정보 조회 실패");
-            const data = await res.json();
-            setAttendanceList(data);
+            const res = await axiosInstance.get(`/admin/get-member-attendance-list`, {
+                params: { email }
+            });
+            setAttendanceList(res.data);
         } catch (err) {
             console.error(err);
             alert("출석 정보를 불러오는 데 실패했습니다.");
@@ -30,11 +31,9 @@ const AdminUserAttendance = () => {
     // 출석 추가
     const handleAddAttendance = async () => {
         try {
-            const res = await fetchWithAuth(
-                `/admin/add-attendance?email=${email}&date=${selectedDate}`,
-                { method: "POST" }
-            );
-            if (!res.ok) throw new Error("추가 실패");
+            await axiosInstance.post(`/admin/add-attendance`, null, {
+                params: { email, date: selectedDate }
+            });
             alert("출석이 추가되었습니다.");
             setShowModal(false);
             fetchAttendanceList();
@@ -44,21 +43,22 @@ const AdminUserAttendance = () => {
         }
     };
 
+
     // 출석 삭제
     const handleDelete = async (attendanceNo) => {
         if (!window.confirm("정말 이 출석 기록을 삭제하시겠습니까?")) return;
         try {
-            const res = await fetchWithAuth(`/admin/delete-attendance?attendance_no=${attendanceNo}`, {
-                method: "DELETE",
+            await axiosInstance.delete(`/admin/delete-attendance`, {
+                params: { attendance_no: attendanceNo }
             });
-            if (!res.ok) throw new Error("삭제 실패");
             alert("삭제 완료되었습니다.");
-            fetchAttendanceList(); // 목록 다시 불러오기
+            fetchAttendanceList();
         } catch (err) {
             console.error(err);
             alert("출석 삭제 중 오류가 발생했습니다.");
         }
     };
+
 
     return (
         <div>
