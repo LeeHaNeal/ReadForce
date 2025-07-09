@@ -159,11 +159,11 @@ public class ChallengeService {
 				
 				for(Level level : levelList) {
 					
-					List<Passage> passageList = passageService.getNormalPassages(
-							language.getLanguageName(),
-							category.getCategoryName(),
-							level.getLevelNumber()
-					);
+					List<Passage> passageList = new ArrayList<>(passageService.getNormalPassages(
+							language.getLanguageName(), 
+							category.getCategoryName(), 
+							level.getLevelNumber()							
+					));
 					
 					Collections.shuffle(passageList);
 					
