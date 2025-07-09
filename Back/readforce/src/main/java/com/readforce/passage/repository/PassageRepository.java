@@ -25,7 +25,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			SELECT p 
 			FROM Passage p 
 			JOIN FETCH p.category c 
-			JOIN FETCH p.type t 
+			LEFT JOIN FETCH p.type t 
 			JOIN FETCH p.level l
 			JOIN FETCH p.language lang
 			JOIN FETCH p.classification cl
@@ -33,7 +33,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND cl.classificationName = :classification
 			AND c.categoryName = :category
 	""")
-	List<Passage> findByLanguageAndCategoryAndCategory(
+	List<Passage> findByLanguageAndCategory(
 			@Param("language") LanguageEnum language, 
 			@Param("classification") ClassificationEnum classification, 
 			@Param("category") CategoryEnum category,
@@ -139,6 +139,49 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			@Param("level") Integer level, 
 			@Param("classification") ClassificationEnum classification, 
 			Pageable pageable
+	);
+
+	
+	@Query("""
+			SELECT p.passageNo
+			FROM Passage p
+			JOIN p.category c
+			JOIN p.type t
+			JOIN p.level l
+			JOIN p.language lang
+			JOIN p.classification cl
+			WHERE lang.languageName = :language
+			AND cl.classificationName = :classification
+			AND c.categoryName = :category
+			AND t.typeName = :type
+			AND l.levelNumber = :level	
+	""")
+	List<Long> findPassageNoByLanguageAndCategoryAndLevelAndClassification(
+			@Param("language") LanguageEnum language, 
+			@Param("category") CategoryEnum category,
+			@Param("level") Integer level, 
+			@Param("classification") ClassificationEnum classification
+	);
+
+	@Query("""
+			SELECT p 
+			FROM Passage p 
+			JOIN FETCH p.category c 
+			LEFT JOIN FETCH p.type t 
+			JOIN FETCH p.level l
+			JOIN FETCH p.language lang
+			JOIN FETCH p.classification cl
+			WHERE lang.languageName = :language
+			AND cl.classificationName = :classification
+			AND c.categoryName = :category
+			AND l.levelNumber = :level
+	""")
+	List<Passage> findByLanguageAndCategoryAndLevel(
+			@Param("language") LanguageEnum language, 
+			@Param("classification") ClassificationEnum classification,
+			@Param("category") CategoryEnum category, 
+			@Param("level") Integer level, 
+			Sort sort
 	);
 	
 	
