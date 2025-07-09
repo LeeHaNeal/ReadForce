@@ -80,7 +80,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(submitRequestDto.getQuestionNo(), submitRequestDto.getSelectedIndex()).getIsCorrect();
 		
-		if(submitRequestDto.getQuestionSolvingTime() < 180) {
+		if(submitRequestDto.getQuestionSolvingTime() > 180) {
 			
 			isCorrect = false;
 			
@@ -88,13 +88,13 @@ public class TestService {
 		
 		Integer nextLevel = evaluate(questionInfo.getLevel(), isCorrect);
 
-		if(nextLevel < 0) {
+		if(nextLevel > 0) {
 			
 			return getTestQuestion(questionInfo.getLanguage(), questionInfo.getCategory(), nextLevel);
 			
 		} else {
 			
-			return getTestQuestion(questionInfo.getLanguage(), CategoryEnum.FACTUAL, nextLevel);
+			return getTestQuestion(questionInfo.getLanguage(), CategoryEnum.FACTUAL, Math.abs(nextLevel));
 			
 		}
 		
@@ -121,7 +121,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(questionNo, selectedIndex).getIsCorrect();
 		
-		if(questionSolvingTime < 120) {
+		if(questionSolvingTime > 180) {
 			
 			isCorrect = false;
 			
@@ -154,7 +154,7 @@ public class TestService {
 		
 		boolean isCorrect = multipleChoiceService.checkResult(submitRequestDto.getQuestionNo(), submitRequestDto.getSelectedIndex()).getIsCorrect();
 		
-		if(submitRequestDto.getQuestionSolvingTime() < 180) {
+		if(submitRequestDto.getQuestionSolvingTime() > 180) {
 			
 			isCorrect = false;
 			

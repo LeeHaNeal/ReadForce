@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
-import fetchWithAuth from "../../utils/fetchWithAuth";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminNewsDetail = () => {
     const { state } = useLocation();
@@ -11,8 +11,8 @@ const AdminNewsDetail = () => {
     useEffect(() => {
         const fetchQuiz = async () => {
             try {
-                const res = await fetchWithAuth("/admin/get-all-news-quiz-list");
-                const data = await res.json();
+                const res = await axiosInstance.get("/admin/get-all-news-quiz-list");
+                const data = res.data;
 
                 // 현재 뉴스 번호와 연관된 퀴즈만 필터링
                 const relatedQuiz = data.filter(q => q.news_no === news.news_no);
@@ -34,11 +34,9 @@ const AdminNewsDetail = () => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
         try {
-            const res = await fetchWithAuth(`/admin/delete-news-quiz?news_quiz_no=${quizNo}`, {
-                method: 'DELETE'
-            });
+            const res = await axiosInstance.delete(`/admin/delete-news-quiz?news_quiz_no=${quizNo}`);
 
-            if (!res.ok) throw new Error("삭제 실패");
+            if (res.status !== 200) throw new Error("삭제 실패");
             setQuizList(prev => prev.filter(q => q.news_quiz_no !== quizNo));
         } catch (err) {
             console.error(err);
