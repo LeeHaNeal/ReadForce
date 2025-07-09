@@ -61,7 +61,13 @@ const UniversalQuestionPage = () => {
 
   const handleSubmit = async (finalAnswers) => {
     try {
-      navigate('/question-result', {
+      const categoryPath = passage.category === 'NEWS'
+        ? 'article'
+        : passage.category === 'NOVEL'
+        ? 'novel'
+        : 'fairytale';
+
+      navigate(`/${categoryPath}/result`, {
         state: {
           passage,
           total: finalAnswers.length,
