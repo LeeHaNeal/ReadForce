@@ -5067,3 +5067,13 @@ Caused by: org.gradle.api.BuildCancelledException: Build cancelled.
 
 !ENTRY org.springframework.tooling.boot.ls 1 0 2025-07-08 17:01:01.786
 !MESSAGE Classpath changed for project: readforce
+!SESSION 2025-07-09 09:40:43.781 -----------------------------------------------
+eclipse.buildId=4.20.1.202310260003
+java.version=17.0.8.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=ko_KR
+Framework arguments:  -product org.springframework.boot.ide.branding.sts4
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.springframework.boot.ide.branding.sts4
+
+!ENTRY org.eclipse.emf.ecore 2 0 2025-07-09 09:40:47.694
+!MESSAGE Both 'org.eclipse.jst.j2ee.core' and 'org.eclipse.jst.j2ee.core' register a package for 'application.xmi'
