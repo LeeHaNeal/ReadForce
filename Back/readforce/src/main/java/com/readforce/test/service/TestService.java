@@ -88,13 +88,13 @@ public class TestService {
 		
 		Integer nextLevel = evaluate(questionInfo.getLevel(), isCorrect);
 
-		if(nextLevel < 0) {
+		if(nextLevel > 0) {
 			
 			return getTestQuestion(questionInfo.getLanguage(), questionInfo.getCategory(), nextLevel);
 			
 		} else {
 			
-			return getTestQuestion(questionInfo.getLanguage(), CategoryEnum.FACTUAL, nextLevel);
+			return getTestQuestion(questionInfo.getLanguage(), CategoryEnum.FACTUAL, Math.abs(nextLevel));
 			
 		}
 		

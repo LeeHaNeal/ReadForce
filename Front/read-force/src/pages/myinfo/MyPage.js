@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './MyPage.css';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import fetchWithAuth from '../../utils/fetchWithAuth';
+import api from '../../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
@@ -24,11 +24,9 @@ const MyPage = () => {
   useEffect(() => {
     const fetchProfileImage = async () => {
       try {
-        const res = await fetch('/file/get-profile-image', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
+        const res = await api.get('/file/get-profile-image', { responseType: 'blob' });
         if (!res.ok) throw new Error('이미지 로딩 실패');
-        const blob = await res.blob();
+        const blob = res.data;
         setProfileImageUrl(URL.createObjectURL(blob));
       } catch (e) {
         console.error('프로필 이미지 불러오기 실패:', e);
@@ -46,8 +44,8 @@ const MyPage = () => {
 
   // 출석 요약 + streak 계산
   useEffect(() => {
-    fetchWithAuth('/attendance/get-attendance-date-list')
-      .then(res => res.json())
+    api.get('/attendance/get-attendance-date-list')
+      .then(res => res.data)
       .then(data => {
         const dates = Array.isArray(data) ? data.map(d => new Date(d)) : [];
         setAttendanceDates(dates);
@@ -83,8 +81,8 @@ const MyPage = () => {
 
   // 전체 정답률
   useEffect(() => {
-    fetchWithAuth('/result/get-overall-correct-answer-rate')
-      .then(res => res.json())
+    api.get('/result/get-overall-correct-answer-rate')
+      .then(res => res.data)
       .then(data => {
         const rate = data?.OVERALL_CORRECT_ANSWER_RATE;
         if (typeof rate === 'number') setCorrectRate(rate);
@@ -93,8 +91,8 @@ const MyPage = () => {
 
   // 오늘 푼 문제 수
   useEffect(() => {
-    fetchWithAuth('/result/get-today-solved-question-count')
-      .then(res => res.json())
+    api.get('/result/get-today-solved-question-count')
+      .then(res => res.data)
       .then(data => {
         const count = data?.TODAY_SOLVED_QUESTION_COUNT;
         if (typeof count === 'number') setTodaySolvedCount(count);
@@ -105,10 +103,10 @@ const MyPage = () => {
     const fetchLearningData = async () => {
       try {
         const [total, today, todayWrong, fav] = await Promise.all([
-          fetchWithAuth('/learning/get-total-learning').then(res => res.json()),
-          fetchWithAuth('/learning/get-today-learning').then(res => res.json()),
-          fetchWithAuth('/learning/get-today-incorrect-learning').then(res => res.json()),
-          fetchWithAuth('/learning/get-favorit-learning').then(res => res.json()),
+          api.get('/learning/get-total-learning').then(res => res.data),
+          api.get('/learning/get-today-learning').then(res => res.data),
+          api.get('/learning/get-today-incorrect-learning').then(res => res.data),
+          api.get('/learning/get-favorit-learning').then(res => res.data),
         ]);
 
         setTotalLearning(total);

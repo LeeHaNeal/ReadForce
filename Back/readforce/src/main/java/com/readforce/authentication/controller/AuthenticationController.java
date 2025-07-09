@@ -129,9 +129,9 @@ public class AuthenticationController {
 	){
 		
 		String username = jwtUtil.extractUsername(refreshToken);
-		String stroedRefreshToken = authenticationService.getRefreshToken(username);
+		String storedRefreshToken = authenticationService.getRefreshToken(username);
 		
-		if(stroedRefreshToken == null) {
+		if(storedRefreshToken == null) {
 
 			authenticationService.deleteRefreshToken(username);
 
@@ -139,7 +139,7 @@ public class AuthenticationController {
 			
 		}
 		
-		if(!stroedRefreshToken.equals(refreshToken) || jwtUtil.isExpiredToken(stroedRefreshToken)) {
+		if(!storedRefreshToken.equals(refreshToken) || jwtUtil.isExpiredToken(storedRefreshToken)) {
 			
 			throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
 			
