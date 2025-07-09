@@ -3,8 +3,10 @@ package com.readforce.administrator.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.readforce.common.MessageCode;
+import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
 import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.enums.TypeEnum;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdministratorUploadNovelRequestDto {
+public class AdministratorUploadPassageRequestDto {
 
 	@NotNull(message = MessageCode.FILE_NOT_NULL)
 	private MultipartFile file;
@@ -29,11 +31,17 @@ public class AdministratorUploadNovelRequestDto {
 	
 	@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 	private LanguageEnum language;
+		
+	@NotNull(message = MessageCode.CLASSIFICATION_NOT_NULL)
+	private ClassificationEnum classification;
+	
+	@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+	private CategoryEnum category;
+	
+	@NotNull(message = MessageCode.TYPE_NOT_NULL)
+	private TypeEnum type;
 	
 	@NotNull(message = MessageCode.LEVEL_NOT_NULL)
 	private Integer level;
-	
-	@NotNull(message = MessageCode.CLASSIFICATION_NOT_NULL)
-	private ClassificationEnum classification;
 	
 }
