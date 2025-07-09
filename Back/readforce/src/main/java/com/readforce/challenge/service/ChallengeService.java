@@ -181,5 +181,28 @@ public class ChallengeService {
 		}
 		
 	}
+	
+	@Transactional
+	public void resetWeeklyChallenge() {
+		
+		revertExistingChallengesToNormal();
+		
+		updateToChallengePassages();		
+		
+	}
+	
+	private void revertExistingChallengesToNormal() {
+		
+		List<Passage> existingChallenges = passageService.getAllPassagesByClassification(ClassificationEnum.CHALLENGE);
+		
+		if(!existingChallenges.isEmpty()) {
+			
+			Classification normalClassification = classificationService.getClassificationByClassfication(ClassificationEnum.NORMAL);
+			
+			existingChallenges.forEach(passage -> passage.chageClassification(normalClassification));
+			
+		}
+		
+	}
 
 }
