@@ -19,12 +19,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdministratorUploadPassageRequestDto {
-
-	@NotNull(message = MessageCode.FILE_NOT_NULL)
-	private MultipartFile file;
 	
 	@NotNull(message = MessageCode.TITLE_NOT_NULL)
 	private String title;
+	
+	@NotNull(message = MessageCode.CONTENT_NOT_BLANK)
+	private String content;
 	
 	@NotNull(message = MessageCode.AUTHOR_NOT_NULL)
 	private String author;
