@@ -26,7 +26,8 @@ export const fetchPassageList = async ({ language, classification, category, typ
       endpoint = '/passage/get-passage-list-by-language-and-category-and-type';
       params.type = type;
     } else if (!type && level) {
-      console.warn('type 없이 level만 있는 경우는 지원되지 않습니다. level은 무시됩니다.');
+      endpoint = '/passage/get-passage-list-by-language-and-category-and-level';
+      params.level = level;
     }
 
     const res = await api.get(endpoint, { params });
@@ -42,10 +43,10 @@ export const debouncedFetchPassageList = debounce(async (params, callback) => {
   callback(data);
 }, 300);
 
-export const fetchPassageQuizByNo = async (passage_no) => {
+export const fetchPassageQuizByNo = async (passageNo) => {
   try {
     const res = await api.get('/passage/get-passage-quiz-object', {
-      params: { passage_no },
+      params: { passageNo },
     });
     return res.data;
   } catch (err) {
@@ -63,6 +64,18 @@ export const savePassageQuizResult = async ({ passage_quiz_no, selected_option_i
     return res.data;
   } catch (err) {
     console.error('지문 퀴즈 정답 저장 실패:', err);
+    return null;
+  }
+};
+
+export const fetchQuestionMeta = async (question_no) => {
+  try {
+    const res = await api.get('/question/get-question-meta', {
+      params: { question_no },
+    });
+    return res.data;
+  } catch (err) {
+    console.error('문제 메타데이터 불러오기 실패:', err);
     return null;
   }
 };

@@ -1,24 +1,22 @@
 import './css/UniversalCard.css';
 import React, { useEffect } from 'react';
 
-const typeMap = {
-  POLITICS: '정치',
-  ECONOMY: '경제',
-  SOCIETY: '사회',
-  CULTURE: '생활/문화',
-  SCIENCE: 'IT/과학',
-  ETC: '기타',
-  MYSTERY: '추리',
-  HISTORY: '역사',
-};
+const UniversalCard = React.memo(({ data, onSolve, typeOptions = [] }) => {
+  const getTypeLabel = (value) => {
+    const trimmed = value?.trim();
+    const found = typeOptions.find(opt => opt.value === trimmed);
+    return found ? found.label : trimmed;
+  };
 
-const UniversalCard = React.memo(({ data, onSolve }) => {
-  useEffect(() => {
-    console.log("받은 데이터 확인:", data);
-  }, [data]);
+  const getLevelLabel = (level) => {
+    if (level <= 3) return '초급';
+    if (level <= 6) return '중급';
+    return '고급';
+  };
 
+  const type = getTypeLabel(data.type);
   const level = data.level;
-  const type = typeMap[data.type] || data.type;
+  const levelLabel = getLevelLabel(level);
 
   return (
     <div className="UniversalCard-card">
@@ -29,7 +27,9 @@ const UniversalCard = React.memo(({ data, onSolve }) => {
             - {data.literature_paragraph_no}
           </span>
         </h3>
-        <span className={`UniversalCard-badge level-${level}`}>{level}단계</span>
+        <span className={`UniversalCard-badge UniversalCard-${levelLabel}`}>
+          {level}단계
+        </span>
       </div>
 
       <p className="UniversalCard-content">{data.content}</p>
@@ -46,5 +46,6 @@ const UniversalCard = React.memo(({ data, onSolve }) => {
     </div>
   );
 });
+
 
 export default UniversalCard;

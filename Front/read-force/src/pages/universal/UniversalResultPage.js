@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './css/ArticleResultPage.css';
+import './css/UniversalResultPage.css';
 
 const ArticleResultPage = () => {
   const navigate = useNavigate();

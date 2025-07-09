@@ -4,19 +4,6 @@ import UniversalList from '../../components/universal/UniversalList';
 import { debouncedFetchPassageList } from '../../api/passageApi';
 import { newsTypeOptions } from '../../components/TypeOptions';
 
-const reverseLevelMap = {
-  '1': 'LEVEL_1',
-  '2': 'LEVEL_2',
-  '3': 'LEVEL_3',
-  '4': 'LEVEL_4',
-  '5': 'LEVEL_5',
-  '6': 'LEVEL_6',
-  '7': 'LEVEL_7',
-  '8': 'LEVEL_8',
-  '9': 'LEVEL_9',
-  '10': 'LEVEL_10',
-};
-
 const ArticlePage = () => {
   const navigate = useNavigate();
   const [newsItems, setNewsItems] = useState([]);
@@ -29,7 +16,7 @@ const ArticlePage = () => {
   const classification = 'NORMAL';
 
   const fetchData = useCallback(() => {
-    const apiLevel = reverseLevelMap[level] || '';
+    const apiLevel = level || '';
 
     debouncedFetchPassageList({
       language,
@@ -51,7 +38,7 @@ const ArticlePage = () => {
   }, [fetchData]);
 
   const handleSolve = (item) => {
-    navigate(`/question/${item.passage_no}`, {
+    navigate(`/article/quiz/${item.passageNo}`, {
       state: { article: item }
     });
   };

@@ -12,7 +12,7 @@ const UniversalList = ({
   onSolve
 }) => {
   const filteredItems = items.filter((item) => {
-    const matchLevel = level ? item.level === level : true;
+    const matchLevel = level ? item.level === parseInt(level) : true;
     const matchType = type ? item.type === type : true;
     return matchLevel && matchType;
   });
@@ -55,9 +55,10 @@ const UniversalList = ({
       <div className="UniversalList-list">
         {paginated.length > 0 ? paginated.map((item, index) => (
           <UniversalCard
-            key={item.id ?? item.new_passage_no ?? item.news_no ?? `unique-${index}`}
+            key={item.id ?? item.new_passageNo ?? item.news_no ?? `unique-${index}`}
             data={item}
             onSolve={onSolve}
+            typeOptions={typeOptions}
           />
         )) : (
           <div className="UniversalList-no-articles">게시물이 없습니다.</div>

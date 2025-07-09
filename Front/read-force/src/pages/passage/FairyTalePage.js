@@ -4,55 +4,31 @@ import UniversalList from '../../components/universal/UniversalList';
 import { debouncedFetchPassageList } from '../../api/passageApi';
 import { fairytaleTypeOptions } from '../../components/TypeOptions';
 
-const reverseLevelMap = {
-  '1': 'LEVEL_1',
-  '2': 'LEVEL_2',
-  '3': 'LEVEL_3',
-  '4': 'LEVEL_4',
-  '5': 'LEVEL_5',
-  '6': 'LEVEL_6',
-  '7': 'LEVEL_7',
-  '8': 'LEVEL_8',
-  '9': 'LEVEL_9',
-  '10': 'LEVEL_10',
-};
-
-const reverseCategoryMap = {
-  '전래': 'TRADITIONAL',
-  '환상': 'FANTASY',
-  '생활': 'LIFE',
-  '정보': 'INFORMATION',
-  '기타': 'ETC',
-};
-
 const FairyTalePage = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
+  const [fairyTaleItems, setFairyTaleItems] = useState([]);
   const [language] = useState('KOREAN');
-  const classification = 'NORMAL';
-  const category = 'FAIRY_TALE';
-
-  const [type, setType] = useState('');
   const [level, setLevel] = useState('');
+  const [type, setType] = useState('');
   const [orderBy, setOrderBy] = useState('latest');
 
-  const fetchData = useCallback(() => {
-    const apiLevel = reverseLevelMap[level] || '';
-    const apiType = reverseCategoryMap[type] || '';
+  const category = 'FAIRY_TALE';
+  const classification = 'NORMAL';
 
-    debouncedFetchPassageList(
-      {
-        language,
-        classification,
-        category,
-        type: apiType,
-        level: apiLevel,
-        orderBy,
-      },
-      (data) => {
-        setItems(data);
-      }
-    );
+  const fetchData = useCallback(() => {
+    const apiLevel = level || '';
+    const apiType = type || '';
+
+    debouncedFetchPassageList({
+      language,
+      classification,
+      category,
+      type: apiType,
+      level: apiLevel,
+      orderBy,
+    }, (data) => {
+      setFairyTaleItems(data);
+    });
   }, [language, classification, category, type, level, orderBy]);
 
   useEffect(() => {
@@ -63,13 +39,15 @@ const FairyTalePage = () => {
   }, [fetchData]);
 
   const handleSolve = (item) => {
-    navigate(`/literature-quiz/${item.passage_no}`);
+    navigate(`/fairytale/quiz/${item.passageNo}`, {
+      state: { article: item }
+    });
   };
 
   return (
     <div className="page-container">
       <UniversalList
-        items={items}
+        items={fairyTaleItems}
         level={level}
         setLevel={setLevel}
         type={type}
