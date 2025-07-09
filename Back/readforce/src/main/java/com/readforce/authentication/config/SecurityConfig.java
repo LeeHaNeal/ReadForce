@@ -53,7 +53,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(
 					auth -> auth.requestMatchers(
 							"/authentication/sign-in",
-							"/authentication/reissueRefreshToken",
+							"/authentication/reissue-refresh-token",
 							"/authentication/get-tokens",
 				            "/member/sign-up",
 				            "/member/social-sign-up",

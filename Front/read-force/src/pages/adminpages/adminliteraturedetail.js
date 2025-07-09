@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import fetchWithAuth from "../../utils/fetchWithAuth";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminLiteratureDetail = () => {
     const { literatureNo } = useParams();
@@ -14,12 +14,8 @@ const AdminLiteratureDetail = () => {
         // 문학 불러오기
         const fetchLiteratureDetail = async () => {
             try {
-                const res = await fetchWithAuth(`/admin/get-all-literature-list`, {
-                    method: "POST"
-                });
-                if (!res.ok) throw new Error("문학 정보 불러오기 실패");
-
-                const data = await res.json();
+                const res = await axiosInstance.post(`/admin/get-all-literature-list`);
+                const data = res.data;
                 const target = data.find(lit => lit.literature_no === Number(literatureNo));
                 setLiterature(target);
             } catch (err) {
@@ -31,10 +27,8 @@ const AdminLiteratureDetail = () => {
         // 문단 불러오기
         const fetchParagraphs = async () => {
             try {
-                const res = await fetchWithAuth(`/admin/get-all-literature-paragraph-list`);
-                if (!res.ok) throw new Error("문단 정보 불러오기 실패");
-
-                const data = await res.json();
+                const res = await axiosInstance.get(`/admin/get-all-literature-paragraph-list`);
+                const data = res.data;
                 const filtered = data.filter(p => String(p.literature_no) === literatureNo);
                 setParagraphs(filtered);
             } catch (err) {
@@ -46,8 +40,8 @@ const AdminLiteratureDetail = () => {
         // 퀴즈 불러오기
         const fetchQuizzes = async () => {
             try {
-                const res = await fetchWithAuth(`/admin/get-all-literature-quiz-list`);
-                const data = await res.json();
+                const res = await axiosInstance.get(`/admin/get-all-literature-quiz-list`);
+                const data = res.data;
                 const filtered = data.filter(q => q.literature_no === Number(literatureNo));
                 setQuizzes(filtered);
             } catch (err) {
@@ -68,11 +62,14 @@ const AdminLiteratureDetail = () => {
         if (!window.confirm("정말 이 문단과 관련된 문제도 함께 삭제하시겠습니까?")) return;
 
         try {
-            const res = await fetchWithAuth(
-                `/admin/delete-literature-paragraph-and-literature-by-literature-paragraph-no?literature_paragraph_no=${paragraphNo}&literature_no=${literatureNo}`,
-                { method: "DELETE" }
+            await axiosInstance.delete(
+                `/admin/delete-literature-paragraph-and-literature-by-literature-paragraph-no`, {
+                params: {
+                    literature_paragraph_no: paragraphNo,
+                    literature_no: literatureNo
+                }
+            }
             );
-            if (!res.ok) throw new Error("문단 삭제 실패");
 
             alert("문단이 삭제되었습니다.");
             setParagraphs(prev => prev.filter(p => p.literature_paragraph_no !== paragraphNo));
@@ -88,10 +85,11 @@ const AdminLiteratureDetail = () => {
         if (!window.confirm("정말 이 퀴즈를 삭제하시겠습니까?")) return;
 
         try {
-            const res = await fetchWithAuth(`/admin/delete-literature-quiz?literature_quiz_no=${quizNo}`, {
-                method: "DELETE"
+            await axiosInstance.delete(`/admin/delete-literature-quiz`, {
+                params: {
+                    literature_quiz_no: quizNo
+                }
             });
-            if (!res.ok) throw new Error("퀴즈 삭제 실패");
 
             alert("퀴즈가 삭제되었습니다.");
             setQuizzes(prev => prev.filter(q => q.literature_quiz_no !== quizNo));
