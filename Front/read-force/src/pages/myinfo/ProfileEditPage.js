@@ -3,6 +3,8 @@ import axiosInstance from '../../api/axiosInstance';
 import kakaoIcon from '../../assets/image/kakao.png';
 import naverIcon from '../../assets/image/naver.png';
 import googleIcon from '../../assets/image/google.png';
+// 기본 프로필 이미지를 import 합니다.
+import defaultProfileImage from '../../assets/image/default-profile.png'; 
 import './EditProfilePage.css';
 
 const ProfileEditPage = () => {
@@ -12,7 +14,10 @@ const ProfileEditPage = () => {
   const [birthday, setBirthday] = useState('');
   const [birthdayMessage, setBirthdayMessage] = useState('');
   const [isBirthdayValid, setIsBirthdayValid] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+
+  // import한 기본 이미지 변수를 사용합니다.
+  const DEFAULT_PROFILE_IMAGE_PATH = defaultProfileImage; 
+  const [profileImageUrl, setProfileImageUrl] = useState(DEFAULT_PROFILE_IMAGE_PATH);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -26,9 +31,11 @@ const ProfileEditPage = () => {
         responseType: 'blob',
       });
       const url = URL.createObjectURL(res.data);
-      setImageUrl(url);
+      setProfileImageUrl(url);
     } catch (err) {
-      console.error('기본 이미지 불러오기 실패:', err);
+      console.error('프로필 이미지 불러오기 실패:', err);
+      // 404 Not Found 또는 다른 오류 시 기본 이미지로 설정
+      setProfileImageUrl(DEFAULT_PROFILE_IMAGE_PATH);
     }
   };
 
@@ -63,7 +70,7 @@ const ProfileEditPage = () => {
       setBirthdayMessage('생년월일 입력 완료');
       setIsBirthdayValid(true);
     } else {
-      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
+      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예:YYYY-MM-DD)');
       setIsBirthdayValid(false);
     }
   };
@@ -109,7 +116,7 @@ const ProfileEditPage = () => {
       if (modifyResponse) {
         const newNickname = modifyResponse.data.NICK_NAME;
         localStorage.setItem('nickname', newNickname);
-        window.dispatchEvent(new Event('nicknameUpdated')); // ✅ Header에게 알려줌
+        window.dispatchEvent(new Event('nicknameUpdated'));
       }
       alert('회원정보가 수정되었습니다.');
       window.location.href = '/';
@@ -132,8 +139,9 @@ const ProfileEditPage = () => {
   const handleImageDelete = async () => {
     try {
       await axiosInstance.delete('/file/delete-profile-image');
-      await fetchProfileImage();
+      setProfileImageUrl(DEFAULT_PROFILE_IMAGE_PATH);
       setSelectedFile(null);
+      alert('프로필 이미지가 삭제되었습니다.');
     } catch {
       alert('이미지 삭제 실패');
     }
@@ -157,9 +165,11 @@ const ProfileEditPage = () => {
         <div className="form-group">
           <label>회원 이미지</label>
           <div className="profile-image-box">
-            {imageUrl && (
-              <img src={imageUrl} alt="프로필 이미지" className="profile-image" />
-            )}
+            <img 
+              src={profileImageUrl} 
+              alt="프로필 이미지" 
+              className="profile-image" 
+            />
             <input
               type="file"
               accept="image/jpeg,image/png,image/gif"
@@ -171,7 +181,7 @@ const ProfileEditPage = () => {
                     return;
                   }
                   setSelectedFile(file);
-                  setImageUrl(URL.createObjectURL(file));
+                  setProfileImageUrl(URL.createObjectURL(file));
                 }
               }}
             />
@@ -216,7 +226,7 @@ const ProfileEditPage = () => {
           <div className="input-with-message">
             <input
               type="text"
-              placeholder="예: 1997-11-04"
+              placeholder="예:YYYY-MM-DD"
               value={birthday}
               onChange={(e) => {
                 const value = e.target.value;

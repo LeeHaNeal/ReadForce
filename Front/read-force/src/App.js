@@ -13,7 +13,7 @@ import Socialsignup from './pages/signup/socialsignup';
 import Login from "./pages/login/login";
 import FindPassword from "./pages/login/findpassword";
 import ResetPassword from "./pages/login/resetpassword";
-import Oauth2redirect from './pages/login/oauth2redirect';
+// import Oauth2redirect from './pages/login/oauth2redirect';
 import Authcallback from './pages/login/authcallback';
 import ProfileEditPage from './pages/myinfo/ProfileEditPage';
 import ChangePasswordPage from './pages/myinfo/ChangePasswordPage';
@@ -98,7 +98,7 @@ function App() {
           <Route path="/signup/emailverifypage" element={<EmailVerifyPage />} />
           <Route path="/signup/signupcompletepage" element={<SignupCompletePage />} />
           <Route path="/challenge" element={<ChallengePage />} />
-          <Route path="/oauth2/redirect" element={<Oauth2redirect />} />
+          {/* <Route path="/oauth2/redirect" element={<Oauth2redirect />} /> */}
           <Route path="/authcallback" element={<Authcallback />} />
           <Route path="/social-sign-up" element={<Socialsignup />} />
           <Route path="/profile-edit" element={<ProfileEditPage />} />

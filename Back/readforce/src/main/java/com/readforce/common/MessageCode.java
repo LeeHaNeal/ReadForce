@@ -6,7 +6,6 @@ public final class MessageCode {
 	
 	
 	
-	
 	public static final String EMAIL_NOT_BLANK = "NOT0001";
 	public static final String PASSWORD_NOT_BLANK = "NOT0002";
 	public static final String NICKNAME_NOT_BLANK = "NOT0003";

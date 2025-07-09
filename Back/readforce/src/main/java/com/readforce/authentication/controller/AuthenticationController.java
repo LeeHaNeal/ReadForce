@@ -128,8 +128,13 @@ public class AuthenticationController {
     		String refreshToken
 	){
 		
+		System.out.println("999999999999999999999999999999999999999999999999999999");
+		System.out.println(refreshToken);
+		
 		String username = jwtUtil.extractUsername(refreshToken);
 		String stroedRefreshToken = authenticationService.getRefreshToken(username);
+		
+		System.out.println("9999"+stroedRefreshToken);
 		
 		if(stroedRefreshToken == null) {
 
@@ -158,7 +163,6 @@ public class AuthenticationController {
 		));
 
 	}
-
 	
 	@PostMapping("/get-tokens")
 	public ResponseEntity<Map<String, String>> getTokens(
@@ -167,6 +171,8 @@ public class AuthenticationController {
 			String temporalToken
 	){
 
+		
+		System.out.println("1231243241341234"+temporalToken);
 		
 		String temporalTokenJson = redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
 		
