@@ -70,4 +70,15 @@ public class ChallengeController {
 		
 	}
 	
+	@PostMapping("/update-to-challenges")
+	public ResponseEntity<Map<String, String>> updateToChallengePassages(){
+		
+		challengeService.updateToChallengePassages();
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.UPDATE_CHALLENGE_PASSAGES_SUCCESS
+		));
+		
+	}
+	
 }

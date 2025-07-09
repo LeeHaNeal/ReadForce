@@ -74,4 +74,10 @@ public class Passage {
 	@JoinColumn(name = "classification_no", nullable = false)
 	private Classification classification;
 	
+	public void chageClassification(Classification classification) {
+		
+		this.classification = classification;
+		
+	}
+	
 }
