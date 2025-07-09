@@ -305,4 +305,20 @@ public class PassageService {
 
 	}
 
+	@Transactional(readOnly = true)
+	public List<Passage> getNormalPassages(
+			LanguageEnum languageName,
+			CategoryEnum categoryName, 
+			Integer levelNumber
+	) {
+		
+		return passageRepository.findByLanguageAndCategoryAndLevelAndClassification(
+				languageName, 
+				categoryName, 
+				levelNumber, 
+				ClassificationEnum.NORMAL, 
+				PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+
+	}
+
 }

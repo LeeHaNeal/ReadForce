@@ -86,8 +86,7 @@ public final class MessageCode {
 	public static final String GENERATE_QUESTION_SUCCESS = "SUC0018";
 	public static final String GENERATE_TEST_QUESTION_SUCCESS = "SUC0019";
 	public static final String UPLOAD_PASSAGE_SUCCESS = "SUC0020";
-	public static final String GENERATE_CHALLENGE_QUESTIONS_SUCCESS = "SUC0021";
-	public static final String GENERATE_CHALLENGE_PASSAGES_SUCCESS = "SUC0022";
+	public static final String UPDATE_CHALLENGE_PASSAGES_SUCCESS = "SUC0021";
 	
 	
 	
