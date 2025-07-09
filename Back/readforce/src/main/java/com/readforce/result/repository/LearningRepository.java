@@ -113,7 +113,7 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 					SELECT MAX(subL.createdAt)
 					FROM Learning subL
 					WHERE subL.questionNo = l.question.questionNo
-			
+			)
 	""")
 	List<Learning> findLatestLearningListForQuestionNoList(
 			@Param("questionNoList") List<Long> questionNoList
