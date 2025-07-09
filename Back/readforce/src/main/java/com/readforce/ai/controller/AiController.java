@@ -94,15 +94,15 @@ public class AiController {
 		
 	}
 	
-//	@PostMapping("/generate-challenge-passages")
-//	public ResponseEntity<Map<String, String>> generateChallengePassages(){
-//		
-//		aiService.generateChallengePassages();
-//		
-//		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-//				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_CHALLENGE_PASSAGES_SUCCESS
-//		));
-//		
-//	}
+	@PostMapping("/generate-challenge-passages")
+	public ResponseEntity<Map<String, String>> generateChallengePassages(){
+		
+		aiService.generateChallengePassages();
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.GENERATE_CHALLENGE_PASSAGES_SUCCESS
+		));
+		
+	}
 	
 }
