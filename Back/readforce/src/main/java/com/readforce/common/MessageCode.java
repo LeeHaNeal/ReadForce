@@ -29,8 +29,9 @@ public final class MessageCode {
 	public static final String TESTER_ID_NOT_BLANK = "NOT0020";
 	public static final String TITLE_NOT_NULL = "NOT0021";
 	public static final String AUTHOR_NOT_NULL = "NOT0022";
-	public static final String SELECTED_CHOICE_LIST_NOT_NULL = "NOT0023";
-	public static final String ALL_CHALLENGE_QUESTION_SOLVING_TIME_NOT_NULL = "NOT0024";
+	public static final String SELECTED_INDEX_LIST_NOT_NULL = "NOT0023";
+	public static final String QUESTION_SOLVING_TIME_LIST_NOT_NULL = "NOT0024";
+
 
 	
 	
