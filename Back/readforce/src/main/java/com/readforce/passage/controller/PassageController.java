@@ -114,6 +114,36 @@ public class PassageController {
 		return ResponseEntity.status(HttpStatus.OK).body(passageList);	
 		
 	}
+	
+	// 카테고리 + 레벨 조회
 
+	
+	@GetMapping("/get-passage-list-by-language-and-category-and-level")
+	public ResponseEntity<List<PassageResponseDto>> getPassageListByLanguageAndCategoryAndLevel(
+			@RequestParam("orderBy")
+			@NotNull(message = MessageCode.ORDER_BY_NOT_NULL)
+			OrderByEnum orderBy,
+			@RequestParam("language")
+			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+			LanguageEnum language,
+			@RequestParam("classification")
+			@NotNull(message = MessageCode.CLASSIFICATION_NOT_NULL)
+			ClassificationEnum classification,
+			@RequestParam("category")
+			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
+			CategoryEnum category,
+			@RequestParam("level")
+			@NotNull(message = MessageCode.LEVEL_NOT_NULL)
+			@Min(value = 1, message = MessageCode.LEVEL_INVALID)
+			@Max(value = 10, message = MessageCode.LEVEL_INVALID)
+			Integer level
+	){
+		
+		List<PassageResponseDto> passageList = 
+				passageService.getPassageListByLanguageAndCategoryAndLevel(orderBy, language, classification, category, level); 
+		
+		return ResponseEntity.status(HttpStatus.OK).body(passageList);
+		
+	}
 	
 }
