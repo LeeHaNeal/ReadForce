@@ -48,6 +48,7 @@ public class AuthenticationService implements UserDetailsService {
 				PrefixEnum.REFRESH.getContent() + email,
 				refreshToken,
 				Duration.ofMillis(refreshExpirationTime)			
+
 		);
 		
 	}

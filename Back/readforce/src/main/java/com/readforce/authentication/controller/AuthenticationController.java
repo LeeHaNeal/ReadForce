@@ -127,16 +127,14 @@ public class AuthenticationController {
     		@NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
     		String refreshToken
 	){
-		
-		System.out.println("999999999999999999999999999999999999999999999999999999");
+
 		System.out.println(refreshToken);
 		
 		String username = jwtUtil.extractUsername(refreshToken);
-		String stroedRefreshToken = authenticationService.getRefreshToken(username);
+		String storedRefreshToken = authenticationService.getRefreshToken(username);
 		
-		System.out.println("9999"+stroedRefreshToken);
-		
-		if(stroedRefreshToken == null) {
+
+		if(storedRefreshToken == null) {
 
 			authenticationService.deleteRefreshToken(username);
 
@@ -144,7 +142,7 @@ public class AuthenticationController {
 			
 		}
 		
-		if(!stroedRefreshToken.equals(refreshToken) || jwtUtil.isExpiredToken(stroedRefreshToken)) {
+		if(!storedRefreshToken.equals(refreshToken) || jwtUtil.isExpiredToken(storedRefreshToken)) {
 			
 			throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
 			
@@ -171,9 +169,6 @@ public class AuthenticationController {
 			String temporalToken
 	){
 
-		
-		System.out.println("1231243241341234"+temporalToken);
-		
 		String temporalTokenJson = redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
 		
 		if(temporalTokenJson == null) {
@@ -202,7 +197,7 @@ public class AuthenticationController {
 			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
 			
 		}
-		System.out.println("11111111111111111111111111111111111"+tokenMap);
+
 		return ResponseEntity.status(HttpStatus.OK).body(tokenMap);
 		
 	}

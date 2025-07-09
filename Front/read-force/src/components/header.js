@@ -1,6 +1,6 @@
 import './header.css';
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 const Header = () => {
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -13,7 +13,13 @@ const Header = () => {
   const isLoggedIn = !!localStorage.getItem("token");
   const provider = localStorage.getItem("provider");
 
+<<<<<<< HEAD
   // ✅ 닉네임 초기 설정 및 업데이트 이벤트 수신
+=======
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+>>>>>>> develop
   useEffect(() => {
     const storedNickname = localStorage.getItem("nickname");
     setNickname(storedNickname || "사용자");
@@ -74,6 +80,7 @@ const Header = () => {
           </h1>
         </div>
 
+<<<<<<< HEAD
         <div className="header-center">
           <nav className="nav">
             <Link to="/article" className="nav-item">기사</Link>
@@ -85,6 +92,18 @@ const Header = () => {
         </div>
 
         <div className="hamburger" onClick={() => setShowMobileMenu(prev => !prev)}>☰</div>
+=======
+      <div className="header-center">
+        <nav className="nav">
+          <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+          <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
+          <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
+          <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
+          <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
+
+        </nav>
+      </div>
+>>>>>>> develop
 
         <div className="header-right auth-buttons">
           <div className="lang-selector">
@@ -137,6 +156,7 @@ const Header = () => {
       </div>
 
       {showMobileMenu && (
+<<<<<<< HEAD
         <div className="mobile-menu">
           <nav className='nav'>
             <Link to="/article" className="nav-item">기사</Link>
@@ -147,6 +167,20 @@ const Header = () => {
           </nav>
         </div>
       )}
+=======
+      <div className="mobile-menu">
+        <nav className='nav'>
+          <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+          <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
+          <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
+          <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
+          <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
+
+        </nav>
+      </div>
+    )}
+
+>>>>>>> develop
     </header>
   );
 };

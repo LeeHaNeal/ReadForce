@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.readforce.common.enums.RoleEnum;
 import com.readforce.common.enums.StatusEnum;
-import com.readforce.result.entity.Challenge;
 import com.readforce.result.entity.Learning;
 import com.readforce.result.entity.Result;
 import com.readforce.result.entity.Score;
@@ -85,10 +84,6 @@ public class Member {
 	@Builder.Default
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Attendance> attendanceList = new ArrayList<>();
-	
-	@Builder.Default
-	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Challenge> challengeList = new ArrayList<>();
 	
 	@Builder.Default
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -103,6 +103,16 @@ public class AiService {
 				passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification, null);
 				
 			}
+			
+			try {
+				
+				Thread.sleep(1000);
+				
+			} catch(InterruptedException exception){
+				
+				Thread.currentThread().interrupt();
+				
+			}
 
 		}
 			
@@ -272,6 +282,16 @@ public class AiService {
 						saveMultipleChoiceQuestion(newPassage, parsedResult);
 						
 					}
+					
+					try {
+						
+						Thread.sleep(1000);
+						
+					} catch(InterruptedException exception){
+						
+						Thread.currentThread().interrupt();
+						
+					}
 
 				}
 
@@ -300,7 +320,7 @@ public class AiService {
 			}
 		} catch(Exception exception) {
 			
-			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
+			return Collections.emptyList();
 			
 		}
 		
@@ -917,6 +937,13 @@ public class AiService {
 		return "{}";
 		
 	}
+
+	@Transactional
+	public void generateChallengeQuestions() {
+		
+		
+	}
+
 
 
 

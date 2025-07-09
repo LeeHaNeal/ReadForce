@@ -4,7 +4,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Main from "./pages/main";
 import MyPage from './pages/myinfo/MyPage';
 import LayOut from "./components/layout";
-import ArticlePage from './pages/article/ArticlePage';
+import ArticlePage from './pages/passage/ArticlePage';
+import NovelPage from './pages/passage/NovelPage';
+import FairyTalePage from './pages/passage/FairyTalePage';
+import UniversalQuestionPage from './pages/universal/UniversalQuestionPage';
+import UniversalResultPage from './pages/universal/UniversalResultPage';
 import SignupWithEmail from "./pages/signup/signupwithemail";
 import SignupChoice from "./pages/signup/signupchoice";
 import EmailVerifyPage from "./pages/signup/emailverifypage";
@@ -22,8 +26,6 @@ import ReadTest from './pages/challenge/readtest';
 import ChallengePage from "./pages/challenge/challengepage";
 import AdminPage from './pages/adminpages/adminpage';
 import ChallengeQuizPage from './pages/challenge/challengeQuizPage';
-import ArticleQuestionPage from './pages/article/ArticleQuestionPage';
-import ArticleResultPage from './pages/article/ArticleResultPage';
 import AdminNews from './pages/adminpages/adminnews';
 import AdminNewsDetail from './pages/adminpages/adminnewsdetail';
 // import AdminNewsQuizList from './pages/adminpages/adminnewsquizlist';
@@ -38,50 +40,11 @@ import TestResultPage from './pages/challenge/testresultpage';
 import TestReviewPage from './pages/challenge/testreviewpage';
 import RankingPage from './pages/challenge/RankingPage';
 import ChallengeResultPage from './pages/challenge/ChallengeResultPage';
-import NovelPage from './pages/literature/NovelPage';
-import FairyTalePage from './pages/literature/FairyTalePage';
-import LiteratureQuizPage from './pages/literature/LiteratureQuestionPage'
-import LiteratureResultPage from './pages/literature/LiteratureResultPage';
 import AdaptiveLearningPage from './pages/adaptive/AdaptiveLearningPage';
 import AdaptiveQuizPage from './pages/adaptive/AdaptiveQuizPage';
 import AdaptiveResultPage from './pages/adaptive/AdaptiveResultPage';
 
 function App() {
-  // 앱 전역 refresh-token 적용 작업중
-  // useEffect(() => {
-  //   const refreshToken = localStorage.getItem('refresh_token');
-  //   if (!refreshToken) {
-  //     console.log("❌ 리프레시 토큰 없음. 리프레시 주기 시작 안함");
-  //     return
-  //   };
-
-  //   console.log("🔁 리프레시 주기 시작됨");
-
-  //   const interval = setInterval(async () => {
-  //     try {
-  //       const res = await fetch('/auth/reissue-refresh-token', {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  //         body: `refresh_token=${encodeURIComponent(refreshToken)}`,
-  //       });
-
-  //       if (res.ok) {
-  //         const data = await res.json();
-  //         localStorage.setItem('token', data.ACCESS_TOKEN);
-  //         localStorage.setItem('refresh_token', data.REFRESH_TOKEN);
-  //         console.log('🔁 토큰 갱신 완료');
-  //       } else {
-  //         console.warn('❌ 리프레시 실패. 로그아웃 처리');
-  //         localStorage.clear();
-  //         window.location.href = '/login';
-  //       }
-  //     } catch (err) {
-  //       console.error('리프레시 요청 에러:', err);
-  //     }
-  //   }, 1000 * 60 * 4); // 4분마다 실행
-
-  //   return () => clearInterval(interval); // cleanup
-  // }, []);
 
   return (
     <Router>
@@ -93,6 +56,12 @@ function App() {
           <Route path="/resetpassword" element={<ResetPassword />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/article" element={<ArticlePage />} />
+          <Route path="/novel" element={<NovelPage />} />
+          <Route path="/fairytale" element={<FairyTalePage />} />
+          <Route path="/article/quiz/:id" element={<UniversalQuestionPage />} />
+          <Route path="/novel/quiz/:id" element={<UniversalQuestionPage />} />
+          <Route path="/fairytale/quiz/:id" element={<UniversalQuestionPage />} />
+          <Route path="/question-result" element={<UniversalResultPage />} />
           <Route path="/signup/signupchoice" element={<SignupChoice />} />
           <Route path="/signup" element={<SignupWithEmail />} />
           <Route path="/signup/emailverifypage" element={<EmailVerifyPage />} />
@@ -106,8 +75,6 @@ function App() {
           <Route path="/test-start" element={<ReadTest />} />
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/challenge/quiz" element={<ChallengeQuizPage />} />
-          <Route path="/question/:id" element={<ArticleQuestionPage />} />
-          <Route path="/question-result" element={<ArticleResultPage />} />
           <Route path="/adminpage/adminnews" element={<AdminNews />} />
           <Route path="/adminpage/adminnews/:newsNo" element={<AdminNewsDetail />} />
           {/* <Route path="/adminpage/adminnews/adminnewsquizlist" element={<AdminNewsQuizList />} /> */}
@@ -117,16 +84,11 @@ function App() {
           <Route path="/adminpage/adminliterature/adminliteratureadd" element={<AdminLiteratureAdd />} />
           <Route path="/adminpage/adminuserinfo/:email" element={<AdminUserInfo />} />
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
-          <Route path="/question-result" element={<ArticleResultPage />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />
           <Route path="/ranking" element={<RankingPage />} />
           <Route path="/challenge/result" element={<ChallengeResultPage />} />
-          <Route path="/literature/novel" element={<NovelPage />} />
-          <Route path="/literature/fairytale" element={<FairyTalePage />} />
-          <Route path="/literature-quiz/:quizId" element={<LiteratureQuizPage />} />
-          <Route path="/literature-result" element={<LiteratureResultPage />} />
           <Route path="/adaptive-learning" element={<AdaptiveLearningPage />} />
           <Route path="/adaptive-learning/start" element={<AdaptiveQuizPage />} />
           <Route path="/adaptive-learning/result" element={<AdaptiveResultPage />} /> 

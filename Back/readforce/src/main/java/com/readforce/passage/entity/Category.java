@@ -34,7 +34,7 @@ public class Category {
 	private Long categoryNo;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "varchar(255)")
 	private CategoryEnum categoryName;
 	
 	@CreatedDate
