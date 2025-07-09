@@ -46,7 +46,7 @@ public class PassageResponseDto {
 		this.publicationDate = passage.getPublicationDate();
 		this.createdAt = passage.getCreatedAt();
 		this.category = passage.getCategory().getCategoryName().name();
-		this.type = passage.getType().getTypeName().name();
+	    this.type = passage.getType() != null ? passage.getType().getTypeName().name() : null;
 		this.level = passage.getLevel().getLevelNumber();
 		this.language = passage.getLanguage().getLanguageName().name();	
 		

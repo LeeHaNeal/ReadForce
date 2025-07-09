@@ -27,6 +27,12 @@ public final class MessageCode {
 	public static final String QUESTION_NO_NOT_NULL = "NOT0018";
 	public static final String QUESTION_SOLVING_TIME_NOT_NULL = "NOT0019";
 	public static final String TESTER_ID_NOT_BLANK = "NOT0020";
+	public static final String TITLE_NOT_NULL = "NOT0021";
+	public static final String AUTHOR_NOT_NULL = "NOT0022";
+	public static final String SELECTED_CHOICE_LIST_NOT_NULL = "NOT0023";
+	public static final String ALL_CHALLENGE_QUESTION_SOLVING_TIME_NOT_NULL = "NOT0024";
+
+	
 	
 	
 	
@@ -78,6 +84,9 @@ public final class MessageCode {
 	public static final String GENERATE_PASSAGE_SUCCESS = "SUC0017";
 	public static final String GENERATE_QUESTION_SUCCESS = "SUC0018";
 	public static final String GENERATE_TEST_QUESTION_SUCCESS = "SUC0019";
+	public static final String UPLOAD_PASSAGE_SUCCESS = "SUC0020";
+	
+	
 	
 	
 	
@@ -93,6 +102,9 @@ public final class MessageCode {
 	public static final String VERIFY_VERIFICATION_CODE_FAIL = "FAI0008";
 	public static final String JSON_MAPPING_FAIL = "FAI0009";
 	public static final String GEMINI_API_REQUEST_FAIL = "FAI0010";
+	public static final String UPLOAD_PASSAGE_FAIL = "FAI0011";
+	
+	
 	
 	
 	

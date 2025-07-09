@@ -40,7 +40,7 @@ public class MultipleChoice extends Question {
 		
 	}
 	
-	public  void addChoice(Choice choice) {
+	private void addChoice(Choice choice) {
 		
 		this.choiceList.add(choice);
 		choice.setMultipleChoice(this);

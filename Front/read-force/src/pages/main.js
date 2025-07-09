@@ -51,6 +51,20 @@ const Main = () => {
     return () => clearInterval(interval);
   }, [isPaused, slides]);
 
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`);
+        setTop5Data(res.data.slice(0, 5));
+      } catch (err) {
+        console.error("Top5 랭킹 불러오기 실패:", err);
+        setTop5Data([]);
+      }
+    }, 600);
+    return () => clearTimeout(debounceRef.current);
+  }, [selectedLanguage]);
+
   // useEffect(() => {
   //   if (debounceRef.current) clearTimeout(debounceRef.current);
   //   debounceRef.current = setTimeout(async () => {
@@ -150,19 +164,18 @@ const Main = () => {
               <tbody>
                 {top5Data.map((user, idx) => {
                   const rankClass = idx === 0 ? "gold" : idx === 1 ? "silver" : idx === 2 ? "bronze" : "";
-                  const scoreKey = `${selectedLanguage.toLowerCase()}_news`;
                   return (
                     <tr key={user.nickname}>
                       <td className={`rank-number ${rankClass}`}>{idx + 1}</td>
                       <td>{user.nickname}</td>
-                      <td className={`point ${rankClass}`}>{user[scoreKey] ?? 0}p</td>
+                      <td className={`point ${rankClass}`}>{user.score ?? 0}p</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-
+          
           <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
