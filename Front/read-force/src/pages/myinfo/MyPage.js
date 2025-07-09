@@ -108,19 +108,26 @@ const MyPage = () => {
   useEffect(() => {
     const fetchLearningData = async () => {
       try {
-        const [total, today, todayWrong, fav] = await Promise.all([
-          axiosInstance.get('/learning/get-total-learning').then((res) => res.data),
-          axiosInstance.get('/learning/get-today-learning').then((res) => res.data),
-          axiosInstance.get('/learning/get-today-incorrect-learning').then((res) => res.data),
-          axiosInstance.get('/learning/get-favorit-learning').then((res) => res.data),
+        const results = await Promise.allSettled([
+          axiosInstance.get('/learning/get-total-learning'),
+          axiosInstance.get('/learning/get-today-learning'),
+          axiosInstance.get('/learning/get-today-incorrect-learning'),
+          axiosInstance.get('/learning/get-favorit-learning'),
         ]);
 
-        setTotalLearning(total);
-        setTodayLearning(today);
-        setTodayIncorrect(todayWrong);
-        setFavoritLearning(fav);
+        const [total, today, todayWrong, fav] = results;
+
+        setTotalLearning(total.status === 'fulfilled' ? total.value.data : 0);
+        setTodayLearning(today.status === 'fulfilled' ? today.value.data : 0);
+        setTodayIncorrect(todayWrong.status === 'fulfilled' ? todayWrong.value.data : 0);
+        setFavoritLearning(fav.status === 'fulfilled' ? fav.value.data : 0);
+
+        if (total.status === 'rejected') console.warn("총 학습 로딩 실패:", total.reason);
+        if (today.status === 'rejected') console.warn("오늘 학습 로딩 실패:", today.reason);
+        if (todayWrong.status === 'rejected') console.warn("오늘 틀린 학습 로딩 실패:", todayWrong.reason);
+        if (fav.status === 'rejected') console.warn("즐겨찾기 학습 로딩 실패:", fav.reason);
       } catch (e) {
-        console.error('학습노트 데이터 로딩 실패:', e);
+        console.error("예상치 못한 오류 발생:", e);
       }
     };
 
