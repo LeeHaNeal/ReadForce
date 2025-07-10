@@ -151,7 +151,7 @@ public class PassageController {
 	// 전체 지문 가져오기
 	@GetMapping("/get-all-passages")
 	public ResponseEntity<List<PassageResponseDto>> getAllPassages() {
-	    List<Passage> passageList = passageService.getAllPassages(); // 이 메서드도 아래에서 추가해줘야 함
+	    List<Passage> passageList = passageService.getAllPassages(); 
 	    List<PassageResponseDto> dtoList = passageList.stream()
 	            .map(PassageResponseDto::new)
 	            .collect(Collectors.toList());
