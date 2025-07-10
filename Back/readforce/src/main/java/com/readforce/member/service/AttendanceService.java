@@ -20,58 +20,64 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AttendanceService {
+	
+	private final AttendanceRepository attendanceRepository;
+	private final ResultService resultService;
+	private final MemberService memberService;
+	
+	@Transactional
+	public void recordAttendance(String email) {
 
-    private final AttendanceRepository attendanceRepository;
-    private final ResultService resultService;
-    private final MemberService memberService;
+		if(attendanceRepository.findByMember_EmailAndAttendanceDate(email, LocalDate.now()).isPresent()) {
+			
+			return;
+			
+		}
+		
+		Member member = memberService.getActiveMemberByEmail(email);
+		
+		Attendance attendance = Attendance.builder()
+				.member(member)
+				.attendanceDate(LocalDate.now())
+				.build();
+		
+		attendanceRepository.save(attendance);
+		
+		updateLearningStreak(email);
+		
+	}
 
-    @Transactional
-    public void recordAttendance(String email) {
+	private void updateLearningStreak(String email) {
+		
+		Result result = resultService.getActiveMemberResultByEmail(email);
+		
+		LocalDate yesterday = LocalDate.now().minusDays(1);
+		
+		boolean attendedYesterday = attendanceRepository
+				.findByMember_EmailAndAttendanceDate(email, yesterday)
+				.isPresent();
+		
+		result.updateLearningStreak(attendedYesterday);
+		
+	}
 
-       
-        if (!attendanceRepository.findByMember_EmailAndAttendanceDate(email, LocalDate.now()).isEmpty()) {
-            return;
-        }
+	@Transactional(readOnly = true)
+	public List<LocalDate> getAttendanceDateList(String email) {
+		
+		List<Attendance> attendanceList = attendanceRepository.findAllByMember_Email(email);
+		
+		if(attendanceList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.ATTENDANCE_NOT_FOUND);
+			
+		}
+		
+		return attendanceList
+				.stream()
+				.map(attendance -> attendance.getAttendanceDate())
+				.collect(Collectors.toList());
 
-        Member member = memberService.getActiveMemberByEmail(email);
-
-        Attendance attendance = Attendance.builder()
-                .member(member)
-                .attendanceDate(LocalDate.now())
-                .build();
-
-        attendanceRepository.save(attendance);
-
-        updateLearningStreak(email);
-    }
-
-    private void updateLearningStreak(String email) {
-
-        Result result = resultService.getActiveMemberResultByEmail(email);
-
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-
-        
-        boolean attendedYesterday = !attendanceRepository
-                .findByMember_EmailAndAttendanceDate(email, yesterday)
-                .isEmpty();
-
-        result.updateLearningStreak(attendedYesterday);
-    }
-
-    @Transactional(readOnly = true)
-    public List<LocalDate> getAttendanceDateList(String email) {
-
-        List<Attendance> attendanceList = attendanceRepository.findAllByMember_Email(email);
-
-        if (attendanceList.isEmpty()) {
-            throw new ResourceNotFoundException(MessageCode.ATTENDANCE_NOT_FOUND);
-        }
-
-        return attendanceList
-                .stream()
-                .map(Attendance::getAttendanceDate)
-                .collect(Collectors.toList());
-    }
+	}
+	
 
 }
