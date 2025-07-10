@@ -43,7 +43,6 @@ const Main = () => {
 
   const currentSlide = slides[slideIndex];
 
-  // 슬라이드 자동 전환
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
@@ -52,7 +51,6 @@ const Main = () => {
     return () => clearInterval(interval);
   }, [isPaused, slides]);
 
-  // 언어별 랭킹 + 틀린문제 동시 fetch
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
@@ -61,7 +59,6 @@ const Main = () => {
           api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`),
           api.get(`/learning/get-most-incorrect-questions?language=${selectedLanguage}&number=3`),
         ]);
-
         setTop5Data(rankingRes.data.slice(0, 5));
         setWrongArticles(wrongRes.data);
       } catch (err) {
@@ -114,7 +111,6 @@ const Main = () => {
               <img src={currentSlide.image} alt="슬라이드 이미지" />
             </div>
           </div>
-
           <button
             className="slide-arrow left"
             onClick={() =>
@@ -123,7 +119,6 @@ const Main = () => {
           >
             ⮜
           </button>
-
           <button
             className="slide-arrow right"
             onClick={() =>
@@ -132,7 +127,6 @@ const Main = () => {
           >
             ⮞
           </button>
-
           <div className="slide-ui">
             <button onClick={() => setIsPaused((prev) => !prev)}>
               {isPaused ? "▶" : "⏸"}
@@ -144,7 +138,6 @@ const Main = () => {
 
       <section className="stats-section">
         <div className="page-container stat-container">
-          {/* Top 5 랭킹 */}
           <div className="stat-box top5">
             <div className="top5-header-row">
               <h3>🏆 <span className="bold">주간 Top 5</span></h3>
@@ -177,8 +170,7 @@ const Main = () => {
             </table>
           </div>
 
-          {/* 가장 많이 틀린 문제 */}
-          <div className="stat-box wrong-articles">
+        <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
@@ -189,8 +181,13 @@ const Main = () => {
                     {quiz.news_quiz_no ? "📰" : "📚"}
                   </div>
                   <div>
-                    <div className="title">{quiz.question_text}</div>
-                    <div className="author">오답률 {quiz.percentage}%</div>
+                    {/* ✅ 지문 제목 (title) */}
+                    <div className="subtitle" title={quiz.title}>
+                      {quiz.title?.length > 25 ? `${quiz.title.slice(0, 25)}...` : quiz.title}
+                    </div>
+
+                    {/* ✅ 오답률 */}
+                    <div className="author">오답률 {quiz.percentage ?? 0}%</div>
                   </div>
                 </div>
               ))
