@@ -41,4 +41,10 @@ public class Type {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;	
 	
+	public void changeTypeName(TypeEnum typeName) {
+		
+		this.typeName = typeName;
+		
+	}
+	
 }

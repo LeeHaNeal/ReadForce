@@ -2,6 +2,7 @@ package com.readforce.result.dto;
 
 import com.readforce.common.MessageCode;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +18,11 @@ public class LearningMultipleChoiceRequestDto {
 	@NotNull(message = MessageCode.SELECTED_INDEX_NOT_NULL)
 	private Integer selectedIndex;
 	
+	@NotNull(message = MessageCode.QUESTION_SOLVING_TIME_NOT_NULL)
+	@Min(value = 11)
 	private Long questionSlovingTime;
 	
+	@NotNull(message = MessageCode.QUESTION_NO_NOT_NULL)
 	private Long questionNo;
 	
 	private Boolean isFavorit;
