@@ -1,6 +1,7 @@
 package com.readforce.common.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.entity.FileDeleteFailLog;
@@ -15,7 +16,7 @@ public class FileDeleteFailLogService {
 
 	private final FileDeleteFailLogRepository fileDeleteFailLogRepository;
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void create(Member member, String message) {
 
 		FileDeleteFailLog fileDelteFailLog = FileDeleteFailLog.builder()

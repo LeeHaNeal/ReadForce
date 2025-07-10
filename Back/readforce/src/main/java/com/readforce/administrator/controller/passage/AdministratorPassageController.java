@@ -5,11 +5,13 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.readforce.administrator.dto.AdministratorPassageModifyRequestDto;
 import com.readforce.administrator.dto.AdministratorUploadPassageRequestDto;
 import com.readforce.common.MessageCode;
 import com.readforce.passage.service.PassageService;
@@ -36,6 +38,15 @@ public class AdministratorPassageController {
 				MessageCode.MESSAGE_CODE, MessageCode.UPLOAD_PASSAGE_SUCCESS
 		));
 		
+	}
+	
+	@PatchMapping("/modify")
+	public ResponseEntity<Map<String, String>> modify(
+			@Valid @RequestBody AdministratorPassageModifyRequestDto requestDto
+	){
+		
+		
+		return null;
 	}
 	
 	
