@@ -30,6 +30,7 @@ import com.readforce.common.exception.JsonException;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.common.service.FileDeleteFailLogService;
 import com.readforce.email.service.EmailService;
+import com.readforce.file.exception.ProfileImageException;
 import com.readforce.file.service.FileService;
 import com.readforce.member.dto.MemberKeyInformationDto;
 import com.readforce.member.dto.MemberModifyDto;
@@ -56,7 +57,6 @@ import com.readforce.result.service.ResultService;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -476,14 +476,13 @@ public class MemberService {
 		Member member = getActiveMemberByEmail(email);
 		String profileImagePath = member.getProfileImagePath();
 		
-		if(profileImagePath == null) {
-			
-			throw new ResourceNotFoundException(MessageCode.PROFILE_IMAGE_NOT_FOUND);
-			
-		}
-
-		return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
-
+		 if (profileImagePath == null || profileImagePath.isEmpty()) {
+			 
+		        throw new ProfileImageException(MessageCode.PROFILE_IMAGE_NOT_FOUND);
+		        
+		    }
+		 
+		 return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 	}
 
 	@Transactional
@@ -532,14 +531,8 @@ public class MemberService {
 				fileDeleteFailLogService.create(member, exception.getMessage());
 				
 			}
-			
-			
-			
+
 		}
-		
-		resultService.getActiveMemberResultByEmailWithOptional(email).ifPresent(result -> {
-			resultMetricService.deleteAllByResult(result);
-		});
 		
 		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
 		

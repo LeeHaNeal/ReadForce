@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './css/UniversalQuestionPage.css';
 import fetchWithAuth from '../../utils/fetchWithAuth';
+import clockImg from '../../assets/image/clock.png';
 
 const UniversalQuestionPage = () => {
   const { id } = useParams();
@@ -14,6 +15,51 @@ const UniversalQuestionPage = () => {
   const [passage, setPassage] = useState(null);
   const [error, setError] = useState(null);
   const [answers, setAnswers] = useState([]);
+
+  const [startTime, setStartTime] = useState(null);
+  const [waitSeconds, setWaitSeconds] = useState(10);
+  const [isWaiting, setIsWaiting] = useState(true);
+
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const currentQuiz = quizList[currentIndex];
+
+  useEffect(() => {
+    setStartTime(Date.now());
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (totalSeconds) => {
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  };
+
+  useEffect(() => {
+    if (!currentQuiz) return;
+
+    setIsWaiting(true);
+    setWaitSeconds(10);
+    setStartTime(Date.now());
+
+    const interval = setInterval(() => {
+      setWaitSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsWaiting(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentIndex, currentQuiz]);
 
   useEffect(() => {
     const loadedPassage = location.state?.passage || {
@@ -43,8 +89,6 @@ const UniversalQuestionPage = () => {
       });
   }, [id, location.state]);
 
-  const currentQuiz = quizList[currentIndex];
-
   const handleNext = () => {
     if (selected === null) return;
 
@@ -72,7 +116,8 @@ const UniversalQuestionPage = () => {
           passage,
           total: finalAnswers.length,
           answers: finalAnswers,
-          category: passage.category
+          category: passage.category,
+          elapsedTime: elapsedSeconds
         },
       });
     } catch (err) {
@@ -93,7 +138,14 @@ const UniversalQuestionPage = () => {
       </div>
 
       <div className="quiz-box">
+        <div className="quiz-header">
         <h4 className="question-heading">💡 문제 {currentIndex + 1}</h4>
+        <div className="quiz-timer">
+          <img src={clockImg} alt="clock" className="clock-icon" />
+            {formatTime(elapsedSeconds)}
+          </div>
+        </div>
+
         <p className="question-text">{currentQuiz.question}</p>
 
         <div className="quiz-options">
@@ -111,10 +163,13 @@ const UniversalQuestionPage = () => {
         <div className="quiz-button-container">
           <button
             className="submit-button"
-            disabled={selected === null}
+            disabled={selected === null || isWaiting}
             onClick={handleNext}
           >
-            {currentIndex < quizList.length - 1 ? '다음 문제' : '제출'}
+            {isWaiting
+              ? `잠시 후 ${waitSeconds}`
+            : currentIndex < quizList.length - 1 
+            ? '다음 문제' : '제출'}
           </button>
         </div>
       </div>

@@ -16,12 +16,22 @@ import com.readforce.common.exception.JsonException;
 import com.readforce.common.exception.RateLimitExceededException;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.file.exception.FileException;
+import com.readforce.file.exception.ProfileImageException;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	
+	@ExceptionHandler(ProfileImageException.class)
+	public ResponseEntity<Map<String, String>> handerProfileImageException(ProfileImageException exception){
+		
+		log.warn("[{}] 발생: {}", exception.getClass().getSimpleName(), exception.getMessage(), exception);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(MessageCode.MESSAGE_CODE, exception.getMessage()));
+		
+	}
 
 	@ExceptionHandler(ApiException.class)
 	public ResponseEntity<Map<String, String>> handlerApiException(ApiException exception){
