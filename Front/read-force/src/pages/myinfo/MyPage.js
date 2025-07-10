@@ -12,6 +12,7 @@ const MyPage = () => {
   const [summary, setSummary] = useState({ total: 0, monthlyRate: 0, streak: 0 });
   const [correctRate, setCorrectRate] = useState(0);
   const [todaySolvedCount, setTodaySolvedCount] = useState(0);
+
   const [totalLearning, setTotalLearning] = useState([]);
   const [todayLearning, setTodayLearning] = useState([]);
   const [todayIncorrect, setTodayIncorrect] = useState([]);
@@ -117,10 +118,10 @@ const MyPage = () => {
 
         const [total, today, todayWrong, fav] = results;
 
-        setTotalLearning(total.status === 'fulfilled' ? total.value.data : 0);
-        setTodayLearning(today.status === 'fulfilled' ? today.value.data : 0);
-        setTodayIncorrect(todayWrong.status === 'fulfilled' ? todayWrong.value.data : 0);
-        setFavoritLearning(fav.status === 'fulfilled' ? fav.value.data : 0);
+        setTotalLearning(total.status === 'fulfilled' ? total.value.data : []);
+        setTodayLearning(today.status === 'fulfilled' ? today.value.data : []);
+        setTodayIncorrect(todayWrong.status === 'fulfilled' ? todayWrong.value.data : []);
+        setFavoritLearning(fav.status === 'fulfilled' ? fav.value.data : []);
 
         if (total.status === 'rejected') console.warn("총 학습 로딩 실패:", total.reason);
         if (today.status === 'rejected') console.warn("오늘 학습 로딩 실패:", today.reason);
@@ -209,12 +210,52 @@ const MyPage = () => {
 
         <div className="learning-note-box">
           <h4>학습 노트</h4>
-          <ul>
-            <li>전체 푼 문제: {totalLearning.length}문제</li>
-            <li>오늘의 푼 문제: {todayLearning.length}문제</li>
-            <li>오늘의 틀린 문제: {todayIncorrect.length}문제</li>
-            <li>즐겨찾기 문제: {favoritLearning.length}문제</li>
-          </ul>
+          <div className="learning-grid">
+            <div className="note-card">
+              <h5>전체 푼 문제</h5>
+              <p>{totalLearning.length}문제</p>
+              {totalLearning.slice(0, 3).map((item) => (
+                <div key={item.questionNo} className="note-item">
+                  <div>{item.title}</div>
+                  <div>{new Date(item.createdAt).toLocaleDateString()}</div>
+                  <div>{item.isCorrect ? '⭕' : '❌'}</div>
+                </div>
+              ))}
+            </div>
+            <div className="note-card">
+              <h5>오늘의 푼 문제</h5>
+              <p>{todayLearning.length}문제</p>
+              {todayLearning.slice(0, 3).map((item) => (
+                <div key={item.questionNo} className="note-item">
+                  <div>{item.title}</div>
+                  <div>{new Date(item.createdAt).toLocaleTimeString()}</div>
+                  <div>{item.isCorrect ? '⭕' : '❌'}</div>
+                </div>
+              ))}
+            </div>
+            <div className="note-card">
+              <h5>오늘의 틀린 문제</h5>
+              <p>{todayIncorrect.length}문제</p>
+              {todayIncorrect.slice(0, 3).map((item) => (
+                <div key={item.questionNo} className="note-item">
+                  <div>{item.title}</div>
+                  <div>{new Date(item.createdAt).toLocaleTimeString()}</div>
+                  <div>❌</div>
+                </div>
+              ))}
+            </div>
+            <div className="note-card">
+              <h5>즐겨찾기 문제</h5>
+              <p>{favoritLearning.length}문제</p>
+              {favoritLearning.slice(0, 3).map((item) => (
+                <div key={item.questionNo} className="note-item">
+                  <div>{item.title}</div>
+                  <div>{new Date(item.createdAt).toLocaleDateString()}</div>
+                  <div>{item.isCorrect ? '⭕' : '❌'}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
