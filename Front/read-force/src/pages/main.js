@@ -80,6 +80,22 @@ const Main = () => {
       : navigate(currentSlide.buttonLink);
   };
 
+  const handleQuizClick = (quiz) => {
+    if (!quiz || !quiz.questionNo) return;
+    navigate(`/questionpage/${quiz.questionNo}`, {
+      state: {
+        passage: {
+          passageNo: quiz.questionNo,
+          title: quiz.title ?? '',
+          summary: quiz.summary ?? '',
+          content: quiz.content ?? '',
+          language: selectedLanguage,
+          category: 'NEWS',
+        },
+      },
+    });
+  };
+
   return (
     <div>
       <section className="hero-fullwidth">
@@ -130,7 +146,10 @@ const Main = () => {
         <div className="page-container stat-container">
           {/* Top 5 랭킹 */}
           <div className="stat-box top5">
-            <h3>🏆 <span className="bold">주간 Top 5</span></h3>
+            <div className="top5-header-row">
+              <h3>🏆 <span className="bold">주간 Top 5</span></h3>
+              <button className="ranking-more-btn" onClick={() => navigate('/ranking')}>＋</button>
+            </div>
             <div className="tabs">
               {["KOREAN", "JAPANESE", "ENGLISH"].map((lang) => (
                 <button
@@ -165,7 +184,7 @@ const Main = () => {
               <p>데이터가 없습니다.</p>
             ) : (
               wrongArticles.map((quiz, index) => (
-                <div className="article" key={index}>
+                <div className="article" key={index} onClick={() => handleQuizClick(quiz)}>
                   <div className="flag">
                     {quiz.news_quiz_no ? "📰" : "📚"}
                   </div>

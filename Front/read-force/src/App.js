@@ -97,6 +97,7 @@ function App() {
           <Route path="/adaptive-learning" element={<AdaptiveLearningPage />} />
           <Route path="/adaptive-learning/start" element={<AdaptiveQuizPage />} />
           <Route path="/adaptive-learning/result" element={<AdaptiveResultPage />} />
+          <Route path="/questionpage/:id" element={<UniversalQuestionPage />} />
         </Route>
       </Routes>
     </Router>
