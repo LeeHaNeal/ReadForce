@@ -38,7 +38,6 @@ public class AdministratorMemberController {
 	
 	private final MemberService memberService;
 	private final PasswordEncoder passwordEncoder;
- 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-member-list")
 	public ResponseEntity<List<AdministratorMemberResponseDto>> getAllMemberList(){
@@ -136,16 +135,6 @@ public class AdministratorMemberController {
 	// 평균 풀이 시간 조회/생성/수정/삭제
 	
 	// 연령대 조회/생성/수정/삭제
-	
-	// 카테고리 조회/생성/수정/삭제
-	
-	// 타입 조회/생성/수정/삭제
-	
-	// 언어 조회/생성/수정/삭제
-	
-	// 구분 조회/생성/수정/삭제
-	
-	// 레벨 조회/생성/수정/삭제
 	
 	// 파일 삭제 시도
 	
