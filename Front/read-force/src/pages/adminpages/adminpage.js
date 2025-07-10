@@ -78,6 +78,9 @@ const AdminPage = () => {
                 <div>
                     <h2>회원 관리</h2>
                 </div>
+                <div>
+                    <button style={ADMIN_AI_BUTTONS}>맴버 추가</button>
+                </div>
             </div>
             <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
                 <thead>

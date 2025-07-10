@@ -26,7 +26,7 @@ import ReadTest from './pages/challenge/readtest';
 import ChallengePage from "./pages/challenge/challengepage";
 import AdminPage from './pages/adminpages/adminpage';
 import ChallengeQuizPage from './pages/challenge/challengeQuizPage';
-import AdminNews from './pages/adminpages/adminnews';
+// import AdminNews from './pages/adminpages/adminnews';
 import AdminNewsDetail from './pages/adminpages/adminnewsdetail';
 // import AdminNewsQuizList from './pages/adminpages/adminnewsquizlist';
 import AdminLiterature from './pages/adminpages/adminliterature';
@@ -79,7 +79,7 @@ function App() {
           <Route path="/test-start" element={<ReadTest />} />
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/challenge/quiz" element={<ChallengeQuizPage />} />
-          <Route path="/adminpage/adminnews" element={<AdminNews />} />
+          {/* <Route path="/adminpage/adminnews" element={<AdminNews />} /> */}
           <Route path="/adminpage/adminnews/:newsNo" element={<AdminNewsDetail />} />
           {/* <Route path="/adminpage/adminnews/adminnewsquizlist" element={<AdminNewsQuizList />} /> */}
           <Route path="/adminpage/adminliterature" element={<AdminLiterature />} />
