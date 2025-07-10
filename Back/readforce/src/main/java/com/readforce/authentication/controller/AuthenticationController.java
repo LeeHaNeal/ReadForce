@@ -168,6 +168,8 @@ public class AuthenticationController {
 			@NotBlank(message = MessageCode.TEMPORAL_TOKEN_NOT_BLANK)
 			String temporalToken
 	){
+		
+		System.out.println("d111111111111111111111111 : " + temporalToken);
 
 		String temporalTokenJson = redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
 		
