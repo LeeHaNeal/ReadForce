@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from '../../api/axiosInstance';
 
 const AdminLiteratureDetail = () => {
-    const { passageNo } = useParams();
-    const [passage, setPassage] = useState(null);
+    const { literatureNo } = useParams();
+    const [literature, setLiterature] = useState(null);
+    const [paragraphs, setParagraphs] = useState([]);
+    const [quizzes, setQuizzes] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchPassageDetail = async () => {
+        // 문학 불러오기
+        const fetchLiteratureDetail = async () => {
             try {
                 const res = await axiosInstance.post(`/admin/get-all-literature-list`);
                 const data = res.data;
@@ -17,7 +20,7 @@ const AdminLiteratureDetail = () => {
                 setLiterature(target);
             } catch (err) {
                 console.error(err);
-                alert("Passage 정보를 불러오지 못했습니다.");
+                alert("문학 정보를 불러오지 못했습니다.");
             }
         };
 
@@ -101,30 +104,96 @@ const AdminLiteratureDetail = () => {
             <button onClick={() => navigate("/adminpage/adminliterature")} style={backbtn}>뒤로가기</button>
             <div style={TITLE_STYLE}>
                 <div>
-                    <h2>{passage.title}</h2>
+                    <h2>{literature.title}</h2>
                 </div>
                 <div style={BUTTON_LIST}>
                     <button
                         style={BUTTON_STYLE}
-                        onClick={() => navigate(`/adminpage/adminliterature/add-passage`)}
-                    >
-                        새 Passage 추가
+                        onClick={() => navigate(`/adminpage/adminliterature/${literatureNo}/add-paragraph`)}>
+                        문단 추가
                     </button>
                 </div>
             </div>
-            <p><strong>저자:</strong> {passage.author}</p>
-            <p><strong>유형:</strong> {passage.type}</p>
-            <p><strong>카테고리:</strong> {passage.category}</p>
-            <p><strong>언어:</strong> {passage.language}</p>
-            <p><strong>분류:</strong> {passage.classification}</p>
-            <p><strong>레벨:</strong> {passage.level}</p>
-            <p><strong>생성일:</strong> {new Date(passage.created_date).toLocaleDateString()}</p>
+            <p><strong>유형:</strong> {literature.type}</p>
+            <p><strong>생성일:</strong> {new Date(literature.created_date).toLocaleDateString()}</p>
 
             <hr style={{ margin: "24px 0" }} />
-            <h3>내용</h3>
-            <pre style={{ backgroundColor: "#f8f9fa", padding: "12px", whiteSpace: "pre-wrap" }}>
-                {passage.content}
-            </pre>
+            {paragraphs.length === 0 ? (
+                <p>문단이 없습니다.</p>
+            ) : (
+                <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                    {paragraphs.map(p => (
+                        <li
+                            key={p.literature_paragraph_no}
+                            style={{
+                                marginBottom: "16px",
+                                padding: "12px",
+                                position: "relative"
+                            }}
+                        >
+                            <div style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                            }}>
+                                <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                                    문단 번호 : {p.literature_paragraph_no}
+                                </div>
+                                <div>
+                                    <button
+                                        onClick={() => handleDeleteParagraph(p.literature_paragraph_no)}
+                                        style={{
+                                            backgroundColor: "white",
+                                            color: "red",
+                                            border: "none",
+                                            fontSize: "12px",
+                                            cursor: "pointer"
+                                        }}
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
+                            </div>
+                            <div>{p.content}</div>
+                        </li>
+                    ))}
+                </ul>
+            )}
+            <hr style={{ margin: "24px 0" }} />
+            <h3 style={{ marginTop: "24px" }}>퀴즈</h3>
+            <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                {quizzes.map(q => (
+                    <li key={q.literature_quiz_no} style={{ marginBottom: "20px", padding: "12px", border: "1px solid #ccc", borderRadius: "8px", position: "relative" }}>
+                        <button
+                            onClick={() => handleDeleteQuiz(q.literature_quiz_no)}
+                            style={{
+                                position: "absolute",
+                                top: "8px",
+                                right: "8px",
+                                backgroundColor: "white",
+                                color: "red",
+                                border: "none",
+                                fontSize: "12px",
+                                cursor: "pointer"
+                            }}
+                        >
+                            삭제
+                        </button>
+                        <p><strong>문제:</strong> {q.question_text}</p>
+                        <ol type="A">
+                            <li>{q.choice1}</li>
+                            <li>{q.choice2}</li>
+                            <li>{q.choice3}</li>
+                            <li>{q.choice4}</li>
+                        </ol>
+                        <p>
+                            <strong>정답:</strong>{" "}
+                            {String.fromCharCode(64 + q.correct_answer_index)}. {q[`choice${q.correct_answer_index}`]}
+                        </p>
+                        <p><strong>해설:</strong> {q.explanation}</p>
+                        <p><strong>배점:</strong> {q.score}</p>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };
@@ -137,19 +206,19 @@ const backbtn = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer"
-};
+}
 
 const TITLE_STYLE = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "16px"
-};
+}
 
 const BUTTON_LIST = {
     display: "flex",
     gap: "8px"
-};
+}
 
 const BUTTON_STYLE = {
     marginBottom: "16px",
@@ -159,6 +228,6 @@ const BUTTON_STYLE = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer"
-};
+}
 
 export default AdminLiteratureDetail;

@@ -3,13 +3,6 @@ import UniversalFilterBar from './UniversalFilterBar';
 import UniversalCard from './UniversalCard';
 import './css/UniversalList.css';
 
-// category 한글 → 영어 변환 매핑
-const reverseCategoryMap = {
-  '뉴스': 'NEWS',
-  '소설': 'NOVEL',
-  '동화': 'FAIRY_TALE',
-};
-
 const UniversalList = ({
   items = [],
   level, setLevel,
@@ -18,16 +11,12 @@ const UniversalList = ({
   typeOptions = [],
   onSolve
 }) => {
-  // 카테고리 매핑 적용해서 비교
-  const apiCategory = reverseCategoryMap[category] || category;
-
   const filteredItems = items.filter((item) => {
     const matchLevel = level ? item.level === parseInt(level) : true;
     const matchType = type ? item.type === type : true;
     return matchLevel && matchType;
   });
 
-  // publicationDate 기준 정렬
   const sorted = [...filteredItems].sort((a, b) =>
     orderBy === 'latest'
       ? new Date(b.publishedAt) - new Date(a.publishedAt)
