@@ -107,4 +107,11 @@ public class ResultMetricService {
 		
 	}
 
+	@Transactional
+	public void deleteAllByResult(Result result) {
+
+		resultMetricRepository.deleteAllByResult(result);		
+		
+	}
+
 }

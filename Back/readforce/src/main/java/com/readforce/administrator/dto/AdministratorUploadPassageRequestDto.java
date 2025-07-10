@@ -1,7 +1,5 @@
 package com.readforce.administrator.dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
