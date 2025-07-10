@@ -38,14 +38,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChallengeService {
 	
-	private LevelService levelService;
-	private PassageService passageService;
-	private MultipleChoiceService multipleChoiceService;
-	private QuestionService questionService;
-	private ScoreService scoreService;
-	private CategoryService categoryService;
-	private LanguageService languageService;
-	private ClassificationService classificationService;
+	private final LevelService levelService;
+	private final PassageService passageService;
+	private final MultipleChoiceService multipleChoiceService;
+	private final QuestionService questionService;
+	private final ScoreService scoreService;
+	private final CategoryService categoryService;
+	private final LanguageService languageService;
+	private final ClassificationService classificationService;
 	
 	@Transactional
 	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {

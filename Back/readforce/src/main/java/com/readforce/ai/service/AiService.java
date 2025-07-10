@@ -578,76 +578,84 @@ public class AiService {
 
 
    private String generatePassagePrompt(AiGeneratePassageRequestDto aiGeneratePassageRequestDto) {
-      
-      String prompt = "";
-      
-      String languageString = getLanguageString(aiGeneratePassageRequestDto.getLanguage());
-      
-      String categoryString = getCategoryString(
-            aiGeneratePassageRequestDto.getLanguage(),
-            aiGeneratePassageRequestDto.getCategory()
-      );
-      
-      String typeString = getTypeString(
-            aiGeneratePassageRequestDto.getLanguage(), 
-            aiGeneratePassageRequestDto.getCategory(),
-            aiGeneratePassageRequestDto.getType()
-      );
-      
-      Level level = levelService.getLevelByLevel(aiGeneratePassageRequestDto.getLevel());
-      
-      switch(aiGeneratePassageRequestDto.getCategory()){
-         
-         case NEWS:
-            
-            switch(aiGeneratePassageRequestDto.getLanguage()) {
-            
-            case KOREAN:
-               prompt = String.format("""
-                     당신은 %s 분야를 다루는 전문 기자입니다. 지금부터 다음 조건에 맞춰 뉴스 기사를 생성해 주세요.
 
-                     1.  **언어:** %s
-                     2.  **카테고리:** %s
-                     3.  **타입:** %s
-                     4.  **난이도:** 전체 10의 난이도 중 %d
-                         * **어휘:** %s
-                         * **문장 구조:** %s
-                         * **내용:** 사실에 기반하되, 독자의 흥미를 유발할 수 있도록 구성해 주세요.
-                         * **분량:** 제목 포함 %d개 문단으로 구성해 주세요.
-                     
-                     5.  **출력 형식:** 아래의 JSON 형식에 맞춰서 출력해 주세요. `title`과 `body` 외의 다른 설명은 추가하지 마세요.
-                     
-                     {
-                       "title": "기사 제목",
-                       "content": "기사 본문 내용. 문단 구분을 위해 '\\n\\n'를 사용해 주세요."
-                     }
+	    String languageString = getLanguageString(aiGeneratePassageRequestDto.getLanguage());
+	    String categoryString = getCategoryString(
+	            aiGeneratePassageRequestDto.getLanguage(),
+	            aiGeneratePassageRequestDto.getCategory()
+	    );
+	    String typeString = getTypeString(
+	            aiGeneratePassageRequestDto.getLanguage(),
+	            aiGeneratePassageRequestDto.getCategory(),
+	            aiGeneratePassageRequestDto.getType()
+	    );
 
-               """, 
-               typeString, 
-               languageString, 
-               categoryString, 
-               typeString, 
-               level.getLevelNumber(), 
-               level.getVocabularyLevel(), 
-               level.getSentenceStructure(),
-               level.getParagraphCount()
-               );
-               break;
-               
-         
-            
-            default:
-         }
-            
-            
-            
-         default:
-         
-      }
-      
-      return prompt;
+	    Level level = levelService.getLevelByLevel(aiGeneratePassageRequestDto.getLevel());
 
-   }
+	    String prompt = "";
+
+	    switch (aiGeneratePassageRequestDto.getCategory()) {
+
+	        case NEWS:
+	            switch (aiGeneratePassageRequestDto.getLanguage()) {
+
+	                case KOREAN:
+	                    prompt = String.format("""
+	                            당신은 %s 분야를 다루는 전문 기자입니다. 이번 기사 주제는 '%s'입니다.
+	                            지금부터 다음 조건에 맞춰 뉴스 기사를 작성해 주세요.
+
+	                            1. **언어:** %s
+	                            2. **카테고리:** %s
+	                            3. **유형:** %s
+	                            4. **난이도:** 전체 10의 난이도 중 %d
+	                               - **어휘:** %s 수준
+	                               - **문장 구조:** %s
+	                               - **내용:** '%s' 주제에 맞는 실제 사례나 최근 이슈를 포함해 주세요.
+	                               - **분량:** 제목 포함 %d개 문단으로 구성해 주세요.
+
+	                            5. **출력 형식:** 아래 JSON 형식으로만 응답해 주세요. 다른 설명은 포함하지 마세요.
+
+	                            {
+	                              "title": "기사 제목",
+	                              "content": "기사 본문 내용. 문단 구분을 위해 '\\n\\n'를 사용하세요."
+	                            }
+	                            """,
+	                            typeString, // 기자 분야
+	                            typeString, // 주제 명시
+	                            languageString,
+	                            categoryString,
+	                            typeString,
+	                            level.getLevelNumber(),
+	                            level.getVocabularyLevel(),
+	                            level.getSentenceStructure(),
+	                            typeString, // 내용에 주제 명시
+	                            level.getParagraphCount()
+	                    );
+	                    break;
+
+	                default:
+	                    prompt = "지원하지 않는 언어입니다.";
+	                    break;
+	            }
+	            break;
+
+	        // [추가 예정] 소설이나 동화는 이곳에 별도 프롬프트 작성
+	        case NOVEL:
+	            prompt = "소설 카테고리는 AI가 직접 생성하지 않습니다.";
+	            break;
+
+	        case FAIRY_TALE:
+	            prompt = "동화 카테고리는 AI가 직접 생성하지 않습니다.";
+	            break;
+
+	        default:
+	            prompt = "지원하지 않는 카테고리입니다.";
+	            break;
+	    }
+
+	    return prompt;
+	}
+
 
 
    private String getCategoryString(LanguageEnum language, CategoryEnum category) {

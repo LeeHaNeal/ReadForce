@@ -72,6 +72,7 @@ function App() {
           <Route path="/test-start" element={<ReadTest />} />
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/challenge/quiz" element={<ChallengeQuizPage />} />
+          <Route path="/challenge/today" element={<ChallengeQuizPage />} />
           <Route path="/adminpage/adminnews" element={<AdminNews />} />
           <Route path="/adminpage/adminnews/:newsNo" element={<AdminNewsDetail />} />
           <Route path="/adminpage/adminliterature" element={<AdminLiterature />} />

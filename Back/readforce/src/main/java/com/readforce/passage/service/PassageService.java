@@ -244,26 +244,25 @@ public class PassageService {
 	@Transactional(readOnly = true)
 	public List<Passage> getChallengePassageList(LanguageEnum language, CategoryEnum category, Integer level) {
 
-		List<Long> passageNoList = passageRepository.findPassageNoByLanguageAndCategoryAndLevelAndClassification(
-				language,
-				category,
-				level,
-				ClassificationEnum.CHALLENGE		
-		);
-		
-		if(passageNoList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-			
-		}
-		
-		Collections.shuffle(passageNoList);
-		
-		List<Long> randomPassageNoList = passageNoList.stream().limit(2).collect(Collectors.toList());
-		
-		return passageRepository.findAllById(randomPassageNoList);
+	    List<Long> passageNoList = passageRepository.findPassageNoByLanguageAndClassificationAndCategoryAndLevel(
+	            language,
+	            ClassificationEnum.CHALLENGE,
+	            category,
+	            level
+	    );
 
+	    if (passageNoList.isEmpty()) {
+	        throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+	    }
+
+	    Collections.shuffle(passageNoList);
+
+	    List<Long> randomPassageNoList = passageNoList.stream().limit(2).collect(Collectors.toList());
+
+	    return passageRepository.findAllById(randomPassageNoList);
 	}
+
+
 
 	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndLevel(
 			OrderByEnum orderBy, 
