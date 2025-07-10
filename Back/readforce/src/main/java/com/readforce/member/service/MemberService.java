@@ -30,6 +30,7 @@ import com.readforce.common.exception.JsonException;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.common.service.FileDeleteFailLogService;
 import com.readforce.email.service.EmailService;
+import com.readforce.file.exception.ProfileImageException;
 import com.readforce.file.service.FileService;
 import com.readforce.member.dto.MemberKeyInformationDto;
 import com.readforce.member.dto.MemberModifyDto;
@@ -56,7 +57,6 @@ import com.readforce.result.service.ResultService;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -74,7 +74,7 @@ public class MemberService {
 	private final CategoryService categoryService;
 	private final TypeService typeService;
 	private final LevelService levelService;
-
+	
 	@Transactional(readOnly = true)
 	public MemberKeyInformationDto getMemberKeyInformationByEmailAndStatus(String email, StatusEnum status) {
 		
@@ -472,13 +472,17 @@ public class MemberService {
 
 	@Transactional
 	public Resource getProfileImage(String email) {
-	    Member member = getActiveMemberByEmail(email);
-	    String profileImagePath = member.getProfileImagePath();
-	    String pathToLoad = (profileImagePath == null || profileImagePath.isEmpty())
-	            ? defaultProfilePath
-	            : profileImagePath;
-
-	    return fileService.loadFileAsResource(pathToLoad, FileCategoryEnum.PROFILE_IMAGE);
+		
+		Member member = getActiveMemberByEmail(email);
+		String profileImagePath = member.getProfileImagePath();
+		
+		 if (profileImagePath == null || profileImagePath.isEmpty()) {
+			 
+		        throw new ProfileImageException(MessageCode.PROFILE_IMAGE_NOT_FOUND);
+		        
+		    }
+		 
+		 return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 	}
 
 	@Transactional
@@ -527,14 +531,8 @@ public class MemberService {
 				fileDeleteFailLogService.create(member, exception.getMessage());
 				
 			}
-			
-			
-			
+
 		}
-		
-		resultService.getActiveMemberResultByEmailWithOptional(email).ifPresent(result -> {
-			resultMetricService.deleteAllByResult(result);
-		});
 		
 		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
 		
