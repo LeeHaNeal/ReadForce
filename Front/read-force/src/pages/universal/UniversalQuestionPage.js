@@ -77,7 +77,6 @@ const UniversalQuestionPage = () => {
 
     const solvingTime = Math.floor((Date.now() - startTime) / 1000);
 
-    console.log(solvingTime)
     try {
       await fetchWithAuth('/learning/save-multiple-choice', {
         method: 'POST',
