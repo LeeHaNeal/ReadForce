@@ -65,12 +65,14 @@ const AdminLiterature = () => {
                     <h2>전체 문학 목록</h2>
                 </div>
                 <div style={LITERATURE_BUTTONS_LIST}>
-                    <button
+                   <button
                         style={LITERATURE_BUTTONS_BUTTONS}
-                        onClick={() => navigate("/adminpage/adminliterature/adminliteratureadd")}
+                        onClick={() => navigate("/adminpage/adminliterature/add-paragraph")}
                     >
-                        문학 추가
+                        Passage 추가
                     </button>
+
+
                     <button
                         style={LITERATURE_BUTTONS_BUTTONS}
                         onClick={handleGenerateQuiz}

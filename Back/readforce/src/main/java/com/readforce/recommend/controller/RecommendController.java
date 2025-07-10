@@ -26,25 +26,23 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class RecommendController {
 
-	private final RecommendService recommendService;
-	private final MemberService memberService;
-	
-	@GetMapping("/get-recommend")
-	public ResponseEntity<MultipleChoiceResponseDto> getRecommend(
-			@RequestParam("/language")
-			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
-			LanguageEnum language,
-			@AuthenticationPrincipal UserDetails userDetails
-	){
-		
-		String email = userDetails.getUsername();
-		
-		Member member = memberService.getActiveMemberByEmail(email);
-		
-		MultipleChoiceResponseDto recommendQuestion = recommendService.getRecommendQuestion(member, language);
-		
-		return ResponseEntity.status(HttpStatus.OK).body(recommendQuestion);
-		
-	}
-	
+    private final RecommendService recommendService;
+    private final MemberService memberService;
+
+    @GetMapping("/get-recommend")
+    public ResponseEntity<MultipleChoiceResponseDto> getRecommend(
+            @RequestParam(name = "language") 
+            @NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
+            LanguageEnum language,
+
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        String email = userDetails.getUsername();
+
+        Member member = memberService.getActiveMemberByEmail(email);
+
+        MultipleChoiceResponseDto recommendQuestion = recommendService.getRecommendQuestion(member, language);
+
+        return ResponseEntity.status(HttpStatus.OK).body(recommendQuestion);
+    }
 }
