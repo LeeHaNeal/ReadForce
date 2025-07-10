@@ -36,9 +36,9 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class AdministratorMemberController {
 	
-	private MemberService memberService;
-	private PasswordEncoder passwordEncoder;
-
+	private final MemberService memberService;
+	private final PasswordEncoder passwordEncoder;
+ 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-member-list")
 	public ResponseEntity<List<AdministratorMemberResponseDto>> getAllMemberList(){

@@ -525,15 +525,7 @@ public class MemberService {
 
 		if(member.getProfileImagePath() != null && !member.getProfileImagePath().isEmpty()) {
 			
-			try {
-				
-				deleteProfileImage(member.getEmail());
-				
-			} catch(Exception exception) {
-				
-				fileDeleteFailLogService.create(member, exception.getMessage());
-								
-			}
+			deleteProfileImage(member.getEmail());
 			
 		}
 		
