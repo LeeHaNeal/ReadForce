@@ -39,6 +39,27 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.quiz-timer {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #0d9488;
+  font-weight: 500;
+}
+
+.clock-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
 .question-heading {
   font-size: 17px;
   font-weight: bold;
