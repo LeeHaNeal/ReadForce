@@ -34,4 +34,35 @@ public class LanguageService {
 
 	}
 
+	@Transactional
+	public void createLanguage(Language language) {
+
+		languageRepository.save(language);
+		
+	}
+
+	@Transactional
+	public Language getLanguageByLanguageNo(Long languageNo) {
+		
+		return languageRepository.findById(languageNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.LANGUAGE_NOT_FOUND));
+		
+	}
+	
+	@Transactional
+	public void modifyLanguage(Long languageNo, LanguageEnum languageName) {
+
+		Language language = getLanguageByLanguageNo(languageNo);
+		
+		language.chageLanguageName(languageName);
+		
+	}
+
+	@Transactional
+	public void deleteLanguageByLanguageNo(Long languageNo) {
+
+		languageRepository.deleteById(languageNo);		
+		
+	}
+
 }

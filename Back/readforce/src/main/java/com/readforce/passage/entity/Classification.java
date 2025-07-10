@@ -41,4 +41,10 @@ public class Classification {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 	
+	public void changeClassificationName(ClassificationEnum classificationName) {
+		
+		this.classificationName = classificationName;
+		
+	}
+	
 }

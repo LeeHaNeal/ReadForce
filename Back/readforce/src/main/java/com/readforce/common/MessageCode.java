@@ -33,6 +33,10 @@ public final class MessageCode {
 	public static final String CONTENT_NOT_BLANK = "NOT0025";
 	public static final String NUMBER_NOT_NULL = "NOT0026";
 	public static final String CATEGORY_NO_NOT_NULL = "NOT0027";
+	public static final String TYPE_NO_NOT_NULL = "NOT0028";
+	public static final String LEVEL_NO_NOT_NULL = "NOT0029";
+	public static final String CLASSIFICATION_NO_NOT_NULL = "NOT0030";
+	public static final String LANGUAGE_NO_NOT_NULL = "NOT0031";	
 
 
 	
@@ -94,8 +98,15 @@ public final class MessageCode {
 	public static final String CREATE_CATEGORY_SUCCESS = "SUC0024";
 	public static final String MODIFY_CATEGORY_SUCCESS = "SUC0025";
 	public static final String DELETE_CATEGORY_SUCCESS = "SUC0026";
-	public static final String CREATE_TYPE_SUCCSEE = "SUC0027";
-	
+	public static final String CREATE_TYPE_SUCCESS = "SUC0027";
+	public static final String MODIFY_TYPE_SUCCESS = "SUC0028";
+	public static final String DELETE_TYPE_SUCCESS = "SUC0029";
+	public static final String CREATE_LANGUAGE_SUCCESS = "SUC0030";
+	public static final String MODIFY_LANGUAGE_SUCCESS = "SUC0031";
+	public static final String DELETE_LANGUAGE_SUCCESS = "SUC0032";
+	public static final String CREATE_CLASSIFICATION_SUCCESS = "SUC0033";
+	public static final String MODIFY_CLASSIFICATION_SUCCESS = "SUC0034";
+	public static final String DELETE_CLASSIFICATION_SUCCESS = "SUC0035";
 	
 	
 	
