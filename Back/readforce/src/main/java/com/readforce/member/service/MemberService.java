@@ -56,7 +56,7 @@ import com.readforce.result.service.ResultService;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -74,7 +74,7 @@ public class MemberService {
 	private final CategoryService categoryService;
 	private final TypeService typeService;
 	private final LevelService levelService;
-	
+
 	@Transactional(readOnly = true)
 	public MemberKeyInformationDto getMemberKeyInformationByEmailAndStatus(String email, StatusEnum status) {
 		
@@ -472,16 +472,14 @@ public class MemberService {
 
 	@Transactional
 	public Resource getProfileImage(String email) {
-		
-		Member member = getActiveMemberByEmail(email);
-		String profileImagePath = member.getProfileImagePath();
-		
-		 if (profileImagePath == null || profileImagePath.isEmpty()) {
-		        return new ClassPathResource("static/image/default-profile.png");
-		    }
+	    Member member = getActiveMemberByEmail(email);
+	    String profileImagePath = member.getProfileImagePath();
+	    String pathToLoad = (profileImagePath == null || profileImagePath.isEmpty())
+	            ? defaultProfilePath
+	            : profileImagePath;
 
-		    return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
-		}
+	    return fileService.loadFileAsResource(pathToLoad, FileCategoryEnum.PROFILE_IMAGE);
+	}
 
 	@Transactional
 	public void emailExistCheck(String email) {

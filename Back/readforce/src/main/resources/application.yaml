@@ -87,6 +87,7 @@ file:
       max-size: 5242880
       max-request-size: 5MB
       allowed-mime-types: image/jpeg,image/png,image/gif
+      default-profile-path: ./upload/image/profile/default-profile.png
 custom:
   fronted:
     password-reset-link-url: http://localhost:3000/resetpassword

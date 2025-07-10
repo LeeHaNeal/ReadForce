@@ -15,37 +15,39 @@ const ProfileEditPage = () => {
   const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const hasFetchedImage = useRef(false); // ✅ 중복 방지
+  const hasFetchedImage = useRef(false);
 
-  const fetchProfileImage = useCallback(async () => {
-    try {
-      const res = await axiosInstance.get('/file/get-profile-image', {
-        responseType: 'blob',
-      });
-      const url = URL.createObjectURL(res.data);
-      setProfileImageUrl(url);
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        setProfileImageUrl(defaultProfileImage);
-      } else {
-        console.error('이미지 로딩 실패:', error);
-      }
-    }
-  }, []);
-
+  // ✅ 이미지 fetch + revokeObjectURL
   useEffect(() => {
+    let objectUrl = null;
+
+    const fetchProfileImage = async () => {
+      try {
+        const res = await axiosInstance.get('/file/get-profile-image', {
+          responseType: 'blob',
+        });
+        objectUrl = URL.createObjectURL(res.data);
+        setProfileImageUrl(objectUrl);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          setProfileImageUrl(defaultProfileImage);
+        } else {
+          console.error('이미지 로딩 실패:', error);
+        }
+      }
+    };
+
     if (!hasFetchedImage.current) {
       hasFetchedImage.current = true;
       fetchProfileImage();
     }
-    return () => {
-      // ✅ 메모리 누수 방지
-      if (profileImageUrl && profileImageUrl !== defaultProfileImage) {
-        URL.revokeObjectURL(profileImageUrl);
-      }
-    };
-  }, [fetchProfileImage, profileImageUrl]);
 
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, []);
+
+  // ✅ 닉네임 중복 체크
   const checkNicknameDuplicate = async (nickname) => {
     try {
       const res = await axiosInstance.get(`/member/nickname-check?nickname=${nickname}`);
@@ -70,6 +72,7 @@ const ProfileEditPage = () => {
     setIsNicknameValid(isAvailable);
   };
 
+  // ✅ 생일 검증
   const validateBirthday = (value) => {
     setBirthdayMessage('');
     const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -95,10 +98,11 @@ const ProfileEditPage = () => {
     validateBirthday(formatted);
   };
 
+  // ✅ 프로필 수정 제출
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (nickname && !isNicknameValid) {
-      alert('닉네임 형식이 잘못되었거나 중복입니다. 다시 확인해주세요.');
+      alert('닉네임 형식이 잘못되었거나 중복입니다.');
       return;
     }
     if (birthday && !isBirthdayValid) {
@@ -188,7 +192,6 @@ const ProfileEditPage = () => {
                 const file = e.target.files[0];
                 if (file && file.size <= 5 * 1024 * 1024) {
                   setSelectedFile(file);
-                  setProfileImageUrl(URL.createObjectURL(file));
                 } else {
                   alert('이미지 용량은 5MB 이하여야 합니다.');
                 }
@@ -233,11 +236,7 @@ const ProfileEditPage = () => {
               type="text"
               placeholder="예:YYYY-MM-DD"
               value={birthday}
-              onChange={(e) => {
-                const value = e.target.value;
-                setBirthdayMessage('');
-                handleBirthdayChange(value);
-              }}
+              onChange={(e) => handleBirthdayChange(e.target.value)}
             />
             {birthdayMessage && (
               <span className={`validation-message ${isBirthdayValid ? 'valid' : 'invalid'}`}>
