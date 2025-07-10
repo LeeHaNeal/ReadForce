@@ -33,4 +33,6 @@ public class AiGeneratePassageRequestDto {
 	@NotNull(message = MessageCode.LEVEL_NOT_NULL)
 	private Integer level;
 	
+	 private Integer count = 1; 
+
 }

@@ -19,7 +19,7 @@ const AdminPassage = () => {
     const [classification, setClassification] = useState("NORMAL");
 
     const [passageList, setPassageList] = useState([]);
-
+    const [count, setCount] = useState(1);
     // 지문 불러오기
     useEffect(() => {
         const fetchPassages = async () => {
@@ -72,6 +72,7 @@ const AdminPassage = () => {
                 category,
                 type,
                 classification,
+                 count
             });
             const data = await res.data;
             alert("성공 : " + data.message);
@@ -113,37 +114,60 @@ const AdminPassage = () => {
 
                         <label>언어:</label>
                         <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                            <option value="KOREAN">KOREAN</option>
-                            <option value="ENGLISH">ENGLISH</option>
-                            <option value="JAPANESE">JAPANESE</option>
+                            <option value="KOREAN">한국어</option>
+                            <option value="ENGLISH">영어</option>
+                            <option value="JAPANESE">일본어</option>
 
                         </select>
 
-                        <br /><label>난이도:</label>
+                      <br /><label>난이도:</label>
                         <select value={level} onChange={(e) => setLevel(parseInt(e.target.value))}>
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
+                            {[...Array(10)].map((_, idx) => (
+                                <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                            ))}
                         </select>
 
                         <br /><label>카테고리:</label>
                         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                            <option value="NEWS">NEWS</option>
-                            <option value="LITERATURE">LITERATURE</option>
+                            <option value="NEWS">뉴스</option>
+                            <option value="NOVEL">소설</option>
+                            <option value="FAIRY_TALE">동화</option>
+                            <option value="VOCABULARY">어휘</option>
+                            <option value="FACTUAL">사실적</option>
+                            <option value="INFERENTIAL">추론적</option>
                         </select>
 
                         <br /><label>유형:</label>
                         <select value={type} onChange={(e) => setType(e.target.value)}>
-                            <option value="ECONOMY">ECONOMY</option>
-                            <option value="SOCIETY">SOCIETY</option>
-                            <option value="SCIENCE">SCIENCE</option>
+                            <option value="POLITICS">정치</option>
+                            <option value="ECONOMY">경제</option>
+                            <option value="SOCIETY">사회</option>
+                            <option value="LIFE_AND_CULTURE">생활/문화</option>
+                            <option value="IT_AND_SCIENCE">IT/과학</option>
+                            <option value="WORLD">세계</option>
+                            <option value="SPORTS">스포츠</option>
+                            <option value="ENTERTAINMENT">연예</option>
+                            <option value="MYSTERY">미스터리</option>
+                            <option value="SCIENCE_FICTION">과학 소설</option>
+                            <option value="FANTASY">판타지</option>
+                            <option value="ROMANCE">로맨스</option>
+                            <option value="HISTORICAL">역사</option>
+                            <option value="ADVENTURE">모험</option>
+                            <option value="THRILLER">스릴러</option>
+                            <option value="SLICE_OF_LIFE">일상</option>
+                            <option value="TRADITIONAL">전통</option>
+                            <option value="INFORMATIONAL">정보성</option>
                         </select>
 
                         <br /><label>분류:</label>
                         <select value={classification} onChange={(e) => setClassification(e.target.value)}>
-                            <option value="NORMAL">NORMAL</option>
-                            <option value="CHALLENGE">CHALLENGE</option>
+                            <option value="NORMAL">일반</option>
+                            <option value="CHALLANGE">챌린지</option>
+                            <option value="TEST">테스트</option>
                         </select>
+
+                        <br /><label>생성 개수:</label> {/* ✅ 추가됨 */}
+                        <input type="number" min="1" max="20" value={count} onChange={(e) => setCount(parseInt(e.target.value) || 1)} />
 
                         <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between" }}>
                             <button onClick={handleGeneratePassageWithParams} disabled={loadingPassage}>

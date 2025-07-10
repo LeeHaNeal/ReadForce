@@ -1,42 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import fetchWithAuth from '../../utils/fetchWithAuth'; 
-import './AdaptiveQuizPage.css'; 
+import fetchWithAuth from '../../utils/fetchWithAuth';
+import './AdaptiveQuizPage.css';
 
 const AdaptiveQuizPage = () => {
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [selected, setSelected] = useState(null);
-  const [notFound] = useState(false);
+  const [notFound, setNotFound] = useState(false);  // notFound 초기화
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await fetchWithAuth('/recommend/get-recommend?language=korean');
+        const res = await fetchWithAuth('/recommend/get-recommend?language=KOREAN');
+        if (!res.ok) {
+          console.error('백엔드 에러 상태 코드:', res.status);
+          setNotFound(true);
+          return;
+        }
+
         const data = await res.json();
 
-        // 정상 데이터가 없을 경우 더미 데이터 출력
+        // 문제 데이터가 없는 경우
         if (!data || !data.question) {
-          console.warn('문제 없음: 더미 데이터로 대체');
-          setQuiz({
-            passage: '그는 고요한 밤에도 불을 켜고 책을 읽었다.',
-            question: '다음 중 이 문장의 뜻과 가장 가까운 것은?',
-            options: ['밤에 잠을 자지 않았다', '낮에 책을 읽었다', 'TV를 보았다', '도서관에 갔다'],
-            correct_answer: '밤에 잠을 자지 않았다',
-            explanation: '밤새워 책을 읽었다는 의미입니다.',
-          });
-        } else {
-          setQuiz(data);
+          console.warn('백엔드에 문제 없음:', data);
+          setNotFound(true);
+          return;
         }
+
+        setQuiz(data);
       } catch (err) {
-        console.error('API 오류: 더미 데이터로 대체', err);
-        setQuiz({
-          passage: '그는 고요한 밤에도 불을 켜고 책을 읽었다.',
-          question: '다음 중 이 문장의 뜻과 가장 가까운 것은?',
-          options: ['밤에 잠을 자지 않았다', '낮에 책을 읽었다', 'TV를 보았다', '도서관에 갔다'],
-          correct_answer: '밤에 잠을 자지 않았다',
-          explanation: '밤새워 책을 읽었다는 의미입니다.',
-        });
+        console.error('API 통신 오류:', err);
+        setNotFound(true);
       }
     };
 
