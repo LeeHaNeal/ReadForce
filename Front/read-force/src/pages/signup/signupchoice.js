@@ -1,7 +1,7 @@
 import './signupchoice.css';
 import { useNavigate } from 'react-router-dom';
 import kakaoIcon from '../../assets/image/kakao.png';
-import naverIcon from '../../assets/image/naver.png';
+// import naverIcon from '../../assets/image/naver.png';
 import googleIcon from '../../assets/image/google.png';
 import emailIcon from '../../assets/image/email.png';
 
@@ -20,11 +20,11 @@ const SignupChoice = () => {
           <span className="arrow">›</span>
         </button>
 
-        <button className="signup-card naver" onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/naver"}>
+        {/* <button className="signup-card naver" onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/naver"}>
           <img src={naverIcon} alt="네이버" />
           <span>네이버로 가입하기</span>
           <span className="arrow">›</span>
-        </button>
+        </button> */}
 
         <button className="signup-card google" onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}>
           <img src={googleIcon} alt="구글" />
