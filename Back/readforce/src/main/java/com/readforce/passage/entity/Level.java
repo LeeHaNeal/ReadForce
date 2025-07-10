@@ -13,12 +13,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Level {
 	
@@ -48,5 +52,46 @@ public class Level {
 	@LastModifiedDate
 	@Column(nullable = false)
 	private LocalDateTime lastModifiedAt;
+	
+	public void changeInfo(
+			Integer levelNumber, 
+			Integer paragraphCount, 
+			String vocabularyLevel,
+			String sentenceStructure,
+			String questionType
+	) {
+		
+		if(levelNumber != null) {
+			
+			this.levelNumber = levelNumber;
+		}
+		
+		if(paragraphCount != null) {
+			
+			this.paragraphCount = paragraphCount;
+			
+		}
+		
+		if(!vocabularyLevel.isBlank()) {
+			
+			this.vocabularyLevel = vocabularyLevel;
+			
+		}
+		
+		if(!sentenceStructure.isBlank())
+		{
+			
+			this.sentenceStructure = sentenceStructure;
+			
+		}
+		
+		if(!questionType.isBlank()) {
+			
+			this.questionType = questionType;
+			
+		}
+			
+	}
+	
 	
 }

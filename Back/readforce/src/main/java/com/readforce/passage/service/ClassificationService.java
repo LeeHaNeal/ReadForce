@@ -1,5 +1,7 @@
 package com.readforce.passage.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,46 @@ public class ClassificationService {
 		return classificationRepository.findByClassificationName(classification)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.CLASSIFICATION_NOT_FOUND));
 				
+	}
+
+	@Transactional(readOnly = true)
+	public List<Classification> getAllClassificationList() {
+		
+		return classificationRepository.findAll();
+
+	}
+
+	@Transactional
+	public void saveClassification(Classification classifcation) {
+
+		classificationRepository.save(classifcation);
+		
+	}
+
+	@Transactional(readOnly = true)
+	public Classification getClassificationByClassificationNo(Long classificationNo) {
+		
+		return classificationRepository.findById(classificationNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.CLASSIFICATION_NOT_NULL));
+		
+	}
+	
+	@Transactional
+	public void modifyClassification(Long classificationNo, ClassificationEnum classificationName) {
+
+		Classification classification = getClassificationByClassificationNo(classificationNo);
+		
+		classification.changeClassificationName(classificationName);
+		
+		saveClassification(classification);
+		
+	}
+
+	@Transactional
+	public void deleteByClassificationNo(Long classificationNo) {
+		
+		classificationRepository.deleteById(classificationNo);
+		
 	}
 
 }

@@ -47,7 +47,8 @@ public class AuthenticationService implements UserDetailsService {
 		redisTemplate.opsForValue().set(
 				PrefixEnum.REFRESH.getContent() + email,
 				refreshToken,
-				Duration.ofMillis(refreshExpirationTime)	
+				Duration.ofMillis(refreshExpirationTime)			
+
 		);
 		
 	}

@@ -12,9 +12,9 @@ public class NicknameValidator implements ConstraintValidator<ValidNickname, Str
 	@Override
 	public boolean isValid(String nickname, ConstraintValidatorContext context) {
 
-		if(nickname == null) {
+		if(nickname == null || nickname.isBlank()) {
 			
-			return false;
+			return true;
 			
 		}
 		

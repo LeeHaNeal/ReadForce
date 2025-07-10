@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.readforce.administrator.dto.AdministratorMemberResponseDto;
+import com.readforce.administrator.dto.AdministratorModifyRequestDto;
 import com.readforce.authentication.dto.OAuthAttributeDto;
 import com.readforce.authentication.exception.AuthenticationException;
 import com.readforce.common.MessageCode;
@@ -50,9 +53,10 @@ import com.readforce.result.entity.Result;
 import com.readforce.result.service.ResultMetricService;
 import com.readforce.result.service.ResultService;
 
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.core.io.ClassPathResource;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -269,7 +273,7 @@ public class MemberService {
 
 		Member member = getActiveMemberByEmail(email);
 		
-		if(memberModifyDto.getNickname() != null && memberModifyDto.getNickname().isEmpty()) {
+		if(memberModifyDto.getNickname() != null && !memberModifyDto.getNickname().isEmpty()) {
 			
 			nicknameCheck(memberModifyDto.getNickname());
 			
@@ -316,7 +320,7 @@ public class MemberService {
 				
 				try {
 					
-					deleteProfileImage(member.getEmail());
+					deleteProfileImage(member);
 					
 				} catch(Exception exception) {
 					
@@ -450,9 +454,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void deleteProfileImage(String email) {
-
-		Member member = getActiveMemberByEmail(email);
+	public void deleteProfileImage(Member member) {
 		
 		String profileImagePath = member.getProfileImagePath();
 		
@@ -474,21 +476,67 @@ public class MemberService {
 		Member member = getActiveMemberByEmail(email);
 		String profileImagePath = member.getProfileImagePath();
 		
-		if(profileImagePath == null) {
-			
-			throw new ResourceNotFoundException(MessageCode.PROFILE_IMAGE_NOT_FOUND);
-			
+		 if (profileImagePath == null || profileImagePath.isEmpty()) {
+		        return new ClassPathResource("static/image/default-profile.png");
+		    }
+
+		    return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 		}
-
-		return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
-
-	}
 
 	@Transactional
 	public void emailExistCheck(String email) {
 
 		memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 		.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<AdministratorMemberResponseDto> getAllMemberList() {
+
+		return memberRepository.findAll().stream()
+				.map(AdministratorMemberResponseDto::new)
+				.collect(Collectors.toList());
+
+	}
+
+	@Transactional
+	public void modifyByAdmin(AdministratorModifyRequestDto requestDto) {
+
+		Member member = memberRepository.findByEmail(requestDto.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+		
+		member.modifyInformation(requestDto);
+				
+		memberRepository.save(member);
+		
+	}
+
+	@Transactional
+	public void deleteMemberByAdmin(@Email String email) {
+		
+		Member member = memberRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+
+		if(member.getProfileImagePath() != null && !member.getProfileImagePath().isEmpty()) {
+			
+			try {
+				
+				deleteProfileImage(member);
+				
+			} catch(Exception exception) {
+				
+				fileDeleteFailLogService.create(member, exception.getMessage());
+				
+			}
+			
+			
+			
+		}
+		
+		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
+		
+		memberRepository.delete(member);		
 		
 	}
 

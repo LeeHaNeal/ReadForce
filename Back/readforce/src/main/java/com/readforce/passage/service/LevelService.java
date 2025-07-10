@@ -172,6 +172,46 @@ public class LevelService {
 
 	}
 
+	@Transactional
+	public void saveLevel(Level level) {
+
+		levelRepository.save(level);
+		
+	}
+	
+	@Transactional(readOnly = true)
+	public Level getLevelByLevelNo(Long levelNo) {
+		
+		return levelRepository.findById(levelNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.LEVEL_NOT_FOUND));
+		
+	}
+
+	@Transactional
+	public void modifyLevel(
+			Long levelNo, 
+			Integer levelNumber, 
+			Integer paragraphCount, 
+			String vocabularyLevel,
+			String sentenceStructure, 
+			String questionType
+	) {
+		
+		Level level = getLevelByLevelNo(levelNo);
+		
+		level.changeInfo(levelNumber, paragraphCount, vocabularyLevel, sentenceStructure, questionType);
+		
+		saveLevel(level);
+		
+	}
+
+	@Transactional
+	public void deleteLevelByLevelNo(Long levelNo) {
+
+		levelRepository.deleteById(levelNo);
+		
+	}
+
 	
 
 

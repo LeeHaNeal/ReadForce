@@ -76,4 +76,37 @@ public class TypeService {
 
 	}
 
+	@Transactional
+	public void saveType(Type type) {
+
+		typeRepository.save(type);
+		
+	}
+
+	@Transactional(readOnly = true)
+	public Type getTypeByTypeNo(Long typeNo) {
+		
+		return typeRepository.findById(typeNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.TYPE_NOT_FOUND));
+		
+	}
+	
+	@Transactional
+	public void modifyType(Long typeNo, TypeEnum typeName) {
+		
+		Type type = getTypeByTypeNo(typeNo);
+		
+		type.changeTypeName(typeName);
+		
+		saveType(type);
+		
+	}
+
+	@Transactional
+	public void deleteTypeByTypeNo(Long typeNo) {
+
+		typeRepository.deleteById(typeNo);
+		
+	}
+
 }

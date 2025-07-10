@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // ✅ 올바른 import
+import { jwtDecode } from 'jwt-decode';
 import './login.css';
 import kakaoIcon from '../../assets/image/kakao.png';
 // import naverIcon from '../../assets/image/naver.png';
@@ -31,11 +31,11 @@ export default function Login() {
         const refreshToken = data.REFRESH_TOKEN;
         const nickname = data.NICKNAME;
 
-        // ✅ JWT 토큰에서 이메일 추출
+        // JWT 토큰에서 이메일 추출
         const decoded = jwtDecode(token);
         const email = decoded.sub;
 
-        // ✅ localStorage 저장
+        // localStorage 저장
         localStorage.setItem('token', token);
         localStorage.setItem('refresh_token', refreshToken);
         localStorage.setItem('nickname', nickname);

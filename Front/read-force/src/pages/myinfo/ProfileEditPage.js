@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import kakaoIcon from '../../assets/image/kakao.png';
-import naverIcon from '../../assets/image/naver.png';
 import googleIcon from '../../assets/image/google.png';
+import defaultProfileImage from '../../assets/image/default-profile.png';
 import './EditProfilePage.css';
 
 const ProfileEditPage = () => {
@@ -11,26 +11,40 @@ const ProfileEditPage = () => {
   const [isNicknameValid, setIsNicknameValid] = useState(null);
   const [birthday, setBirthday] = useState('');
   const [birthdayMessage, setBirthdayMessage] = useState('');
-  const [isBirthdayValid, setIsBirthdayValid] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [isBirthdayValid, setIsBirthdayValid] = useState(true);
+  const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const hasFetchedImage = useRef(false); // ✅ 중복 방지
 
-  useEffect(() => {
-    fetchProfileImage();
-  }, []);
-
-  const fetchProfileImage = async () => {
+  const fetchProfileImage = useCallback(async () => {
     try {
       const res = await axiosInstance.get('/file/get-profile-image', {
         responseType: 'blob',
       });
       const url = URL.createObjectURL(res.data);
-      setImageUrl(url);
-    } catch (err) {
-      console.error('기본 이미지 불러오기 실패:', err);
+      setProfileImageUrl(url);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setProfileImageUrl(defaultProfileImage);
+      } else {
+        console.error('이미지 로딩 실패:', error);
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!hasFetchedImage.current) {
+      hasFetchedImage.current = true;
+      fetchProfileImage();
+    }
+    return () => {
+      // ✅ 메모리 누수 방지
+      if (profileImageUrl && profileImageUrl !== defaultProfileImage) {
+        URL.revokeObjectURL(profileImageUrl);
+      }
+    };
+  }, [fetchProfileImage, profileImageUrl]);
 
   const checkNicknameDuplicate = async (nickname) => {
     try {
@@ -63,7 +77,7 @@ const ProfileEditPage = () => {
       setBirthdayMessage('생년월일 입력 완료');
       setIsBirthdayValid(true);
     } else {
-      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
+      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예:YYYY-MM-DD)');
       setIsBirthdayValid(false);
     }
   };
@@ -83,14 +97,22 @@ const ProfileEditPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (nickname && !isNicknameValid) {
+      alert('닉네임 형식이 잘못되었거나 중복입니다. 다시 확인해주세요.');
+      return;
+    }
+    if (birthday && !isBirthdayValid) {
+      alert('생년월일 형식이 잘못되었습니다.');
+      return;
+    }
+
     const updates = [];
     const infoPayload = {};
-
     if (nickname && isNicknameValid) infoPayload.nickname = nickname;
     if (birthday && isBirthdayValid) infoPayload.birthday = birthday;
 
     if (Object.keys(infoPayload).length > 0) {
-      updates.push(axiosInstance.patch('/member/modify-info', infoPayload));
+      updates.push(axiosInstance.patch('/member/modify', infoPayload));
     }
 
     if (selectedFile) {
@@ -105,9 +127,11 @@ const ProfileEditPage = () => {
 
     try {
       const responses = await Promise.all(updates);
-      const modifyResponse = responses.find((res) => res?.data?.NICK_NAME);
+      const modifyResponse = responses.find((res) => res?.data?.NICKNAME);
       if (modifyResponse) {
-        localStorage.setItem('nickname', modifyResponse.data.NICK_NAME);
+        const newNickname = modifyResponse.data.NICKNAME;
+        localStorage.setItem('nickname', newNickname);
+        window.dispatchEvent(new Event('nicknameUpdated'));
       }
       alert('회원정보가 수정되었습니다.');
       window.location.href = '/';
@@ -118,7 +142,7 @@ const ProfileEditPage = () => {
 
   const handleWithdraw = async () => {
     try {
-      await axiosInstance.delete('/member/withdraw-member');
+      await axiosInstance.delete('/member/withdraw');
       localStorage.clear();
       alert('탈퇴 완료되었습니다.');
       window.location.href = '/';
@@ -130,8 +154,9 @@ const ProfileEditPage = () => {
   const handleImageDelete = async () => {
     try {
       await axiosInstance.delete('/file/delete-profile-image');
-      await fetchProfileImage();
+      setProfileImageUrl(defaultProfileImage);
       setSelectedFile(null);
+      alert('프로필 이미지가 삭제되었습니다.');
     } catch {
       alert('이미지 삭제 실패');
     }
@@ -142,9 +167,8 @@ const ProfileEditPage = () => {
       const res = await axiosInstance.post('/auth/get-social-account-link-token');
       const state = res.data.STATE;
       const redirectUri = `http://localhost:8080/oauth2/authorization/${provider}?state=${state}`;
-      console.log(state);
       window.location.href = redirectUri;
-    } catch (err) {
+    } catch {
       alert('SNS 연동 요청 실패');
     }
   };
@@ -156,29 +180,21 @@ const ProfileEditPage = () => {
         <div className="form-group">
           <label>회원 이미지</label>
           <div className="profile-image-box">
-            {imageUrl && (
-              <img src={imageUrl} alt="프로필 이미지" className="profile-image" />
-            )}
+            <img src={profileImageUrl} alt="프로필 이미지" className="profile-image" />
             <input
               type="file"
               accept="image/jpeg,image/png,image/gif"
               onChange={(e) => {
                 const file = e.target.files[0];
-                if (file) {
-                  if (file.size > 5 * 1024 * 1024) {
-                    alert('이미지 용량은 5MB 이하여야 합니다.');
-                    return;
-                  }
+                if (file && file.size <= 5 * 1024 * 1024) {
                   setSelectedFile(file);
-                  setImageUrl(URL.createObjectURL(file));
+                  setProfileImageUrl(URL.createObjectURL(file));
+                } else {
+                  alert('이미지 용량은 5MB 이하여야 합니다.');
                 }
               }}
             />
-            <button
-              type="button"
-              className="remove-image-button"
-              onClick={handleImageDelete}
-            >
+            <button type="button" className="remove-image-button" onClick={handleImageDelete}>
               이미지 삭제
             </button>
           </div>
@@ -215,7 +231,7 @@ const ProfileEditPage = () => {
           <div className="input-with-message">
             <input
               type="text"
-              placeholder="예: 1997-11-04"
+              placeholder="예:YYYY-MM-DD"
               value={birthday}
               onChange={(e) => {
                 const value = e.target.value;
@@ -236,9 +252,6 @@ const ProfileEditPage = () => {
           <div className="social-login">
             <button type="button" className="social-btn" onClick={() => openSocialRedirect('kakao')}>
               <img src={kakaoIcon} alt="카카오" />
-            </button>
-            <button type="button" className="social-btn" onClick={() => openSocialRedirect('naver')}>
-              <img src={naverIcon} alt="네이버" />
             </button>
             <button type="button" className="social-btn" onClick={() => openSocialRedirect('google')}>
               <img src={googleIcon} alt="구글" />

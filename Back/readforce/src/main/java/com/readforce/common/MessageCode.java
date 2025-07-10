@@ -6,7 +6,6 @@ public final class MessageCode {
 	
 	
 	
-	
 	public static final String EMAIL_NOT_BLANK = "NOT0001";
 	public static final String PASSWORD_NOT_BLANK = "NOT0002";
 	public static final String NICKNAME_NOT_BLANK = "NOT0003";
@@ -33,7 +32,16 @@ public final class MessageCode {
 	public static final String TOTAL_QUESTION_SOLVING_TIME_NOT_NULL = "NOT0024";
 	public static final String CONTENT_NOT_BLANK = "NOT0025";
 	public static final String NUMBER_NOT_NULL = "NOT0026";
-
+	public static final String CATEGORY_NO_NOT_NULL = "NOT0027";
+	public static final String TYPE_NO_NOT_NULL = "NOT0028";
+	public static final String LEVEL_NO_NOT_NULL = "NOT0029";
+	public static final String CLASSIFICATION_NO_NOT_NULL = "NOT0030";
+	public static final String LANGUAGE_NO_NOT_NULL = "NOT0031";
+	public static final String PARAGRAPH_COUNT_NOT_NULL = "NOT0032";
+	public static final String VOCABULARY_LEVEL_NOT_BLANK = "NOT0033";
+	public static final String SENTENCE_STRUCTURE_NOT_BLANK = "NOT0034";
+	public static final String QUESTION_TYPE_NOT_BLANK = "NOT0035";
+	public static final String PUBLICATION_DATE_NOT_NULL = "NOT0036";
 
 	
 	
@@ -89,6 +97,24 @@ public final class MessageCode {
 	public static final String GENERATE_TEST_QUESTION_SUCCESS = "SUC0019";
 	public static final String UPLOAD_PASSAGE_SUCCESS = "SUC0020";
 	public static final String UPDATE_CHALLENGE_PASSAGES_SUCCESS = "SUC0021";
+	public static final String ADD_MEMBER_SUCCESS = "SUC0022";
+	public static final String DELETE_MEMBER_SUCCESS = "SUC0023";
+	public static final String CREATE_CATEGORY_SUCCESS = "SUC0024";
+	public static final String MODIFY_CATEGORY_SUCCESS = "SUC0025";
+	public static final String DELETE_CATEGORY_SUCCESS = "SUC0026";
+	public static final String CREATE_TYPE_SUCCESS = "SUC0027";
+	public static final String MODIFY_TYPE_SUCCESS = "SUC0028";
+	public static final String DELETE_TYPE_SUCCESS = "SUC0029";
+	public static final String CREATE_LANGUAGE_SUCCESS = "SUC0030";
+	public static final String MODIFY_LANGUAGE_SUCCESS = "SUC0031";
+	public static final String DELETE_LANGUAGE_SUCCESS = "SUC0032";
+	public static final String CREATE_CLASSIFICATION_SUCCESS = "SUC0033";
+	public static final String MODIFY_CLASSIFICATION_SUCCESS = "SUC0034";
+	public static final String DELETE_CLASSIFICATION_SUCCESS = "SUC0035";
+	public static final String CREATE_LEVEL_SUCCESS = "SUC0036";
+	public static final String MODIFY_LEVEL_SUCCESS = "SUC0037";
+	public static final String DELETE_LEVEL_SUCCESS = "SUC0038";
+	public static final String DELETE_PASSAGE_SUCCESS = "SUC0039";
 	
 	
 	

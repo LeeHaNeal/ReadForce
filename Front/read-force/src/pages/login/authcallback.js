@@ -1,17 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Authcallback() {
   const navigate = useNavigate();
+  const hasRunRef = useRef(false);
 
   useEffect(() => {
+    if (hasRunRef.current) return;
+    hasRunRef.current = true;
+
     const urlParams = new URLSearchParams(window.location.search);
     const temporalToken = urlParams.get('TEMPORAL_TOKEN');
 
     const handleNewUser = () => {
       if (temporalToken) {
         localStorage.setItem('temporal_token', temporalToken);
-        window.location.replace('/signup/social');
+        window.location.replace('/member/social-sign-up');
       } else {
         alert('회원가입에 실패했습니다.');
         navigate('/login');
@@ -30,6 +34,9 @@ export default function Authcallback() {
       localStorage.setItem('refresh_token', REFRESH_TOKEN);
       localStorage.setItem('nickname', NICKNAME);
       localStorage.setItem('social_provider', SOCIAL_PROVIDER || '');
+      
+      window.dispatchEvent(new Event('nicknameUpdated'));
+
       navigate('/');
     };
 
