@@ -36,9 +36,7 @@ public class TestController {
 			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 			LanguageEnum language
 	){
-		
 		QuestionTestResponseDto startQuestion = testService.getTestQuestion(language, CategoryEnum.VOCABULARY, 6);
-		
 		return ResponseEntity.status(HttpStatus.OK).body(startQuestion);
 		
 	}
@@ -47,7 +45,6 @@ public class TestController {
 	public ResponseEntity<QuestionTestResponseDto> submitVocabularyResult(
 			@Valid @RequestBody TestSubmitRequestDto submitRequestDto
 	){
-		
 		QuestionTestResponseDto nextQuestion = testService.submitVocabularyResult(submitRequestDto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(nextQuestion);
@@ -61,6 +58,7 @@ public class TestController {
 		
 		Object result = testService.submitFactualResult(submitRequestDto);
 		
+		
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 		
 	}
@@ -70,7 +68,6 @@ public class TestController {
 	public ResponseEntity<QuestionTestResultDto> submitInferentialResult(
 			@Valid @RequestBody TestSubmitRequestDto submitRequestDto
 	){
-		
 		QuestionTestResultDto result = testService.submitInferentialResult(submitRequestDto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(result);

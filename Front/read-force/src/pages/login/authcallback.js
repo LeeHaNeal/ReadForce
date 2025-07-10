@@ -11,7 +11,7 @@ export default function Authcallback() {
     const handleNewUser = () => {
       if (temporalToken) {
         localStorage.setItem('temporal_token', temporalToken);
-        window.location.replace('/signup/social');
+        window.location.replace('/member/social-sign-up');
       } else {
         alert('회원가입에 실패했습니다.');
         navigate('/login');

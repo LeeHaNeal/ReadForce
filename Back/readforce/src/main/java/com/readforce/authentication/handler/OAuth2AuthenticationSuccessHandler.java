@@ -152,8 +152,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 					.build()
 					.toUriString();
 			
+			
 		}
-		
+		System.out.println("999999999999999999999999999");
 		httpServletResponse.sendRedirect(targetUrl);
 			
 	}
