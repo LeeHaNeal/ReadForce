@@ -39,6 +39,11 @@ public class Language {
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;	
+	private LocalDateTime createdAt;
 	
+	public void chageLanguageName(LanguageEnum languageName){
+		
+		this.languageName = languageName;
+		
+	}
 }
