@@ -320,7 +320,7 @@ public class MemberService {
 				
 				try {
 					
-					deleteProfileImage(member.getEmail());
+					deleteProfileImage(member);
 					
 				} catch(Exception exception) {
 					
@@ -454,9 +454,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void deleteProfileImage(String email) {
-
-		Member member = getActiveMemberByEmail(email);
+	public void deleteProfileImage(Member member) {
 		
 		String profileImagePath = member.getProfileImagePath();
 		
@@ -527,13 +525,15 @@ public class MemberService {
 			
 			try {
 				
-				deleteProfileImage(member.getEmail());
+				deleteProfileImage(member);
 				
 			} catch(Exception exception) {
 				
 				fileDeleteFailLogService.create(member, exception.getMessage());
-								
+				
 			}
+			
+			
 			
 		}
 		

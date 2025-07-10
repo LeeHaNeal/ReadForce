@@ -36,8 +36,12 @@ public final class MessageCode {
 	public static final String TYPE_NO_NOT_NULL = "NOT0028";
 	public static final String LEVEL_NO_NOT_NULL = "NOT0029";
 	public static final String CLASSIFICATION_NO_NOT_NULL = "NOT0030";
-	public static final String LANGUAGE_NO_NOT_NULL = "NOT0031";	
-
+	public static final String LANGUAGE_NO_NOT_NULL = "NOT0031";
+	public static final String PARAGRAPH_COUNT_NOT_NULL = "NOT0032";
+	public static final String VOCABULARY_LEVEL_NOT_BLANK = "NOT0033";
+	public static final String SENTENCE_STRUCTURE_NOT_BLANK = "NOT0034";
+	public static final String QUESTION_TYPE_NOT_BLANK = "NOT0035";
+	public static final String PUBLICATION_DATE_NOT_NULL = "NOT0036";
 
 	
 	
@@ -107,6 +111,9 @@ public final class MessageCode {
 	public static final String CREATE_CLASSIFICATION_SUCCESS = "SUC0033";
 	public static final String MODIFY_CLASSIFICATION_SUCCESS = "SUC0034";
 	public static final String DELETE_CLASSIFICATION_SUCCESS = "SUC0035";
+	public static final String CREATE_LEVEL_SUCCESS = "SUC0036";
+	public static final String MODIFY_LEVEL_SUCCESS = "SUC0037";
+	public static final String DELETE_LEVEL_SUCCESS = "SUC0038";
 	
 	
 	

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.readforce.common.MessageCode;
+import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
 
 import jakarta.validation.Valid;
@@ -55,7 +56,9 @@ public class FileController {
 		
 		String email = userDetails.getUsername();
 		
-		memberService.deleteProfileImage(email);
+		Member member = memberService.getActiveMemberByEmail(email);
+		
+		memberService.deleteProfileImage(member);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(MessageCode.MESSAGE_CODE, MessageCode.PROFILE_IMAGE_DELETE_SUCCESS));
 		
