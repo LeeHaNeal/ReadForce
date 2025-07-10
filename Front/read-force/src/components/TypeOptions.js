@@ -3,8 +3,11 @@ export const newsTypeOptions = [
   { value: 'POLITICS', label: '정치' },
   { value: 'ECONOMY', label: '경제' },
   { value: 'SOCIETY', label: '사회' },
-  { value: 'CULTURE', label: '생활/문화' },
-  { value: 'SCIENCE', label: 'IT/과학' },
+  { value: 'LIFE_AND_CULTURE', label: '생활/문화' },
+  { value: 'IT_AND_SCIENCE', label: 'IT/과학' },
+  { value: 'WORLD', label: '세계' },
+  { value: 'SPORTS', label: '스포츠' },
+  { value: 'ENTERTAINMENT', label: '연예' },
   { value: 'ETC', label: '기타' },
 ];
 
