@@ -503,45 +503,44 @@ public class AiService {
    }
 
    @Transactional
-   public void generatePassage(AiGeneratePassageRequestDto aiGeneratePassageRequestDto) {
-      
-      Level level = levelService.getLevelByLevel(aiGeneratePassageRequestDto.getLevel());
-      
-      Language language = languageService.getLangeageByLanguage(aiGeneratePassageRequestDto.getLanguage());
-      
-      Classification classification = classificationService.getClassificationByClassfication(aiGeneratePassageRequestDto.getClassification());
+   public void generatePassage(AiGeneratePassageRequestDto requestDto) {
 
-      String prompt = generatePassagePrompt(aiGeneratePassageRequestDto);
-      
-      Map<String, Object> requestResult = requestGenerate(prompt);
-      
-      String content = extractContentFromResponse(requestResult);
-      
-      GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
-      
-      String author = NameEnum.GEMINI.name();
-       
-      LocalDate publicationDate = LocalDate.now();
-       
-      Category category = categoryService.getCategoryByCategory(aiGeneratePassageRequestDto.getCategory());
+       Level level = levelService.getLevelByLevel(requestDto.getLevel());
+       Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+       Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
+       Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+       Type type = typeService.getTypeByType(requestDto.getType());
 
-      Type type = typeService.getTypeByType(aiGeneratePassageRequestDto.getType());
-      
-      passageService.savePassage(
-            parsedResult.getTitle(), 
-            parsedResult.getContent(), 
-            author, 
-            publicationDate, 
-            category, 
-            level, 
-            language, 
-            classification,
-            type
-      );
-      
-      
-      
+       int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
+
+       for (int i = 0; i < count; i++) {
+
+           String prompt = generatePassagePrompt(requestDto);
+           Map<String, Object> requestResult = requestGenerate(prompt);
+           String content = extractContentFromResponse(requestResult);
+           GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
+
+           passageService.savePassage(
+                   parsedResult.getTitle(),
+                   parsedResult.getContent(),
+                   NameEnum.GEMINI.name(),
+                   LocalDate.now(),
+                   category,
+                   level,
+                   language,
+                   classification,
+                   type
+           );
+
+           try {
+               Thread.sleep(3000);  // 3초 간격
+           } catch (InterruptedException e) {
+               Thread.currentThread().interrupt();
+           }
+       }
    }
+
+
 
 
    private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {

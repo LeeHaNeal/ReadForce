@@ -113,15 +113,21 @@ public class LevelService {
 		List<ResultMetric> metricList = resultMetricService.getAllByResultAndLanguage_Language(result, language);
 		
 		Map<Integer, Double> levelCorrectRateMap = metricList.stream()
-				.filter(metric -> weakCategory.name().equals(metric.getCategory().getCategoryName().name())
-						&& weakType.name().equals(metric.getType().getTypeName().name())
-						&& metric.getLevel() != null
-						&& metric.getCorrectAnswerRate() != null)
-				.collect(Collectors.toMap(
-						metric -> metric.getLevel().getLevelNumber(),
-						ResultMetric::getCorrectAnswerRate,
-						(rate1, rate2) -> rate1
-				));
+			    .filter(metric -> Optional.ofNullable(metric.getCategory())
+			                               .map(category -> category.getCategoryName().name())
+			                               .map(name -> name.equals(weakCategory.name()))
+			                               .orElse(false))
+			    .filter(metric -> Optional.ofNullable(metric.getType())
+			                               .map(type -> type.getTypeName().name())
+			                               .map(name -> name.equals(weakType.name()))
+			                               .orElse(false))
+			    .filter(metric -> metric.getLevel() != null && metric.getCorrectAnswerRate() != null)
+			    .collect(Collectors.toMap(
+			            metric -> metric.getLevel().getLevelNumber(),
+			            ResultMetric::getCorrectAnswerRate,
+			            (rate1, rate2) -> rate1
+			    ));
+
 		
 		Integer skilledLevel = null;
 		for(double threshold = 0.80; threshold >= 0.0; threshold -= 0.05) {

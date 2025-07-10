@@ -18,6 +18,7 @@ const AdminPage = () => {
     const [category, setCategory] = useState("NEWS");
     const [type, setType] = useState("ECONOMY");
     const [classification, setClassification] = useState("NORMAL");
+    const [count, setCount] = useState(1);
 
     const [loadingTestPassage, setLoadingTestPassage] = useState(false);
     const [loadingTestQuestion, setLoadingTestQuestion] = useState(false);
@@ -115,7 +116,8 @@ const AdminPage = () => {
                     level,
                     category,
                     type,
-                    classification,         
+                    classification, 
+                    count
             });
             const data = await res.data;
             alert("✅ " + data.message);
@@ -223,6 +225,8 @@ const AdminPage = () => {
                             <option value="TEST">테스트</option>
                         </select>
 
+                        <br /><label>생성 개수:</label> {/* ✅ 추가됨 */}
+                        <input type="number" min="1" max="20" value={count} onChange={(e) => setCount(parseInt(e.target.value) || 1)} />
 
                         <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between" }}>
                             <button onClick={handleGeneratePassageWithParams} disabled={loadingPassage}>
