@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './css/ArticleResultPage.css';
+import './css/UniversalResultPage.css';
 
-const ArticleResultPage = () => {
+const UniversalResultPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showExplanation, setShowExplanation] = useState(false);
@@ -16,18 +16,20 @@ const ArticleResultPage = () => {
     ? '👏 대단해요! 문맥을 잘 파악하셨네요.'
     : '😢 조금만 더 집중해볼까요? 누구나 틀릴 수 있어요!';
 
-  const getBackPath = () => {
-    switch (language.trim()) {
-      case '한국어':
-        return '/korea';
-      case '일본어':
-        return '/japan';
-      case '영어':
-        return '/usa';
-      default:
-        return '/korea';
-    }
-  };
+const category = location.state?.category || 'NEWS';
+
+const getBackPath = () => {
+  switch (category.trim()) {
+    case 'NEWS':
+      return '/article';
+    case 'NOVEL':
+      return '/novel';
+    case 'FAIRY_TALE':
+      return '/fairytale';
+    default:
+      return '/article';
+  }
+};
 
   return (
     <div className="ArticleResult-wrapper">
@@ -52,4 +54,4 @@ const ArticleResultPage = () => {
   );
 };
 
-export default ArticleResultPage;
+export default UniversalResultPage;

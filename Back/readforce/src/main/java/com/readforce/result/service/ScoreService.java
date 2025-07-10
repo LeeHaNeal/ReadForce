@@ -52,4 +52,11 @@ public class ScoreService {
 		
 	}
 
+	@Transactional
+	public void deleteAll() {
+
+		scoreRepository.deleteAllInBatch();
+		
+	}
+
 }

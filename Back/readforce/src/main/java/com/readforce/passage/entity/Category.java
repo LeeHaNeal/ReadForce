@@ -34,11 +34,17 @@ public class Category {
 	private Long categoryNo;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "varchar(255)")
 	private CategoryEnum categoryName;
 	
 	@CreatedDate
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;	
 
+	public void changeCategoryName(CategoryEnum categoryName) {
+		
+		this.categoryName = categoryName;
+		
+	}
+	
 }

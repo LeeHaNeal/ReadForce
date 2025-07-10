@@ -37,109 +37,172 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
+	
+	private LevelService levelService;
+	private PassageService passageService;
+	private MultipleChoiceService multipleChoiceService;
+	private QuestionService questionService;
+	private ScoreService scoreService;
+	private CategoryService categoryService;
+	private LanguageService languageService;
+	private ClassificationService classificationService;
+	
+	@Transactional
+	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
+		
+		List<MultipleChoiceResponseDto> resultList = new ArrayList<>();
+		
+		List<Level> allLevelList = levelService.getAllLevelList();
+		
+		for(Level level : allLevelList) {
+			
+			List<Passage> randomPassageList = passageService.getChallengePassageList(language, category, level.getLevelNumber());
+			
+			for(Passage passage : randomPassageList) {
+				
+				List<MultipleChoiceResponseDto> multipleChoiceDtoList = multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
 
-    private final LevelService levelService;
-    private final PassageService passageService;
-    private final MultipleChoiceService multipleChoiceService;
-    private final QuestionService questionService;
-    private final ScoreService scoreService;
-    private final CategoryService categoryService;
-    private final LanguageService languageService;
-    private final ClassificationService classificationService;
+				if(!multipleChoiceDtoList.isEmpty()) {
+					
+					MultipleChoiceResponseDto multipleChoiceDto = multipleChoiceDtoList.get(0);
+					
+					resultList.add(multipleChoiceDto);
+					
+				}
+				
+			}
+			
+		}
+		
+		if(resultList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
+			
+		}
+	
+		return resultList;
+		
+	}
 
-    @Transactional(readOnly = true)
-    public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
+	@Transactional
+	public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
 
-        List<MultipleChoiceResponseDto> resultList = new ArrayList<>();
-        List<Level> levelList = levelService.getAllLevelList();
+		double totalScore = 0.0;
+		
+		final long MAX_TIME_SECONDS = 1800;
+		
+		for(Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
+			
+			for(Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
+				
+				Long questionNo = entry.getKey();
+				Integer selectedIndex = entry.getValue();
+				
+				QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
+				
+				boolean isCorrect = checkResult.getIsCorrect();
+				
+				if(isCorrect) {
+					
+					QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
 
-        for (Level level : levelList) {
+					Level level = levelService.getLevelByLevel(questionInfo.getLevel());
+					
+					double baseScore = level.getLevelNumber() * 4;
+					
+					totalScore += baseScore;
+					
+				}
+				
+			}
+			
+		}
+		
+		long solvingTime = requestDto.getTotalQuestionSolvingTime();
+		if(solvingTime < MAX_TIME_SECONDS) {
+			
+			double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
+			
+			totalScore += timeBonus;
+			
+		}
+		
+		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+		
+		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+		
+		scoreService.createScore(
+				member,
+				totalScore,
+				category,
+				language
+		);
+		
+		return totalScore;
+		
+	}
 
-            List<Passage> passageList = passageService.getTodayChallengePassageList(
-                    language, category, level.getLevelNumber()
-            );
+	@Transactional
+	public void updateToChallengePassages() {
+		
+		List<Language> languageList = languageService.getAllLanguageList();
+		
+		List<Category> categoryList = categoryService.getAllCategoryList();
+		
+		List<Level> levelList = levelService.getAllLevelList();
+		
+		Classification ChallengeClassification = classificationService.getClassificationByClassfication(ClassificationEnum.CHALLENGE);
+		
+		for(Language language : languageList) {
+			
+			for(Category category : categoryList) {
+				
+				for(Level level : levelList) {
+					
+					List<Passage> passageList = new ArrayList<>(passageService.getNormalPassages(
+							language.getLanguageName(), 
+							category.getCategoryName(), 
+							level.getLevelNumber()							
+					));
+					
+					Collections.shuffle(passageList);
+					
+					passageList
+						.stream()
+						.limit(2)
+						.forEach(passage -> {
+							passage.chageClassification(ChallengeClassification);							
+						});
 
-            for (Passage passage : passageList) {
-                List<MultipleChoiceResponseDto> multipleChoiceList =
-                        multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	@Transactional
+	public void resetWeeklyChallenge() {
+		
+		revertExistingChallengesToNormal();
+		
+		updateToChallengePassages();		
+		
+	}
+	
+	private void revertExistingChallengesToNormal() {
+		
+		List<Passage> existingChallenges = passageService.getAllPassagesByClassification(ClassificationEnum.CHALLENGE);
+		
+		if(!existingChallenges.isEmpty()) {
+			
+			Classification normalClassification = classificationService.getClassificationByClassfication(ClassificationEnum.NORMAL);
+			
+			existingChallenges.forEach(passage -> passage.chageClassification(normalClassification));
+			
+		}
+		
+	}
 
-                if (!multipleChoiceList.isEmpty()) {
-                    resultList.add(multipleChoiceList.get(0)); // 첫 문제만 추가
-                }
-            }
-        }
-
-        if (resultList.isEmpty()) {
-            throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
-        }
-
-        return resultList;
-    }
-
-    @Transactional
-    public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
-
-        double totalScore = 0.0;
-        final long MAX_TIME_SECONDS = 1800;
-
-        for (Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
-            for (Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
-
-                Long questionNo = entry.getKey();
-                Integer selectedIndex = entry.getValue();
-
-                QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
-
-                if (checkResult.getIsCorrect()) {
-                    QuestionLevelAndCategoryAndLanguageDto questionInfo =
-                            questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
-
-                    Level level = levelService.getLevelByLevel(questionInfo.getLevel());
-                    totalScore += level.getLevelNumber() * 4;
-                }
-            }
-        }
-
-        long solvingTime = requestDto.getTotalQuestionSolvingTime();
-        if (solvingTime < MAX_TIME_SECONDS) {
-            double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
-            totalScore += timeBonus;
-        }
-
-        Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-        Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-
-        scoreService.createScore(member, totalScore, category, language);
-
-        return totalScore;
-    }
-
-    @Transactional
-    public void updateToChallengePassages() {
-
-        List<Language> languages = languageService.getAllLanguageList();
-        List<Category> categories = categoryService.getAllCategoryList();
-        List<Level> levels = levelService.getAllLevelList();
-        Classification challengeClassification =
-                classificationService.getClassificationByClassfication(ClassificationEnum.CHALLANGE);
-
-        for (Language language : languages) {
-            for (Category category : categories) {
-                for (Level level : levels) {
-
-                    List<Passage> passageList = new ArrayList<>(passageService.getNormalPassages(
-                            language.getLanguageName(),
-                            category.getCategoryName(),
-                            level.getLevelNumber()
-                    ));
-
-                    Collections.shuffle(passageList);
-
-                    passageList.stream()
-                            .limit(2)
-                            .forEach(passage -> passage.chageClassification(challengeClassification));
-                }
-            }
-        }
-    }
 }

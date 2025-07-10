@@ -6,7 +6,6 @@ public final class MessageCode {
 	
 	
 	
-	
 	public static final String EMAIL_NOT_BLANK = "NOT0001";
 	public static final String PASSWORD_NOT_BLANK = "NOT0002";
 	public static final String NICKNAME_NOT_BLANK = "NOT0003";
@@ -31,6 +30,9 @@ public final class MessageCode {
 	public static final String AUTHOR_NOT_NULL = "NOT0022";
 	public static final String SELECTED_INDEX_LIST_NOT_NULL = "NOT0023";
 	public static final String TOTAL_QUESTION_SOLVING_TIME_NOT_NULL = "NOT0024";
+	public static final String CONTENT_NOT_BLANK = "NOT0025";
+	public static final String NUMBER_NOT_NULL = "NOT0026";
+	public static final String CATEGORY_NO_NOT_NULL = "NOT0027";
 
 
 	
@@ -87,6 +89,12 @@ public final class MessageCode {
 	public static final String GENERATE_TEST_QUESTION_SUCCESS = "SUC0019";
 	public static final String UPLOAD_PASSAGE_SUCCESS = "SUC0020";
 	public static final String UPDATE_CHALLENGE_PASSAGES_SUCCESS = "SUC0021";
+	public static final String ADD_MEMBER_SUCCESS = "SUC0022";
+	public static final String DELETE_MEMBER_SUCCESS = "SUC0023";
+	public static final String CREATE_CATEGORY_SUCCESS = "SUC0024";
+	public static final String MODIFY_CATEGORY_SUCCESS = "SUC0025";
+	public static final String DELETE_CATEGORY_SUCCESS = "SUC0026";
+	public static final String CREATE_TYPE_SUCCSEE = "SUC0027";
 	
 	
 	

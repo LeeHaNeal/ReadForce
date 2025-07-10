@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import fetchWithAuth from "../../utils/fetchWithAuth";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminLiteratureDetail = () => {
     const { passageNo } = useParams();
@@ -10,20 +11,90 @@ const AdminLiteratureDetail = () => {
     useEffect(() => {
         const fetchPassageDetail = async () => {
             try {
-                const res = await fetchWithAuth(`/administrator/passage/get-passage-detail?passage_no=${passageNo}`);
-                if (!res.ok) throw new Error("Passage 정보 불러오기 실패");
-                const data = await res.json();
-                setPassage(data);
+                const res = await axiosInstance.post(`/admin/get-all-literature-list`);
+                const data = res.data;
+                const target = data.find(lit => lit.literature_no === Number(literatureNo));
+                setLiterature(target);
             } catch (err) {
                 console.error(err);
                 alert("Passage 정보를 불러오지 못했습니다.");
             }
         };
 
-        fetchPassageDetail();
-    }, [passageNo]);
+        // 문단 불러오기
+        const fetchParagraphs = async () => {
+            try {
+                const res = await axiosInstance.get(`/admin/get-all-literature-paragraph-list`);
+                const data = res.data;
+                const filtered = data.filter(p => String(p.literature_no) === literatureNo);
+                setParagraphs(filtered);
+            } catch (err) {
+                console.error(err);
+                alert("문단 정보를 불러오지 못했습니다.");
+            }
+        };
 
-    if (!passage) return <div>불러오는 중...</div>;
+        // 퀴즈 불러오기
+        const fetchQuizzes = async () => {
+            try {
+                const res = await axiosInstance.get(`/admin/get-all-literature-quiz-list`);
+                const data = res.data;
+                const filtered = data.filter(q => q.literature_no === Number(literatureNo));
+                setQuizzes(filtered);
+            } catch (err) {
+                console.error(err);
+                alert("퀴즈 정보를 불러오지 못했습니다.");
+            }
+        };
+
+        fetchLiteratureDetail();
+        fetchParagraphs();
+        fetchQuizzes();
+    }, [literatureNo]);
+
+    if (!literature) return <div>불러오는 중...</div>;
+
+    // 문단 삭제 ( 문제도 함께 )
+    const handleDeleteParagraph = async (paragraphNo) => {
+        if (!window.confirm("정말 이 문단과 관련된 문제도 함께 삭제하시겠습니까?")) return;
+
+        try {
+            await axiosInstance.delete(
+                `/admin/delete-literature-paragraph-and-literature-by-literature-paragraph-no`, {
+                params: {
+                    literature_paragraph_no: paragraphNo,
+                    literature_no: literatureNo
+                }
+            }
+            );
+
+            alert("문단이 삭제되었습니다.");
+            setParagraphs(prev => prev.filter(p => p.literature_paragraph_no !== paragraphNo));
+            setQuizzes(prev => prev.filter(q => q.literature_paragraph_no !== paragraphNo));
+        } catch (err) {
+            console.error(err);
+            alert("문단 삭제 중 오류 발생");
+        }
+    };
+
+    // 퀴즈 삭제
+    const handleDeleteQuiz = async (quizNo) => {
+        if (!window.confirm("정말 이 퀴즈를 삭제하시겠습니까?")) return;
+
+        try {
+            await axiosInstance.delete(`/admin/delete-literature-quiz`, {
+                params: {
+                    literature_quiz_no: quizNo
+                }
+            });
+
+            alert("퀴즈가 삭제되었습니다.");
+            setQuizzes(prev => prev.filter(q => q.literature_quiz_no !== quizNo));
+        } catch (err) {
+            console.error(err);
+            alert("퀴즈 삭제 중 오류 발생");
+        }
+    };
 
     return (
         <div style={{ padding: "24px" }}>

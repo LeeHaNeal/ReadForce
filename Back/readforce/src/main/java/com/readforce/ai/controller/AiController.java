@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.readforce.ai.service.AiService;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.LanguageEnum;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ public class AiController {
 
 	private final AiService aiService;
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/generate-test-passage")
 	public ResponseEntity<Map<String, String>> generateTestPassage(
 			@RequestParam("language")
@@ -42,6 +45,7 @@ public class AiController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/generate-test-question")
 	public ResponseEntity<Map<String, String>> generateTestQuestion(
 			@RequestParam("language")
@@ -57,10 +61,10 @@ public class AiController {
 		
 	}
 	
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/generate-passage")
 	public ResponseEntity<Map<String, String>> generatePassage(
-			@RequestBody AiGeneratePassageRequestDto aiGeneratePassageRequestDto
+			@Valid @RequestBody AiGeneratePassageRequestDto aiGeneratePassageRequestDto
 	){
 		
 		aiService.generatePassage(aiGeneratePassageRequestDto);
@@ -71,7 +75,7 @@ public class AiController {
 		
 	}
 	
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/generate-question")
 	public ResponseEntity<Map<String, String>> generateQuestion(){
 		

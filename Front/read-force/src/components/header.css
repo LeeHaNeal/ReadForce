@@ -175,8 +175,20 @@
   align-items: center;
 }
 
+.nav-item {
+  color: #555;
+  text-decoration: none;
+  margin: 0 12px;
+  transition: color 0.2s;
+}
+
 .nav-item:hover {
   color: #439395;
+}
+
+.nav-item.active {
+  color: #439395;
+  font-weight: bolder;
 }
 
 .hamburger {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import fetchWithAuth from '../../utils/fetchWithAuth';
-import Flex from 'react-calendar/dist/Flex.js';
+import axiosInstance from '../../api/axiosInstance';
+// import Flex from 'react-calendar/dist/Flex.js';
 
 const AdminPage = () => {
     const navigate = useNavigate();
@@ -32,10 +32,10 @@ const AdminPage = () => {
     // 모든 회원정보 불러오기
     const fetchUsers = async () => {
         try {
-            const res = await fetchWithAuth("/admin/get-all-member-list");
+            const res = await axiosInstance.get("/admin/get-all-member-list");
             if (!res.ok) throw new Error("권한 없음 또는 토큰 문제");
 
-            const data = await res.json();
+            const data = await res.data;
             setUsers(data);
         } catch (error) {
             console.error("회원 목록 불러오기 실패", error);
@@ -48,13 +48,7 @@ const AdminPage = () => {
 
     const handleChangeStatus = async (email, newStatus) => {
         try {
-            const res = await fetchWithAuth("/admin/modify-info", {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, status: newStatus }),
-            });
-
-            if (!res.ok) throw new Error("상태 변경 실패");
+            const res = await axiosInstance.patch("/admin/modify-info", { email, status: newStatus });
 
             updateUserStatus(email, newStatus);
         } catch (err) {
@@ -67,10 +61,7 @@ const AdminPage = () => {
     const handleDelete = async (email) => {
         if (!window.confirm("정말로 이 회원을 삭제하시겠습니까?")) return;
         try {
-            const res = await fetchWithAuth(`/admin/delete-member-by-email?email=${email}`, {
-                method: "DELETE"
-            });
-            if (!res.ok) throw new Error("삭제 실패");
+            const res = await axiosInstance.delete(`/admin/delete-member-by-email?email=${email}`);
 
             alert("회원이 삭제되었습니다.");
             setUsers((prev) => prev.filter((user) => user.email !== email));
@@ -91,13 +82,8 @@ const AdminPage = () => {
     const handleGenerateTestPassage = async () => {
         setLoadingTestPassage(true);
         try {
-            const res = await fetchWithAuth("/ai/generate-test-passage?language=KOREAN", {
-                method: "POST",
-            });
-
-            if (!res.ok) throw new Error("AI 지문 생성 실패");
-
-            const data = await res.json();
+            const res = await axiosInstance.post("/ai/generate-test-passage?language=KOREAN");
+            const data = res.data;
             alert("✅ " + data.message);
         } catch (err) {
             console.error(err);
@@ -110,13 +96,8 @@ const AdminPage = () => {
     const handleGenerateTestQuestion = async () => {
         setLoadingTestQuestion(true);
         try {
-            const res = await fetchWithAuth("/ai/generate-test-question?language=KOREAN", {
-                method: "POST",
-            });
-
-            if (!res.ok) throw new Error("AI 문제 생성 실패");
-
-            const data = await res.json();
+            const res = await axiosInstance.post("/ai/generate-test-question?language=KOREAN");
+            const data = await res.data;
             alert("✅ " + data.message);
         } catch (err) {
             console.error(err);
@@ -128,21 +109,14 @@ const AdminPage = () => {
     const handleGeneratePassageWithParams = async () => {
         setLoadingPassage(true);
         try {
-            const res = await fetchWithAuth("/ai/generate-passage", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
+            const res = await axiosInstance.post("/ai/generate-passage", {
                     language,
                     level,
                     category,
                     type,
-                    classification,
-                }),
+                    classification,         
             });
-
-            if (!res.ok) throw new Error("지문 생성 실패");
-
-            const data = await res.json();
+            const data = await res.data;
             alert("✅ " + data.message);
             setShowPassageModal(false);
         } catch (err) {
@@ -157,13 +131,8 @@ const AdminPage = () => {
     const handleGenerateQuestion = async () => {
         setLoadingQuestion(true);
         try {
-            const res = await fetchWithAuth("/ai/generate-question", {
-                method: "POST",
-            });
-
-            if (!res.ok) throw new Error("문제 생성 실패");
-
-            const data = await res.json();
+            const res = await axiosInstance.post("/ai/generate-question");
+            const data = await res.data;
             alert("✅ " + data.message);
         } catch (err) {
             console.error(err);

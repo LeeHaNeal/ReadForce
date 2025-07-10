@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import fetchWithAuth from "../../utils/fetchWithAuth";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminLiterature = () => {
     const [literatureList, setLiteratureList] = useState([]);
@@ -10,12 +10,8 @@ const AdminLiterature = () => {
         // 문학 목록 불러오기
         const fetchLiterature = async () => {
             try {
-                const res = await fetchWithAuth("/admin/get-all-literature-list", {
-                    method: "POST"
-                });
-                if (!res.ok) throw new Error("문학 목록 불러오기 실패");
-                const data = await res.json();
-                setLiteratureList(data);
+                const res = await axiosInstance.post("/admin/get-all-literature-list");
+                setLiteratureList(res.data);
             } catch (err) {
                 console.error(err);
                 alert("문학 데이터를 불러오는 데 실패했습니다.");
@@ -30,19 +26,12 @@ const AdminLiterature = () => {
         if (!window.confirm("문학 문제를 생성하시겠습니까?\n(문제가 없는 문단에만 생성됩니다)")) return;
 
         try {
-            const res = await fetchWithAuth("/admin/generate-creative-literature-quiz", {
-                method: "POST"
-            });
-            if (!res.ok) throw new Error("문학 문제 생성 실패");
-
+            await axiosInstance.post("/admin/generate-creative-literature-quiz");
             alert("문학 문제가 생성되었습니다!");
 
             // 문학 목록 갱신 (옵션)
-            const refresh = await fetchWithAuth("/admin/get-all-literature-list", {
-                method: "POST"
-            });
-            const newData = await refresh.json();
-            setLiteratureList(newData);
+            const refresh = await axiosInstance.post("/admin/get-all-literature-list");
+            setLiteratureList(refresh.data);
 
         } catch (err) {
             console.error(err);
@@ -55,11 +44,9 @@ const AdminLiterature = () => {
         if (!window.confirm("정말 이 문학과 관련된 모든 데이터를 삭제하시겠습니까?")) return;
 
         try {
-            const res = await fetchWithAuth(
-                `/admin/delete-literature-and-literature-paragraph-and-literature-quiz-by-literature-no?literature_no=${literatureNo}`,
-                { method: "DELETE" }
-            );
-            if (!res.ok) throw new Error("삭제 실패");
+            await axiosInstance.delete(`/admin/delete-literature-and-literature-paragraph-and-literature-quiz-by-literature-no`, {
+                params: { literature_no: literatureNo }
+            });
             alert("삭제되었습니다.");
 
             // 목록 갱신

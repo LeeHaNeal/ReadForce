@@ -1,7 +1,5 @@
 package com.readforce.administrator.dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
@@ -19,12 +17,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdministratorUploadPassageRequestDto {
-
-	@NotNull(message = MessageCode.FILE_NOT_NULL)
-	private MultipartFile file;
 	
 	@NotNull(message = MessageCode.TITLE_NOT_NULL)
 	private String title;
+	
+	@NotNull(message = MessageCode.CONTENT_NOT_BLANK)
+	private String content;
 	
 	@NotNull(message = MessageCode.AUTHOR_NOT_NULL)
 	private String author;

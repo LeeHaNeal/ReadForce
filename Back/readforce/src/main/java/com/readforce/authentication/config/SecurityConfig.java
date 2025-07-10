@@ -53,7 +53,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(
 					auth -> auth.requestMatchers(
 							"/authentication/sign-in",
-							"/authentication/reissueRefreshToken",
+							"/authentication/reissue-refresh-token",
 							"/authentication/get-tokens",
 				            "/member/sign-up",
 				            "/member/social-sign-up",
@@ -65,7 +65,10 @@ public class SecurityConfig {
 				            "/email/send-password-reset-link",
 				            "/ranking/get-ranking-list",
 				            "/test/**",
-				            "/oauth2/**"							
+				            "/oauth2/**",
+							"/passage/**",
+							"**"
+
 					)
 					.permitAll()
 					.anyRequest()

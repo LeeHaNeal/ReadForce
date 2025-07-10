@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import fetchWithAuth from "../../utils/fetchWithAuth";
+import { useParams, useNavigate } from "react-router-dom";
+import axiosInstance from '../../api/axiosInstance';
 
 const AdminAddParagraph = () => {
     const navigate = useNavigate();
@@ -41,37 +41,23 @@ const AdminAddParagraph = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!content.trim()) {
-            alert("내용을 입력하세요.");
-            return;
-        }
-
-        const blob = new Blob([content], { type: "text/plain" });
-        const file = new File([blob], "passage.txt", { type: "text/plain" });
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("title", title);
-        formData.append("author", author);
-        formData.append("language", language);
-        formData.append("classification", classification);
-        formData.append("category", category);
-        formData.append("type", type);
-        formData.append("level", level);
+        const body = {
+            literature_no: Number(literatureNo),
+            category,
+            level,
+            content,
+        };
+        console.log("literatureNo:", literatureNo);
+        console.log("body:", body);
 
         try {
-            const res = await fetchWithAuth("/administrator/passage/upload-passage", {
-                method: "POST",
-                body: formData,
-            });
+            await axiosInstance.post("/admin/add-literature-paragraph", body);
 
-            if (!res.ok) throw new Error("문단 업로드 실패");
-
-            alert("문단이 성공적으로 업로드되었습니다.");
-            navigate("/adminpage/adminliterature");
+            alert("문단이 성공적으로 추가되었습니다!");
+            navigate(`/adminpage/adminliterature/${literatureNo}`);
         } catch (err) {
             console.error(err);
-            alert(err.message || "문단 업로드 중 오류 발생");
+            alert("문단 추가 중 오류 발생: " + err.message);
         }
     };
 

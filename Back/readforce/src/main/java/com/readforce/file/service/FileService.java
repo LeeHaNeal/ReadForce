@@ -1,12 +1,10 @@
 package com.readforce.file.service;
 
 import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,16 +202,5 @@ public class FileService {
 		return fileInformationMap;
 		
 	}
-
-	public List<String> parseFileToParagraphList(MultipartFile file) throws java.io.IOException {
-		
-		String novelText = new String(file.getBytes(), StandardCharsets.UTF_8);
-		
-		return Arrays.asList(novelText.split("\\R+"));
-		
-	}
-	
-	
-	
 	
 }

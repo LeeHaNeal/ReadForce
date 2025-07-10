@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './MyPage.css';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import api from '../../api/axiosInstance';
+import axiosInstance from '../../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 
 const MyPage = () => {
@@ -17,15 +17,15 @@ const MyPage = () => {
   const [todayIncorrect, setTodayIncorrect] = useState([]);
   const [favoritLearning, setFavoritLearning] = useState([]);
 
-  const isLoggedIn = !!localStorage.getItem("token");
+  const isLoggedIn = !!localStorage.getItem('token');
   const navigate = useNavigate();
 
-  // 프로필 이미지
   useEffect(() => {
     const fetchProfileImage = async () => {
       try {
-        const res = await api.get('/file/get-profile-image', { responseType: 'blob' });
-        if (!res.ok) throw new Error('이미지 로딩 실패');
+        const res = await axiosInstance.get('/file/get-profile-image', {
+          responseType: 'blob',
+        });
         const blob = res.data;
         setProfileImageUrl(URL.createObjectURL(blob));
       } catch (e) {
@@ -35,35 +35,40 @@ const MyPage = () => {
     if (isLoggedIn) fetchProfileImage();
   }, [isLoggedIn]);
 
-  // 닉네임
   useEffect(() => {
     if (isLoggedIn) {
       setNickname(localStorage.getItem('nickname') || '사용자');
     }
   }, [isLoggedIn]);
 
-  // 출석 요약 + streak 계산
   useEffect(() => {
-    api.get('/attendance/get-attendance-date-list')
-      .then(res => res.data)
-      .then(data => {
-        const dates = Array.isArray(data) ? data.map(d => new Date(d)) : [];
+    axiosInstance
+      .get('/attendance/get-attendance-date-list')
+      .then((res) => {
+        const data = res.data;
+        const dates = Array.isArray(data) ? data.map((d) => new Date(d)) : [];
         setAttendanceDates(dates);
 
         const today = new Date();
-        const thisMonthDates = dates.filter(d => d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth());
+        const thisMonthDates = dates.filter(
+          (d) => d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth()
+        );
         const monthlyRate = Math.round((thisMonthDates.length / today.getDate()) * 100);
 
-        // 연속 출석 계산
         const getStreak = (dates) => {
-          const sorted = [...dates].map(d => new Date(d.getFullYear(), d.getMonth(), d.getDate())).sort((a, b) => b - a);
+          const sorted = [...dates]
+            .map((d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()))
+            .sort((a, b) => b - a);
           let streak = 0;
           let current = new Date();
           for (const date of sorted) {
             if (date.toDateString() === current.toDateString()) {
               streak++;
               current.setDate(current.getDate() - 1);
-            } else if (date.toDateString() === new Date(current.getFullYear(), current.getMonth(), current.getDate() - 1).toDateString()) {
+            } else if (
+              date.toDateString() ===
+              new Date(current.getFullYear(), current.getMonth(), current.getDate() - 1).toDateString()
+            ) {
               streak++;
               current.setDate(current.getDate() - 1);
             } else break;
@@ -76,37 +81,38 @@ const MyPage = () => {
           monthlyRate,
           streak: getStreak(dates),
         });
-      });
+      })
+      .catch((e) => console.error('출석 로딩 실패:', e));
   }, []);
 
-  // 전체 정답률
   useEffect(() => {
-    api.get('/result/get-overall-correct-answer-rate')
-      .then(res => res.data)
-      .then(data => {
-        const rate = data?.OVERALL_CORRECT_ANSWER_RATE;
+    axiosInstance
+      .get('/result/get-overall-correct-answer-rate')
+      .then((res) => {
+        const rate = res.data?.OVERALL_CORRECT_ANSWER_RATE;
         if (typeof rate === 'number') setCorrectRate(rate);
-      });
+      })
+      .catch((e) => console.error('정답률 로딩 실패:', e));
   }, []);
 
-  // 오늘 푼 문제 수
   useEffect(() => {
-    api.get('/result/get-today-solved-question-count')
-      .then(res => res.data)
-      .then(data => {
-        const count = data?.TODAY_SOLVED_QUESTION_COUNT;
+    axiosInstance
+      .get('/result/get-today-solved-question-count')
+      .then((res) => {
+        const count = res.data?.TODAY_SOLVED_QUESTION_COUNT;
         if (typeof count === 'number') setTodaySolvedCount(count);
-      });
+      })
+      .catch((e) => console.error('오늘 푼 문제 로딩 실패:', e));
   }, []);
 
   useEffect(() => {
     const fetchLearningData = async () => {
       try {
         const [total, today, todayWrong, fav] = await Promise.all([
-          api.get('/learning/get-total-learning').then(res => res.data),
-          api.get('/learning/get-today-learning').then(res => res.data),
-          api.get('/learning/get-today-incorrect-learning').then(res => res.data),
-          api.get('/learning/get-favorit-learning').then(res => res.data),
+          axiosInstance.get('/learning/get-total-learning').then((res) => res.data),
+          axiosInstance.get('/learning/get-today-learning').then((res) => res.data),
+          axiosInstance.get('/learning/get-today-incorrect-learning').then((res) => res.data),
+          axiosInstance.get('/learning/get-favorit-learning').then((res) => res.data),
         ]);
 
         setTotalLearning(total);
@@ -121,7 +127,6 @@ const MyPage = () => {
     fetchLearningData();
   }, []);
 
-  // 칭호 뱃지
   const getBadgeLabel = (rate) => {
     if (rate >= 100) return '초고수';
     if (rate >= 75) return '고급';
@@ -162,7 +167,9 @@ const MyPage = () => {
               maxDetail="month"
               tileClassName={({ date, view }) => {
                 if (view === 'month') {
-                  const isAttendance = attendanceDates.some(att => att.toDateString() === date.toDateString());
+                  const isAttendance = attendanceDates.some(
+                    (att) => att.toDateString() === date.toDateString()
+                  );
                   if (isAttendance) return 'attended-day';
                   if (date.getDay() === 0) return 'sunday';
                   if (date.getDay() === 6) return 'saturday';
