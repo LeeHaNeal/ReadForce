@@ -32,13 +32,15 @@ const AdminPage = () => {
     // 모든 회원정보 불러오기
     const fetchUsers = async () => {
         try {
-            const res = await axiosInstance.get("/admin/get-all-member-list");
-            if (!res.ok) throw new Error("권한 없음 또는 토큰 문제");
-
-            const data = await res.data;
-            setUsers(data);
+            const res = await axiosInstance.get("/administrator/member/get-all-member-list");
+            setUsers(res.data);
         } catch (error) {
             console.error("회원 목록 불러오기 실패", error);
+            if (error.response?.status === 403) {
+                alert("관리자 권한이 없습니다.");
+            } else if (error.response?.status === 401) {
+                alert("로그인 정보가 만료되었습니다. 다시 로그인 해주세요.");
+            }
         }
     };
 
@@ -46,9 +48,10 @@ const AdminPage = () => {
         fetchUsers();
     }, []);
 
+    // 계정 상태 변경
     const handleChangeStatus = async (email, newStatus) => {
         try {
-            const res = await axiosInstance.patch("/admin/modify-info", { email, status: newStatus });
+            const res = await axiosInstance.patch("/administrator/member/modify", { email, status: newStatus });
 
             updateUserStatus(email, newStatus);
         } catch (err) {
@@ -61,7 +64,9 @@ const AdminPage = () => {
     const handleDelete = async (email) => {
         if (!window.confirm("정말로 이 회원을 삭제하시겠습니까?")) return;
         try {
-            const res = await axiosInstance.delete(`/admin/delete-member-by-email?email=${email}`);
+            const res = await axiosInstance.delete(`/administrator/member/delete`, {
+                params: { email },
+            });
 
             alert("회원이 삭제되었습니다.");
             setUsers((prev) => prev.filter((user) => user.email !== email));
@@ -79,6 +84,7 @@ const AdminPage = () => {
         );
     };
 
+    // 테스트 지문 생성
     const handleGenerateTestPassage = async () => {
         setLoadingTestPassage(true);
         try {
@@ -93,6 +99,7 @@ const AdminPage = () => {
         }
     };
 
+    // 테스트 문제 생성
     const handleGenerateTestQuestion = async () => {
         setLoadingTestQuestion(true);
         try {
@@ -111,11 +118,11 @@ const AdminPage = () => {
         setLoadingPassage(true);
         try {
             const res = await axiosInstance.post("/ai/generate-passage", {
-                    language,
-                    level,
-                    category,
-                    type,
-                    classification,         
+                language,
+                level,
+                category,
+                type,
+                classification,
             });
             const data = await res.data;
             alert("✅ " + data.message);
@@ -202,6 +209,7 @@ const AdminPage = () => {
                 <span style={ADMIN_BUTTONS_LIST}>
                     <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/adminnews")}>뉴스 관리</button>
                     <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminliterature')}>문학 관리</button>
+                    <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminpassage')}>문제 관리</button>
                 </span>
                 <div style={ADMIN_TITLE}>
                     <div>
@@ -256,10 +264,10 @@ const AdminPage = () => {
                                     {user.email}
                                 </td>
                                 <td style={tdStyle}>{user.birthday || "-"}</td>
-                                <td style={tdStyle}>{new Date(user.create_date).toLocaleDateString()}</td>
-                                <td style={tdStyle}>{user.last_modified_date ? new Date(user.last_modified_date).toLocaleDateString() : "-"}</td>
-                                <td style={tdStyle}>{user.withdraw_date ? new Date(user.withdraw_date).toLocaleDateString() : "-"}</td>
-                                <td style={tdStyle}>{user.social_provider || "-"}</td>
+                                <td style={tdStyle}>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td style={tdStyle}>{user.lastModifiedAt ? new Date(user.lastModifiedAt).toLocaleDateString() : "-"}</td>
+                                <td style={tdStyle}>{user.withdrawAt ? new Date(user.withdrawAt).toLocaleDateString() : "-"}</td>
+                                <td style={tdStyle}>{user.socialProvider || "-"}</td>
                                 <td style={tdStyle}>{user.role}</td>
                                 <td style={{
                                     color: user.status === "ACTIVE" ? "green" : "red", border: "1px solid #ddd",
