@@ -56,7 +56,7 @@ import com.readforce.result.service.ResultService;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.core.io.ClassPathResource;
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -320,7 +320,7 @@ public class MemberService {
 				
 				try {
 					
-					deleteProfileImage(member.getEmail());
+					deleteProfileImage(member);
 					
 				} catch(Exception exception) {
 					
@@ -454,9 +454,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void deleteProfileImage(String email) {
-
-		Member member = getActiveMemberByEmail(email);
+	public void deleteProfileImage(Member member) {
 		
 		String profileImagePath = member.getProfileImagePath();
 		
@@ -478,15 +476,12 @@ public class MemberService {
 		Member member = getActiveMemberByEmail(email);
 		String profileImagePath = member.getProfileImagePath();
 		
-		if(profileImagePath == null) {
-			
-			throw new ResourceNotFoundException(MessageCode.PROFILE_IMAGE_NOT_FOUND);
-			
+		 if (profileImagePath == null || profileImagePath.isEmpty()) {
+		        return new ClassPathResource("static/image/default-profile.png");
+		    }
+
+		    return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
 		}
-
-		return fileService.loadFileAsResource(profileImagePath, FileCategoryEnum.PROFILE_IMAGE);
-
-	}
 
 	@Transactional
 	public void emailExistCheck(String email) {
@@ -527,13 +522,15 @@ public class MemberService {
 			
 			try {
 				
-				deleteProfileImage(member.getEmail());
+				deleteProfileImage(member);
 				
 			} catch(Exception exception) {
 				
 				fileDeleteFailLogService.create(member, exception.getMessage());
-								
+				
 			}
+			
+			
 			
 		}
 		

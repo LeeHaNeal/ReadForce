@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import kakaoIcon from '../../assets/image/kakao.png';
 import googleIcon from '../../assets/image/google.png';
@@ -15,6 +15,7 @@ const ProfileEditPage = () => {
   const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const hasFetchedImage = useRef(false); // ✅ 중복 방지
 
   const fetchProfileImage = useCallback(async () => {
     try {
@@ -23,14 +24,27 @@ const ProfileEditPage = () => {
       });
       const url = URL.createObjectURL(res.data);
       setProfileImageUrl(url);
-    } catch {
-      setProfileImageUrl(defaultProfileImage);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setProfileImageUrl(defaultProfileImage);
+      } else {
+        console.error('이미지 로딩 실패:', error);
+      }
     }
   }, []);
 
   useEffect(() => {
-    fetchProfileImage();
-  }, [fetchProfileImage]);
+    if (!hasFetchedImage.current) {
+      hasFetchedImage.current = true;
+      fetchProfileImage();
+    }
+    return () => {
+      // ✅ 메모리 누수 방지
+      if (profileImageUrl && profileImageUrl !== defaultProfileImage) {
+        URL.revokeObjectURL(profileImageUrl);
+      }
+    };
+  }, [fetchProfileImage, profileImageUrl]);
 
   const checkNicknameDuplicate = async (nickname) => {
     try {
@@ -83,12 +97,10 @@ const ProfileEditPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (nickname && !isNicknameValid) {
       alert('닉네임 형식이 잘못되었거나 중복입니다. 다시 확인해주세요.');
       return;
     }
-
     if (birthday && !isBirthdayValid) {
       alert('생년월일 형식이 잘못되었습니다.');
       return;
@@ -96,7 +108,6 @@ const ProfileEditPage = () => {
 
     const updates = [];
     const infoPayload = {};
-
     if (nickname && isNicknameValid) infoPayload.nickname = nickname;
     if (birthday && isBirthdayValid) infoPayload.birthday = birthday;
 
