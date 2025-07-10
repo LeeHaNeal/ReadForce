@@ -125,34 +125,6 @@ const AdminPage = () => {
             setLoadingTestQuestion(false);
         }
     };
-
-    // AI 지문 생성
-    // const handleGeneratePassage = async () => {
-    //     setLoadingPassage(true);
-    //     try {
-    //         const res = await fetchWithAuth("/ai/generate-passage", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({
-    //                 language: "KOREAN",
-    //                 level: 1,
-    //                 category: "NEWS",
-    //                 type: "ECONOMY",
-    //                 classification: "NORMAL",
-    //             }),
-    //         });
-
-    //         if (!res.ok) throw new Error("지문 생성 실패");
-
-    //         const data = await res.json();
-    //         alert("✅ " + data.message);
-    //     } catch (err) {
-    //         console.error(err);
-    //         alert("❌ 지문 생성 중 오류가 발생했습니다.");
-    //     } finally {
-    //         setLoadingPassage(false);
-    //     }
-    // };
     const handleGeneratePassageWithParams = async () => {
         setLoadingPassage(true);
         try {
@@ -200,7 +172,21 @@ const AdminPage = () => {
             setLoadingQuestion(false);
         }
     };
+    const handleUpdateChallengePassages = async () => {
+    if (!window.confirm("오늘의 챌린지 Passage를 갱신하시겠습니까?")) return;
+    try {
+        const res = await fetchWithAuth("/challenge/update-to-challenges", {
+            method: "POST",
+        });
 
+        if (!res.ok) throw new Error("챌린지 Passage 갱신 실패");
+
+        alert("✅ 오늘의 챌린지 Passage가 성공적으로 갱신되었습니다!");
+    } catch (err) {
+        console.error(err);
+        alert("❌ 챌린지 Passage 갱신 중 오류가 발생했습니다.");
+    }
+};
     return (
         <>
             {showPassageModal && (
@@ -215,37 +201,58 @@ const AdminPage = () => {
 
                         <label>언어:</label>
                         <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                            <option value="KOREAN">KOREAN</option>
-                            <option value="ENGLISH">ENGLISH</option>
-                            <option value="JAPANESE">JAPANESE</option>
+                            <option value="KOREAN">한국어</option>
+                            <option value="ENGLISH">영어</option>
+                            <option value="JAPANESE">일본어</option>
 
                         </select>
 
-                        <br /><label>난이도:</label>
+                      <br /><label>난이도:</label>
                         <select value={level} onChange={(e) => setLevel(parseInt(e.target.value))}>
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
+                            {[...Array(10)].map((_, idx) => (
+                                <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                            ))}
                         </select>
 
                         <br /><label>카테고리:</label>
                         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                            <option value="NEWS">NEWS</option>
-                            <option value="LITERATURE">LITERATURE</option>
+                            <option value="NEWS">뉴스</option>
+                            <option value="NOVEL">소설</option>
+                            <option value="FAIRY_TALE">동화</option>
+                            <option value="VOCABULARY">어휘</option>
+                            <option value="FACTUAL">사실적</option>
+                            <option value="INFERENTIAL">추론적</option>
                         </select>
 
                         <br /><label>유형:</label>
                         <select value={type} onChange={(e) => setType(e.target.value)}>
-                            <option value="ECONOMY">ECONOMY</option>
-                            <option value="SOCIETY">SOCIETY</option>
-                            <option value="SCIENCE">SCIENCE</option>
+                            <option value="POLITICS">정치</option>
+                            <option value="ECONOMY">경제</option>
+                            <option value="SOCIETY">사회</option>
+                            <option value="LIFE_AND_CULTURE">생활/문화</option>
+                            <option value="IT_AND_SCIENCE">IT/과학</option>
+                            <option value="WORLD">세계</option>
+                            <option value="SPORTS">스포츠</option>
+                            <option value="ENTERTAINMENT">연예</option>
+                            <option value="MYSTERY">미스터리</option>
+                            <option value="SCIENCE_FICTION">과학 소설</option>
+                            <option value="FANTASY">판타지</option>
+                            <option value="ROMANCE">로맨스</option>
+                            <option value="HISTORICAL">역사</option>
+                            <option value="ADVENTURE">모험</option>
+                            <option value="THRILLER">스릴러</option>
+                            <option value="SLICE_OF_LIFE">일상</option>
+                            <option value="TRADITIONAL">전통</option>
+                            <option value="INFORMATIONAL">정보성</option>
                         </select>
 
                         <br /><label>분류:</label>
                         <select value={classification} onChange={(e) => setClassification(e.target.value)}>
-                            <option value="NORMAL">NORMAL</option>
-                            <option value="CHALLENGE">CHALLENGE</option>
+                            <option value="NORMAL">일반</option>
+                            <option value="CHALLANGE">챌린지</option>
+                            <option value="TEST">테스트</option>
                         </select>
+
 
                         <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between" }}>
                             <button onClick={handleGeneratePassageWithParams} disabled={loadingPassage}>
@@ -258,7 +265,7 @@ const AdminPage = () => {
             )}
             <div style={{ padding: "24px" }}>
                 <span style={ADMIN_BUTTONS_LIST}>
-                    <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/adminnews")}>뉴스 관리</button>
+                    <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/adminnews")}>기사 관리</button>
                     <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminliterature')}>문학 관리</button>
                 </span>
                 <div style={ADMIN_TITLE}>
@@ -280,6 +287,9 @@ const AdminPage = () => {
                         </button>
                         <button style={ADMIN_AI_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
                             {loadingQuestion ? '생성 중...' : '문제 생성'}
+                        </button>
+                         <button style={ADMIN_AI_BUTTONS} onClick={handleUpdateChallengePassages}>
+                            챌린지 Passage 갱신
                         </button>
                     </div>
                 </div>

@@ -7,48 +7,34 @@ const ChallengeStartModal = ({ onClose }) => {
 
   const [category, setCategory] = useState('NEWS');
   const [language, setLanguage] = useState('KOREAN');
-  const [literatureType, setLiteratureType] = useState('NOVEL');
 
-  const handleStartClick = () => {
-    if (category === 'NEWS') {
-      navigate(`/challenge/quiz?language=${language}&category=NEWS`);
-    } else {
-      navigate(`/challenge/quiz?language=${language}&category=${literatureType}`);
-    }
+  const handleStart = () => {
+    navigate(`/challenge/today?language=${language}&category=${category}`);
     onClose();
-};
-
+  };
 
   return (
     <div className="ChallengeStartModal-overlay">
       <div className="ChallengeStartModal-content">
-        <h2 className="ChallengeStartModal-title">도전 유형 선택</h2>
+        <h2 className="ChallengeStartModal-title">오늘의 도전 시작하기</h2>
 
-        <div className="ChallengeStartModal-category">
+        <div className="ChallengeStartModal-option-group">
+          <p>카테고리 선택</p>
           <button className={category === 'NEWS' ? 'selected' : ''} onClick={() => setCategory('NEWS')}>기사</button>
-          <button className={category === 'LITERATURE' ? 'selected' : ''} onClick={() => setCategory('LITERATURE')}>문학</button>
+          <button className={category === 'NOVEL' ? 'selected' : ''} onClick={() => setCategory('NOVEL')}>소설</button>
+          <button className={category === 'FAIRY_TALE' ? 'selected' : ''} onClick={() => setCategory('FAIRY_TALE')}>동화</button>
         </div>
 
-        {category === 'NEWS' && (
-          <div className="ChallengeStartModal-option-group">
-            <p>언어 선택</p>
-            <button className={language === 'KOREAN' ? 'selected' : ''} onClick={() => setLanguage('KOREAN')}>한국어</button>
-            <button className={language === 'ENGLISH' ? 'selected' : ''} onClick={() => setLanguage('ENGLISH')}>English</button>
-            <button className={language === 'JAPANESE' ? 'selected' : ''} onClick={() => setLanguage('JAPANESE')}>일본어</button>
-          </div>
-        )}
-
-        {category === 'LITERATURE' && (
-          <div className="ChallengeStartModal-option-group">
-            <p>문학 종류 선택</p>
-            <button className={literatureType === 'NOVEL' ? 'selected' : ''} onClick={() => setLiteratureType('NOVEL')}>소설</button>
-            <button className={literatureType === 'FAIRYTALE' ? 'selected' : ''} onClick={() => setLiteratureType('FAIRYTALE')}>동화</button>
-          </div>
-        )}
+        <div className="ChallengeStartModal-option-group">
+          <p>언어 선택</p>
+          <button className={language === 'KOREAN' ? 'selected' : ''} onClick={() => setLanguage('KOREAN')}>한국어</button>
+          <button className={language === 'ENGLISH' ? 'selected' : ''} onClick={() => setLanguage('ENGLISH')}>영어</button>
+          <button className={language === 'JAPANESE' ? 'selected' : ''} onClick={() => setLanguage('JAPANESE')}>일본어</button>
+        </div>
 
         <div className="ChallengeStartModal-actions">
           <button onClick={onClose}>취소</button>
-          <button onClick={handleStartClick}>시작하기</button>
+          <button onClick={handleStart}>도전 시작</button>
         </div>
       </div>
     </div>

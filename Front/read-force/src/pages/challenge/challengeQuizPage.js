@@ -14,22 +14,17 @@ const ChallengeQuizPage = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answerList, setAnswerList] = useState([]); // 제출할 답안 목록
-  const [timeLeft, setTimeLeft] = useState(30 * 60);
+  const [answerList, setAnswerList] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 minutes
   const [loading, setLoading] = useState(true);
   const timerRef = useRef(null);
 
+  /** 문제 가져오기 + 타이머 시작 */
   useEffect(() => {
-    if (!language || !category) {
-      alert('language와 category 파라미터가 필요합니다.');
-      navigate('/');
-      return;
-    }
-
-    api.get(`/challenge/get-challenge-question-list`, {
+    api.get('/challenge/get-challenge-question-list', {
       params: { language, category }
     })
-      .then(res => setQuizzes(res.data))
+      .then(res => setQuizzes(res.data))  
       .catch(() => alert('문제 불러오기 실패'))
       .finally(() => setLoading(false));
 
@@ -45,12 +40,14 @@ const ChallengeQuizPage = () => {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [language, category, navigate]);
+  }, [language, category]);
 
+  /** 보기 선택 */
   const handleSelect = (index) => {
     setSelectedAnswer(index);
   };
 
+  /** 다음 문제로 이동 */
   const handleNext = () => {
     if (selectedAnswer === null) {
       alert('답을 선택해주세요.');
@@ -58,21 +55,16 @@ const ChallengeQuizPage = () => {
     }
 
     const currentQuiz = quizzes[currentIndex];
-    setAnswerList(prev => [
-      ...prev,
-      { [currentQuiz.questionNo]: selectedAnswer }
-    ]);
+    setAnswerList(prev => [...prev, { [currentQuiz.questionNo]: selectedAnswer }]);
     setSelectedAnswer(null);
     setCurrentIndex(prev => prev + 1);
   };
 
+  /** 결과 제출 */
   const handleSubmit = async () => {
     if (selectedAnswer !== null && currentIndex < quizzes.length) {
       const currentQuiz = quizzes[currentIndex];
-      setAnswerList(prev => [
-        ...prev,
-        { [currentQuiz.questionNo]: selectedAnswer }
-      ]);
+      setAnswerList(prev => [...prev, { [currentQuiz.questionNo]: selectedAnswer }]);
     }
 
     clearInterval(timerRef.current);
@@ -86,7 +78,7 @@ const ChallengeQuizPage = () => {
 
     try {
       const res = await api.post('/challenge/submit-challenge-result', payload);
-      alert(`도전 완료! 점수: ${res.data.SCORE}`);
+      alert(`오늘의 도전 완료! 점수: ${res.data.SCORE}`);
       navigate('/challenge');
     } catch (error) {
       console.error(error);
@@ -95,6 +87,7 @@ const ChallengeQuizPage = () => {
     }
   };
 
+  /** 남은 시간 포맷팅 */
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
@@ -119,25 +112,23 @@ const ChallengeQuizPage = () => {
           <span className="ChallengeQuizPage-timer">남은 시간: {formatTime(timeLeft)}</span>
         </div>
 
-        <div className="ChallengeQuizPage-question">{currentQuiz.questionText}</div>
-        {currentQuiz.choices.map((choice, idx) => (
-          <button
-            key={idx}
-            className={`ChallengeQuizPage-option ${selectedAnswer === idx ? 'selected' : ''}`}
-            onClick={() => handleSelect(idx)}
-          >
-            {choice}
-          </button>
-        ))}
+      <div className="ChallengeQuizPage-question">{currentQuiz.question}</div>
+
+       {currentQuiz.choiceList?.map((choice, idx) => (
+        <button
+          key={idx}
+          className={`ChallengeQuizPage-option ${selectedAnswer === idx ? 'selected' : ''}`}
+          onClick={() => handleSelect(idx)}
+        >
+          {choice.content}
+        </button>
+      ))}
+
 
         {currentIndex === quizzes.length - 1 ? (
-          <button className="ChallengeQuizPage-submit" onClick={handleSubmit}>
-            제출하기
-          </button>
+          <button className="ChallengeQuizPage-submit" onClick={handleSubmit}>제출하기</button>
         ) : (
-          <button className="ChallengeQuizPage-submit" onClick={handleNext}>
-            다음 문제
-          </button>
+          <button className="ChallengeQuizPage-submit" onClick={handleNext}>다음 문제</button>
         )}
       </div>
     </div>

@@ -37,30 +37,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ChallengeService {
-	
-	private LevelService levelService;
-	private PassageService passageService;
-	private MultipleChoiceService multipleChoiceService;
-	private QuestionService questionService;
-	private ScoreService scoreService;
-	private CategoryService categoryService;
-	private LanguageService languageService;
-	private ClassificationService classificationService;
-	
-	@Transactional
-	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
-		
-		List<MultipleChoiceResponseDto> resultList = new ArrayList<>();
-		
-		List<Level> allLevelList = levelService.getAllLevelList();
-		
-		for(Level level : allLevelList) {
-			
-			List<Passage> randomPassageList = passageService.getChallengePassageList(language, category, level.getLevelNumber());
-			
-			for(Passage passage : randomPassageList) {
-				
-				List<MultipleChoiceResponseDto> multipleChoiceDtoList = multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
 
     private final LevelService levelService;
     private final PassageService passageService;
@@ -69,26 +45,26 @@ public class ChallengeService {
     private final ScoreService scoreService;
     private final CategoryService categoryService;
     private final LanguageService languageService;
+    private final ClassificationService classificationService;
 
-    /**
-     * 챌린지 문제 리스트 조회
-     */
     @Transactional(readOnly = true)
     public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
 
         List<MultipleChoiceResponseDto> resultList = new ArrayList<>();
-        List<Level> allLevelList = levelService.getAllLevelList();
+        List<Level> levelList = levelService.getAllLevelList();
 
-        for (Level level : allLevelList) {
-            List<Passage> randomPassageList = passageService.getChallengePassageList(language, category, level.getLevelNumber());
+        for (Level level : levelList) {
 
-            for (Passage passage : randomPassageList) {
-                List<MultipleChoiceResponseDto> multipleChoiceDtoList = multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
+            List<Passage> passageList = passageService.getTodayChallengePassageList(
+                    language, category, level.getLevelNumber()
+            );
 
-                if (!multipleChoiceDtoList.isEmpty()) {
-                    // 지문 하나당 하나의 문제만 사용
-                    MultipleChoiceResponseDto multipleChoiceDto = multipleChoiceDtoList.get(0);
-                    resultList.add(multipleChoiceDto);
+            for (Passage passage : passageList) {
+                List<MultipleChoiceResponseDto> multipleChoiceList =
+                        multipleChoiceService.getMultipleChoiceQuestionListByPassageNo(passage.getPassageNo());
+
+                if (!multipleChoiceList.isEmpty()) {
+                    resultList.add(multipleChoiceList.get(0)); // 첫 문제만 추가
                 }
             }
         }
@@ -100,14 +76,11 @@ public class ChallengeService {
         return resultList;
     }
 
-    /**
-     * 챌린지 결과 제출 및 점수 계산
-     */
     @Transactional
     public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
 
         double totalScore = 0.0;
-        final long MAX_TIME_SECONDS = 1800; // 최대 보너스 시간 기준 (30분)
+        final long MAX_TIME_SECONDS = 1800;
 
         for (Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
             for (Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
@@ -118,21 +91,21 @@ public class ChallengeService {
                 QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
 
                 if (checkResult.getIsCorrect()) {
-                    QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
+                    QuestionLevelAndCategoryAndLanguageDto questionInfo =
+                            questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
+
                     Level level = levelService.getLevelByLevel(questionInfo.getLevel());
-                    totalScore += level.getLevelNumber() * 4; // 정답 시 점수
+                    totalScore += level.getLevelNumber() * 4;
                 }
             }
         }
 
-        // 시간 보너스 계산
         long solvingTime = requestDto.getTotalQuestionSolvingTime();
         if (solvingTime < MAX_TIME_SECONDS) {
             double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
             totalScore += timeBonus;
         }
 
-        // 점수 저장
         Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
         Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
 
@@ -141,44 +114,32 @@ public class ChallengeService {
         return totalScore;
     }
 
-	@Transactional
-	public void updateToChallengePassages() {
-		
-		List<Language> languageList = languageService.getAllLanguageList();
-		
-		List<Category> categoryList = categoryService.getAllCategoryList();
-		
-		List<Level> levelList = levelService.getAllLevelList();
-		
-		Classification ChallengeClassification = classificationService.getClassificationByClassfication(ClassificationEnum.CHALLENGE);
-		
-		for(Language language : languageList) {
-			
-			for(Category category : categoryList) {
-				
-				for(Level level : levelList) {
-					
-					List<Passage> passageList = passageService.getNormalPassages(
-							language.getLanguageName(),
-							category.getCategoryName(),
-							level.getLevelNumber()
-					);
-					
-					Collections.shuffle(passageList);
-					
-					passageList
-						.stream()
-						.limit(2)
-						.forEach(passage -> {
-							passage.chageClassification(ChallengeClassification);							
-						});
+    @Transactional
+    public void updateToChallengePassages() {
 
-				}
-				
-			}
-			
-		}
-		
-	}
+        List<Language> languages = languageService.getAllLanguageList();
+        List<Category> categories = categoryService.getAllCategoryList();
+        List<Level> levels = levelService.getAllLevelList();
+        Classification challengeClassification =
+                classificationService.getClassificationByClassfication(ClassificationEnum.CHALLANGE);
 
+        for (Language language : languages) {
+            for (Category category : categories) {
+                for (Level level : levels) {
+
+                    List<Passage> passageList = new ArrayList<>(passageService.getNormalPassages(
+                            language.getLanguageName(),
+                            category.getCategoryName(),
+                            level.getLevelNumber()
+                    ));
+
+                    Collections.shuffle(passageList);
+
+                    passageList.stream()
+                            .limit(2)
+                            .forEach(passage -> passage.chageClassification(challengeClassification));
+                }
+            }
+        }
+    }
 }
