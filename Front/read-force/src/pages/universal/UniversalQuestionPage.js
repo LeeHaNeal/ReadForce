@@ -16,50 +16,34 @@ const UniversalQuestionPage = () => {
   const [error, setError] = useState(null);
   const [answers, setAnswers] = useState([]);
 
-  const [startTime, setStartTime] = useState(null);
-  const [waitSeconds, setWaitSeconds] = useState(10);
   const [isWaiting, setIsWaiting] = useState(true);
-
+  const [waitSeconds, setWaitSeconds] = useState(10);
+  const [startTime, setStartTime] = useState(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
   const currentQuiz = quizList[currentIndex];
 
   useEffect(() => {
-    setStartTime(Date.now());
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatTime = (totalSeconds) => {
-    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-    const seconds = String(totalSeconds % 60).padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  };
-
-  useEffect(() => {
-    if (!currentQuiz) return;
-
-    setIsWaiting(true);
+    const newStart = Date.now();
+    setStartTime(newStart);
+    setElapsedSeconds(0);
     setWaitSeconds(10);
-    setStartTime(Date.now());
+    setIsWaiting(true);
 
-    const interval = setInterval(() => {
-      setWaitSeconds(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setIsWaiting(false);
-          return 0;
-        }
-        return prev - 1;
-      });
+    const timer = setInterval(() => {
+      const secondsPassed = Math.floor((Date.now() - newStart) / 1000);
+      setElapsedSeconds(secondsPassed);
     }, 1000);
-    return () => clearInterval(interval);
-  }, [currentIndex, currentQuiz]);
+
+    const waitTimer = setTimeout(() => {
+      setIsWaiting(false);
+    }, 10000);
+
+    return () => {
+      clearInterval(timer);
+      clearTimeout(waitTimer);
+    };
+  }, [currentIndex]);
 
   useEffect(() => {
     const loadedPassage = location.state?.passage || {
@@ -78,56 +62,76 @@ const UniversalQuestionPage = () => {
     setPassage(loadedPassage);
 
     fetchWithAuth(`/multiple_choice/get-multiple-choice-question-list?passageNo=${loadedPassage.passageNo}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("퀴즈 로딩 성공:", data);
+      .then((res) => res.json())
+      .then((data) => {
         setQuizList(data);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("퀴즈 로딩 실패:", err);
         setError("퀴즈 로딩 중 오류 발생");
       });
   }, [id, location.state]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (selected === null) return;
 
-    const updatedAnswers = [...answers, { questionNo: currentQuiz.questionNo, selected }];
+    const solvingTime = Math.floor((Date.now() - startTime) / 1000);
+
+    console.log(solvingTime)
+    try {
+      await fetchWithAuth('/learning/save-multiple-choice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          questionNo: currentQuiz.questionNo,
+          selectedIndex: selected,
+          questionSolvingTime: solvingTime,
+          isFavorit: false,
+        }),
+      });
+    } catch (err) {
+      console.error('서버 저장 실패:', err);
+      alert('답안 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+      return;
+    }
+
+    const updatedAnswers = [
+      ...answers,
+      {
+        questionNo: currentQuiz.questionNo,
+        selectedIndex: selected,
+        questionSolvingTime: solvingTime,
+      },
+    ];
+
     setAnswers(updatedAnswers);
     setSelected(null);
 
     if (currentIndex < quizList.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      handleSubmit(updatedAnswers);
-    }
-  };
-
-  const handleSubmit = async (finalAnswers) => {
-    try {
-      const categoryPath = passage.category === 'NEWS'
-        ? 'article'
-        : passage.category === 'NOVEL'
-        ? 'novel'
-        : 'fairytale';
+      const categoryPath =
+        passage.category === 'NEWS'
+          ? 'article'
+          : passage.category === 'NOVEL'
+          ? 'novel'
+          : 'fairytale';
 
       navigate(`/${categoryPath}/result`, {
         state: {
           passage,
-          total: finalAnswers.length,
-          answers: finalAnswers,
+          total: updatedAnswers.length,
+          answers: updatedAnswers,
+          quizList,
           category: passage.category,
-          elapsedTime: elapsedSeconds
         },
       });
-    } catch (err) {
-      console.error('퀴즈 저장 실패:', err);
-      alert('퀴즈 결과 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
   if (error) return <div className="PassageQuestion-container">{error}</div>;
-  if (!passage || quizList.length === 0 || !currentQuiz) return <div className="PassageQuestion-container">로딩 중...</div>;
+  if (!passage || quizList.length === 0 || !currentQuiz)
+    return <div className="PassageQuestion-container">로딩 중...</div>;
 
   return (
     <div className="page-container quiz-layout">
@@ -139,10 +143,10 @@ const UniversalQuestionPage = () => {
 
       <div className="quiz-box">
         <div className="quiz-header">
-        <h4 className="question-heading">💡 문제 {currentIndex + 1}</h4>
-        <div className="quiz-timer">
-          <img src={clockImg} alt="clock" className="clock-icon" />
-            {formatTime(elapsedSeconds)}
+          <h4 className="question-heading">💡 문제 {currentIndex + 1}</h4>
+          <div className="quiz-timer">
+            <img src={clockImg} alt="clock" className="clock-icon" />
+            {elapsedSeconds}s
           </div>
         </div>
 
@@ -167,9 +171,10 @@ const UniversalQuestionPage = () => {
             onClick={handleNext}
           >
             {isWaiting
-              ? `잠시 후 ${waitSeconds}`
-            : currentIndex < quizList.length - 1 
-            ? '다음 문제' : '제출'}
+              ? `잠시 후 ${10 - elapsedSeconds}`
+              : currentIndex < quizList.length - 1
+              ? '다음 문제'
+              : '제출'}
           </button>
         </div>
       </div>

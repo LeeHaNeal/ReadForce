@@ -6,30 +6,28 @@ import { novelTypeOptions } from '../../components/TypeOptions';
 
 const NovelPage = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
+  const [novelItems, setNovelItems] = useState([]);
   const [language] = useState('KOREAN');
-  const classification = 'NORMAL';
-  const category = 'NOVEL';
-
-  const [type, setType] = useState('');
   const [level, setLevel] = useState('');
+  const [type, setType] = useState('');
   const [orderBy, setOrderBy] = useState('latest');
+
+  const category = 'NOVEL';
+  const classification = 'NORMAL';
 
   const fetchData = useCallback(() => {
     const apiLevel = level || '';
     const apiType = type || '';
 
-    debouncedFetchPassageList(
-      {
-        language,
-        classification,
-        category,
-        type: apiType,
-        level: apiLevel,
-        orderBy,
-      },
-      (data) => {
-        setItems(data);
+    debouncedFetchPassageList({
+      language,
+      classification,
+      category,
+      type: apiType,
+      level: apiLevel,
+      orderBy,
+      }, (data) => {
+        setNovelItems(data);
       }
     );
   }, [language, classification, category, type, level, orderBy]);
@@ -50,7 +48,7 @@ const NovelPage = () => {
   return (
     <div className="page-container">
       <UniversalList
-        items={items}
+        items={novelItems}
         level={level}
         setLevel={setLevel}
         type={type}

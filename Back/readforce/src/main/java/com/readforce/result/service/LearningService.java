@@ -45,7 +45,7 @@ public class LearningService {
 		
 		Member member = memberService.getActiveMemberByEmail(email);
 		
-		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSlovingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
+		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSolvingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
 		
 		updateResultAndMetric(member);
 		
