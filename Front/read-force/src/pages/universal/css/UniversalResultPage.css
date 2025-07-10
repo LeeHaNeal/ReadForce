@@ -86,3 +86,17 @@
   font-size: 14px;
   line-height: 1.6;
 }
+
+.solving-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 14px;
+  color: #2c7a7b; 
+}
+
+.clock-icon {
+  width: 18px;
+  height: 18px;
+}

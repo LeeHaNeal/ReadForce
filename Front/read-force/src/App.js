@@ -31,6 +31,8 @@ import AdminLiteratureDetail from './pages/adminpages/adminliteraturedetail';
 import AdminAddParagraph from './pages/adminpages/adminaddparagraph';
 import AdminUserInfo from './pages/adminpages/adminuserinifo';
 import AdminUserAttendance from './pages/adminpages/adminuserattendance';
+import AdminPassage from './pages/adminpages/adminpassage';
+
 import TestQuestionPage from './pages/challenge/testquestionpage';
 import TestResultPage from './pages/challenge/testresultpage';
 import TestReviewPage from './pages/challenge/testreviewpage';
@@ -66,7 +68,7 @@ function App() {
           <Route path="/challenge" element={<ChallengePage />} />
           {/* <Route path="/oauth2/redirect" element={<Oauth2redirect />} /> */}
           <Route path="/authcallback" element={<Authcallback />} />
-          <Route path="/social-sign-up" element={<Socialsignup />} />          
+          <Route path="/social-sign-up" element={<Socialsignup />} />
           <Route path="/profile-edit" element={<ProfileEditPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/test-start" element={<ReadTest />} />
@@ -81,6 +83,7 @@ function App() {
           <Route path="/adminpage/adminliterature/:literatureNo/add-paragraph" element={<AdminAddParagraph />} />
           <Route path="/adminpage/adminuserinfo/:email" element={<AdminUserInfo />} />
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
+          <Route path="/adminpage/adminpassage" element={<AdminPassage />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />

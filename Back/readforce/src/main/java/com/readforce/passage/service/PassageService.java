@@ -242,25 +242,26 @@ public class PassageService {
 	@Transactional(readOnly = true)
 	public List<Passage> getChallengePassageList(LanguageEnum language, CategoryEnum category, Integer level) {
 
-	    List<Long> passageNoList = passageRepository.findPassageNoByLanguageAndClassificationAndCategoryAndLevel(
-	            language,
-	            ClassificationEnum.CHALLENGE,
-	            category,
-	            level
-	    );
+		List<Long> passageNoList = passageRepository.findPassageNoByLanguageAndCategoryAndLevelAndClassification(
+				language,
+				category,
+				level,
+				ClassificationEnum.CHALLENGE		
+		);
+		
+		if(passageNoList.isEmpty()) {
+			
+			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
+			
+		}
+		
+		Collections.shuffle(passageNoList);
+		
+		List<Long> randomPassageNoList = passageNoList.stream().limit(2).collect(Collectors.toList());
+		
+		return passageRepository.findAllById(randomPassageNoList);
 
-	    if (passageNoList.isEmpty()) {
-	        throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-	    }
-
-	    Collections.shuffle(passageNoList);
-
-	    List<Long> randomPassageNoList = passageNoList.stream().limit(2).collect(Collectors.toList());
-
-	    return passageRepository.findAllById(randomPassageNoList);
 	}
-
-
 
 	public List<PassageResponseDto> getPassageListByLanguageAndCategoryAndLevel(
 			OrderByEnum orderBy, 
@@ -307,6 +308,12 @@ public class PassageService {
 		
 		return passageRepository.findAllByClassification_ClassificationName(classificationName, Pageable.unpaged()).getContent();
 		
+	}
+	
+	// 전체 지문 가져오기
+	@Transactional(readOnly = true)
+	public List<Passage> getAllPassages() {
+	    return passageRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
 	}
 
 	@Transactional

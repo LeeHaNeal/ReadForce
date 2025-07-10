@@ -1,6 +1,7 @@
 package com.readforce.passage.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.OrderByEnum;
 import com.readforce.common.enums.TypeEnum;
 import com.readforce.passage.dto.PassageResponseDto;
+import com.readforce.passage.entity.Passage;
 import com.readforce.passage.service.PassageService;
 
 import jakarta.validation.constraints.Max;
@@ -144,6 +146,16 @@ public class PassageController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(passageList);
 		
+	}
+	
+	// 전체 지문 가져오기
+	@GetMapping("/get-all-passages")
+	public ResponseEntity<List<PassageResponseDto>> getAllPassages() {
+	    List<Passage> passageList = passageService.getAllPassages(); 
+	    List<PassageResponseDto> dtoList = passageList.stream()
+	            .map(PassageResponseDto::new)
+	            .collect(Collectors.toList());
+	    return ResponseEntity.ok(dtoList);
 	}
 	
 }
