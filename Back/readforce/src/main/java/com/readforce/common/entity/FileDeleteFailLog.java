@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.readforce.member.entity.Member;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -44,7 +45,7 @@ public class FileDeleteFailLog {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "member_no", nullable = false)
 	private Member member;
 }

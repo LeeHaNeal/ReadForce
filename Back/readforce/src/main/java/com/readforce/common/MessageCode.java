@@ -164,6 +164,7 @@ public final class MessageCode {
 	
 	
 	
+	
 	public static final String SOCIAL_EMAIL_ALREADY_CONNECTED = "DUP0001";
 	public static final String SOCIAL_EMAIL_ALREADY_USED = "DUP0002";
 	public static final String TODAY_ALREADY_ATTENDANCE = "DUP0003";
