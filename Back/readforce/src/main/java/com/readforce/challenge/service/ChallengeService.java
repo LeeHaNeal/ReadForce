@@ -166,7 +166,7 @@ public class ChallengeService {
 						.stream()
 						.limit(2)
 						.forEach(passage -> {
-							passage.chageClassification(ChallengeClassification);							
+							passage.changeClassification(ChallengeClassification);							
 						});
 
 				}
@@ -194,7 +194,7 @@ public class ChallengeService {
 			
 			Classification normalClassification = classificationService.getClassificationByClassfication(ClassificationEnum.NORMAL);
 			
-			existingChallenges.forEach(passage -> passage.chageClassification(normalClassification));
+			existingChallenges.forEach(passage -> passage.changeClassification(normalClassification));
 			
 		}
 		

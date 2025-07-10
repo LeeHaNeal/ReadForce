@@ -129,9 +129,8 @@ public class AdministratorMemberController {
 		
 	}
 	
-	// 지문 수정/삭제
 	
-	// 문제 수정/삭제
+	// 문제 삭제
 	
 	// 평균 풀이 시간 조회/생성/수정/삭제
 	

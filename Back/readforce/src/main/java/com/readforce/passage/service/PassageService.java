@@ -20,7 +20,6 @@ import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.OrderByEnum;
 import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
-import com.readforce.file.service.FileService;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Classification;
@@ -42,7 +41,6 @@ public class PassageService {
 	private final LevelService levelService;
 	private final ClassificationService classificationService;
 	private final TypeService typeService;
-	private final FileService fileService;
 	
 	@Transactional(readOnly = true)
 	public List<PassageResponseDto> getPassageListByLanguageAndCategory(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category) {
@@ -310,5 +308,15 @@ public class PassageService {
 		return passageRepository.findAllByClassification_ClassificationName(classificationName, Pageable.unpaged()).getContent();
 		
 	}
+
+	@Transactional
+	public void deletePassage(Long passageNo) {
+
+		Passage passage = getPassageByPassageNo(passageNo);
+		
+		passageRepository.delete(passage);
+		
+	}
+
 
 }
