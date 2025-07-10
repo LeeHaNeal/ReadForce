@@ -114,6 +114,8 @@ public final class MessageCode {
 	public static final String CREATE_LEVEL_SUCCESS = "SUC0036";
 	public static final String MODIFY_LEVEL_SUCCESS = "SUC0037";
 	public static final String DELETE_LEVEL_SUCCESS = "SUC0038";
+	public static final String DELETE_PASSAGE_SUCCESS = "SUC0039";
+	
 	
 	
 	

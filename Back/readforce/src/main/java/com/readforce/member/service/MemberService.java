@@ -534,10 +534,6 @@ public class MemberService {
 			
 		}
 		
-		resultService.getActiveMemberResultByEmailWithOptional(email).ifPresent(result -> {
-			resultMetricService.deleteAllByResult(result);
-		});
-		
 		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
 		
 		memberRepository.delete(member);		
