@@ -4,13 +4,13 @@ import mainImage from "../assets/image/mainimage.png";
 import slide2Image from "../assets/image/slide2.png";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import fetchWithAuth from '../utils/fetchWithAuth';
 
 const Main = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("KOREAN");
   const [top5Data, setTop5Data] = useState([]);
+  const [wrongArticles, setWrongArticles] = useState([]);
   const navigate = useNavigate();
   const debounceRef = useRef(null);
 
@@ -43,6 +43,7 @@ const Main = () => {
 
   const currentSlide = slides[slideIndex];
 
+  // 슬라이드 자동 전환
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
@@ -51,33 +52,26 @@ const Main = () => {
     return () => clearInterval(interval);
   }, [isPaused, slides]);
 
+  // 언어별 랭킹 + 틀린문제 동시 fetch
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`);
-        setTop5Data(res.data.slice(0, 5));
+        const [rankingRes, wrongRes] = await Promise.all([
+          api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`),
+          api.get(`/learning/get-most-incorrect-questions?language=${selectedLanguage}&number=3`),
+        ]);
+
+        setTop5Data(rankingRes.data.slice(0, 5));
+        setWrongArticles(wrongRes.data);
       } catch (err) {
-        console.error("Top5 랭킹 불러오기 실패:", err);
+        console.error("데이터 불러오기 실패:", err);
         setTop5Data([]);
+        setWrongArticles([]);
       }
     }, 600);
     return () => clearTimeout(debounceRef.current);
   }, [selectedLanguage]);
-
-  // useEffect(() => {
-  //   if (debounceRef.current) clearTimeout(debounceRef.current);
-  //   debounceRef.current = setTimeout(async () => {
-  //     try {
-  //       const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
-  //       setTop5Data(res.data.slice(0, 5));
-  //     } catch (err) {
-  //       console.error("Top5 fetch error", err);
-  //       setTop5Data([]);
-  //     }
-  //   }, 600);
-  //   return () => clearTimeout(debounceRef.current);
-  // }, [selectedLanguage]);
 
   const handleButtonClick = () => {
     if (!currentSlide.buttonLink) return;
@@ -85,19 +79,6 @@ const Main = () => {
       ? window.open(currentSlide.buttonLink, "_blank")
       : navigate(currentSlide.buttonLink);
   };
-
-  const [wrongArticles, setWrongArticles] = useState([]);
-
-  // useEffect(() => {
-  //   fetchWithAuth('/quiz/get-most-incorrected-quiz')
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setWrongArticles(data);
-  //     })
-  //     .catch(err => {
-  //       console.error("가장 많이 틀린 퀴즈 불러오기 실패:", err);
-  //     });
-  // }, []);
 
   return (
     <div>
@@ -147,6 +128,7 @@ const Main = () => {
 
       <section className="stats-section">
         <div className="page-container stat-container">
+          {/* Top 5 랭킹 */}
           <div className="stat-box top5">
             <h3>🏆 <span className="bold">주간 Top 5</span></h3>
             <div className="tabs">
@@ -175,13 +157,13 @@ const Main = () => {
               </tbody>
             </table>
           </div>
-          
+
+          {/* 가장 많이 틀린 문제 */}
           <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
             ) : (
-              Array.isArray(wrongArticles) &&
               wrongArticles.map((quiz, index) => (
                 <div className="article" key={index}>
                   <div className="flag">

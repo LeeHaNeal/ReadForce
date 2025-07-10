@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import kakaoIcon from '../../assets/image/kakao.png';
 import googleIcon from '../../assets/image/google.png';
@@ -16,11 +16,12 @@ const ProfileEditPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const hasFetchedImage = useRef(false);
+  const previewUrlRef = useRef(null); // ✅ 미리보기 URL 추적용
 
-  // ✅ 이미지 fetch + revokeObjectURL
+  // ✅ 프로필 이미지 가져오기
   useEffect(() => {
     let objectUrl = null;
-
+  
     const fetchProfileImage = async () => {
       try {
         const res = await axiosInstance.get('/file/get-profile-image', {
@@ -28,22 +29,20 @@ const ProfileEditPage = () => {
         });
         objectUrl = URL.createObjectURL(res.data);
         setProfileImageUrl(objectUrl);
-      } catch (error) {
-        if (error.response?.status === 404) {
-          setProfileImageUrl(defaultProfileImage);
-        } else {
-          console.error('이미지 로딩 실패:', error);
-        }
+      } catch {
+        // 🔇 어떤 에러든 기본 이미지로 fallback
+        setProfileImageUrl(defaultProfileImage);
       }
     };
-
+  
     if (!hasFetchedImage.current) {
       hasFetchedImage.current = true;
       fetchProfileImage();
     }
-
+  
     return () => {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     };
   }, []);
 
@@ -72,7 +71,6 @@ const ProfileEditPage = () => {
     setIsNicknameValid(isAvailable);
   };
 
-  // ✅ 생일 검증
   const validateBirthday = (value) => {
     setBirthdayMessage('');
     const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -160,6 +158,10 @@ const ProfileEditPage = () => {
       await axiosInstance.delete('/file/delete-profile-image');
       setProfileImageUrl(defaultProfileImage);
       setSelectedFile(null);
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
       alert('프로필 이미지가 삭제되었습니다.');
     } catch {
       alert('이미지 삭제 실패');
@@ -191,6 +193,12 @@ const ProfileEditPage = () => {
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (file && file.size <= 5 * 1024 * 1024) {
+                  const previewUrl = URL.createObjectURL(file);
+                  if (previewUrlRef.current) {
+                    URL.revokeObjectURL(previewUrlRef.current);
+                  }
+                  previewUrlRef.current = previewUrl;
+                  setProfileImageUrl(previewUrl);
                   setSelectedFile(file);
                 } else {
                   alert('이미지 용량은 5MB 이하여야 합니다.');
