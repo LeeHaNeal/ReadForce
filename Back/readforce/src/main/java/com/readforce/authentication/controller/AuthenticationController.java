@@ -127,10 +127,13 @@ public class AuthenticationController {
     		@NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
     		String refreshToken
 	){
+
+		System.out.println(refreshToken);
 		
 		String username = jwtUtil.extractUsername(refreshToken);
 		String storedRefreshToken = authenticationService.getRefreshToken(username);
 		
+
 		if(storedRefreshToken == null) {
 
 			authenticationService.deleteRefreshToken(username);
@@ -158,7 +161,6 @@ public class AuthenticationController {
 		));
 
 	}
-
 	
 	@PostMapping("/get-tokens")
 	public ResponseEntity<Map<String, String>> getTokens(
@@ -167,7 +169,6 @@ public class AuthenticationController {
 			String temporalToken
 	){
 
-		
 		String temporalTokenJson = redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
 		
 		if(temporalTokenJson == null) {
@@ -196,7 +197,7 @@ public class AuthenticationController {
 			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
 			
 		}
-		System.out.println("11111111111111111111111111111111111"+tokenMap);
+
 		return ResponseEntity.status(HttpStatus.OK).body(tokenMap);
 		
 	}

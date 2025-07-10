@@ -172,14 +172,20 @@ public class TestService {
 	}
 
 	private QuestionTestResultDto getTestResult(LanguageEnum language, Integer level, boolean factualResult, boolean inferentialResult) {
+		
+		System.out.println("dsaffffffffffffffffffffffffffff  "+ level);
 	
-		String vocabularyLevel = levelService.getVocabularyLevelByLevel(level);		
+		String vocabularyLevel = levelService.getVocabularyLevelByLevel(level);
+		
+		System.out.println("dsaffffffffffffffffffffffffffff  "+ vocabularyLevel);
 
 		return generateTestComment(language, vocabularyLevel, factualResult, inferentialResult);
 				
 	}
 
 	private QuestionTestResultDto generateTestComment(LanguageEnum language, String vocabularyLevel, boolean factualResult, boolean inferentialResult) {
+		
+		System.out.println("asdfasdf  123144545        "+vocabularyLevel);
 		
 		String testResultComment = "";
 		
@@ -203,8 +209,7 @@ public class TestService {
 					testResultComment = koreanStartComment + koreanVocabularyComment + koreanFactualIncorrectComment +koreanInferentialIncorrectComment;
 				}
 				
-		}
-		
+		}		
 		
 		return QuestionTestResultDto.builder()
 				.testResultComment(testResultComment)
@@ -223,7 +228,7 @@ public class TestService {
 			case 4 -> isCorrect ? 5 : 3;
 			case 5 -> isCorrect ? -5 : -4;
 			case 3 -> isCorrect ? 2 : -2;
-			case 2 -> isCorrect ? -2 : -1;
+			case 2 -> isCorrect ? -2 : 1;
 			default -> -1;
 		
 		};

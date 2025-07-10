@@ -12,6 +12,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public class QuestionTestResponseDto {
 	
+	@Override
+	public String toString() {
+		return "QuestionTestResponseDto [testerId=" + testerId + ", passageNo=" + passageNo + ", title=" + title
+				+ ", content=" + content + ", author=" + author + ", publicationDate=" + publicationDate + ", category="
+				+ category + ", level=" + level + ", questionNo=" + questionNo + ", multipleChoiceNo="
+				+ multipleChoiceNo + ", question=" + question + ", choiceList=" + choiceList + "]";
+	}
+
 	private final String testerId;
 
 	private final Long passageNo;
