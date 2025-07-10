@@ -18,6 +18,7 @@ import com.readforce.question.dto.QuestionTestResultDto;
 import com.readforce.test.dto.TestSubmitRequestDto;
 import com.readforce.test.service.TestService;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +45,7 @@ public class TestController {
 	
 	@PostMapping("/submit-vocabulary-result")
 	public ResponseEntity<QuestionTestResponseDto> submitVocabularyResult(
-			@RequestBody TestSubmitRequestDto submitRequestDto
+			@Valid @RequestBody TestSubmitRequestDto submitRequestDto
 	){
 		
 		QuestionTestResponseDto nextQuestion = testService.submitVocabularyResult(submitRequestDto);
@@ -55,7 +56,7 @@ public class TestController {
 	
 	@PostMapping("/submit-factual-result")
 	public ResponseEntity<?> submitFactualResult(
-			@RequestBody TestSubmitRequestDto submitRequestDto
+			@Valid @RequestBody TestSubmitRequestDto submitRequestDto
 	){
 		
 		Object result = testService.submitFactualResult(submitRequestDto);
@@ -67,7 +68,7 @@ public class TestController {
 	
 	@PostMapping("/submit-inferential-result")
 	public ResponseEntity<QuestionTestResultDto> submitInferentialResult(
-			@RequestBody TestSubmitRequestDto submitRequestDto
+			@Valid @RequestBody TestSubmitRequestDto submitRequestDto
 	){
 		
 		QuestionTestResultDto result = testService.submitInferentialResult(submitRequestDto);

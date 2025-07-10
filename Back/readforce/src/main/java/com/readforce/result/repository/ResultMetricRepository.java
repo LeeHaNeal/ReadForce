@@ -15,5 +15,7 @@ public interface ResultMetricRepository extends JpaRepository<ResultMetric, Long
 	List<ResultMetric> findAllByResultAndLanguage_LanguageName(Result result, LanguageEnum language);
 
 	List<ResultMetric> findAllByResult(Result result);
+
+	void deleteAllByResult(Result result);
 	
 }

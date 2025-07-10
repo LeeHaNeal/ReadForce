@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.readforce.administrator.dto.AdministratorModifyRequestDto;
 import com.readforce.common.enums.RoleEnum;
 import com.readforce.common.enums.StatusEnum;
 import com.readforce.result.entity.Learning;
@@ -123,6 +124,36 @@ public class Member {
 			this.profileImagePath = profileImagePath;
 			
 		}
+		
+	}
+	
+	public void modifyInformation(AdministratorModifyRequestDto requestDto) {
+		
+		if(requestDto.getNickname() != null) {
+			
+			this.nickname = requestDto.getNickname();
+			
+		}
+		
+		if(requestDto.getBirthday() != null) {
+			
+			
+			this.birthday = requestDto.getBirthday();
+			
+		}
+		
+		if(requestDto.getStatus() != null) {
+			
+			this.status = requestDto.getStatus();
+			
+		}
+		
+		if(requestDto.getRole() != null) {
+			
+			this.role = requestDto.getRole();
+			
+		}
+		
 		
 	}
 	

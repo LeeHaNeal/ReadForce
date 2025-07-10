@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.readforce.administrator.dto.AdministratorMemberResponseDto;
+import com.readforce.administrator.dto.AdministratorModifyRequestDto;
 import com.readforce.authentication.dto.OAuthAttributeDto;
 import com.readforce.authentication.exception.AuthenticationException;
 import com.readforce.common.MessageCode;
@@ -50,6 +53,7 @@ import com.readforce.result.entity.Result;
 import com.readforce.result.service.ResultMetricService;
 import com.readforce.result.service.ResultService;
 
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -489,6 +493,57 @@ public class MemberService {
 
 		memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 		.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<AdministratorMemberResponseDto> getAllMemberList() {
+
+		return memberRepository.findAll().stream()
+				.map(AdministratorMemberResponseDto::new)
+				.collect(Collectors.toList());
+
+	}
+
+	@Transactional
+	public void modifyByAdmin(AdministratorModifyRequestDto requestDto) {
+
+		Member member = memberRepository.findByEmail(requestDto.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+		
+		member.modifyInformation(requestDto);
+				
+		memberRepository.save(member);
+		
+	}
+
+	@Transactional
+	public void deleteMemberByAdmin(@Email String email) {
+		
+		Member member = memberRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+
+		if(member.getProfileImagePath() != null && !member.getProfileImagePath().isEmpty()) {
+			
+			try {
+				
+				deleteProfileImage(member.getEmail());
+				
+			} catch(Exception exception) {
+				
+				fileDeleteFailLogService.create(member, exception.getMessage());
+								
+			}
+			
+		}
+		
+		resultService.getActiveMemberResultByEmailWithOptional(email).ifPresent(result -> {
+			resultMetricService.deleteAllByResult(result);
+		});
+		
+		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
+		
+		memberRepository.delete(member);		
 		
 	}
 

@@ -14,6 +14,7 @@ import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Type;
+import com.readforce.passage.entity.Type.TypeBuilder;
 import com.readforce.passage.repository.TypeRepository;
 import com.readforce.result.entity.Result;
 import com.readforce.result.entity.ResultMetric;
@@ -74,6 +75,13 @@ public class TypeService {
 		return typeRepository.findByTypeName(type)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.TYPE_NOT_FOUND));
 
+	}
+
+	@Transactional
+	public void saveType(Type type) {
+
+		typeRepository.save(type);
+		
 	}
 
 }
