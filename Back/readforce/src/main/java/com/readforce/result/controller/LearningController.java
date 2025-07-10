@@ -20,6 +20,7 @@ import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
 import com.readforce.result.service.LearningService;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public class LearningController {
 	
 	@PostMapping("/save-multiple-choice")
 	public ResponseEntity<Map<String, String>> saveMultipleChoice(
-			@RequestBody LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto,
+			@Valid @RequestBody LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
 		

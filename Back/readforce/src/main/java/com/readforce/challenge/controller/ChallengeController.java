@@ -25,6 +25,7 @@ import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
 import com.readforce.question.dto.MultipleChoiceResponseDto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
@@ -55,7 +56,7 @@ public class ChallengeController {
 	
 	@PostMapping("/submit-challenge-result")
 	public ResponseEntity<Map<String, Double>> submitChallengeResult(
-			@RequestBody ChallengeSubmitResultRequestDto requestDto,
+			@Valid @RequestBody ChallengeSubmitResultRequestDto requestDto,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
 		String email = userDetails.getUsername();

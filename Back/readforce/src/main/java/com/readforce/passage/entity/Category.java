@@ -41,4 +41,10 @@ public class Category {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;	
 
+	public void changeCategoryName(CategoryEnum categoryName) {
+		
+		this.categoryName = categoryName;
+		
+	}
+	
 }
