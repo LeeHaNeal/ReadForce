@@ -58,7 +58,7 @@ const ChallengePage = () => {
   return (
     <div className="ChallengePage-container">
       <h2 className="ChallengePage-title">
-        “ 오늘 <span className="ChallengePage-highlight">812명</span>이 도전했어요! ”
+        “ 오늘의 도전! ”
       </h2>
 
       <div className="ChallengePage-top-container">
