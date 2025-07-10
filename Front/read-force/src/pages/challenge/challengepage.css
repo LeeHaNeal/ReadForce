@@ -1,223 +1,32 @@
-.ChallengePage-title {
-  font-size: 24px;
-  text-align: center;
-  margin-bottom: 2rem;
-  font-weight: bold;
-}
 
-.ChallengePage-highlight {
-  color: #14b8a6;
-}
-
-.ChallengePage-container {
-  padding: 2rem 1rem;
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-.ChallengePage-top-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.ChallengePage-stats-box {
-  flex: 1;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 1.5rem 1rem;
-  text-align: center;
-}
-
-.ChallengePage-stats-box h3 {
-  text-align: left;
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  padding-left: 0.5rem;
-}
-
-.ChallengePage-grid-4x2 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.2rem;
-  margin-bottom: 1.5rem;
-  padding: 0 0.5rem;
-}
-
-.ChallengePage-grid-4x2 .label {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 0.2rem;
-  text-align: center;
-}
-
-.ChallengePage-grid-4x2 .number {
-  font-size: 20px;
-  font-weight: bold;
-  color: #111;
-  text-align: center;
-}
-
-.ChallengePage-btn {
+.challenge-wrapper {
+  height: calc(90vh - 100px);
   width: 100%;
-  background: #66c7c2;
-  color: white;
-  padding: 0.6rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.ChallengePage-btn:hover {
-  background: #14b8a6;
-}
-
-.ChallengePage-top5-box {
-  flex: 1;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 1.5rem 1rem;
-}
-
-.ChallengePage-top5-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ChallengePage-top5-box h3 {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.ChallengePage-ranking-more-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  color: #0f766e;
-  cursor: pointer;
-  transition: transform 0.2s, color 0.2s;
-}
-
-.ChallengePage-ranking-more-btn:hover {
-  transform: scale(1.2);
-  color: #0d9488;
-}
-
-.ChallengePage-top5-tabs {
-  display: flex;
+  flex-direction: column;
   justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.ChallengePage-top5-tabs button {
-  background: none;
-  border: 1px solid #ccc;
-  padding: 4px 12px;
-  margin: 0 5px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #444;
-  transition: all 0.2s;
-}
-
-.ChallengePage-top5-tabs button.active {
-  background-color: #14b8a6;
-  color: white;
-  border-color: #14b8a6;
-}
-
-.ChallengePage-top5-box ol {
-  padding-left: 0;
-  list-style: none;
-}
-
-.ChallengePage-top5-box li {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-bottom: 0.6rem;
-}
-
-.rank {
-  font-weight: bold;
-  margin-right: 0.5rem;
-}
-
-.gold { color: #f59e0b; }
-.silver { color: #9ca3af; }
-.bronze { color: #f97316; }
-
-.point {
-  font-weight: bold;
-}
-
-.ChallengePage-wrong-section {
-  margin-top: 2rem;
-}
-
-.ChallengePage-wrong-header-row {
-  display: grid;
-  grid-template-columns: 1fr 60px 90px;
-  align-items: end;
-  margin-bottom: 0.5rem;
-  padding: 0 1rem;
-}
-
-.ChallengePage-wrong-header-row h3 {
-  font-size: 18px;
-  margin: 0;
-}
-
-.ChallengePage-right-label {
-  font-size: 13px;
-  color: #888;
-  text-align: center;
-}
-
-.ChallengePage-wrong-item {
-  display: grid;
-  grid-template-columns: 1fr 60px 90px;
   align-items: center;
-  padding: 0.8rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-bottom: 0.8rem;
-  background: #fff;
-}
-
-.ChallengePage-wrong-item p {
-  font-size: 14px;
-  margin: 0;
-  color: #111;
-}
-
-.ChallengePage-wrong-item span {
+  gap: 4rem;                
   text-align: center;
-  font-size: 13px;
-  color: #333;
 }
 
-.ChallengePage-wrong-item button {
-  background: #14b8a6;
-  color: #fff;
-  padding: 0.4rem 0.8rem;
+.challenge-trophy {
+  width: min(90vw, 630px);  
+  height: auto;
+}
+
+.challenge-btn {
+  padding: 0.9rem 5rem;
+  font-size: 1.2rem;
+  color: #ffffff;
+  background: #439395;      
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: opacity 0.2s ease;
+  font-weight: bold;
 }
 
-.ChallengePage-wrong-item button:hover {
-  background: #0d9488;
+.challenge-btn:hover {
+  opacity: 0.85;
 }
