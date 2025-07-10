@@ -66,7 +66,7 @@ function App() {
           <Route path="/challenge" element={<ChallengePage />} />
           {/* <Route path="/oauth2/redirect" element={<Oauth2redirect />} /> */}
           <Route path="/authcallback" element={<Authcallback />} />
-          <Route path="/social-sign-up" element={<Socialsignup />} />
+          <Route path="/member/social-sign-up" element={<Socialsignup />} />          
           <Route path="/profile-edit" element={<ProfileEditPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/test-start" element={<ReadTest />} />
