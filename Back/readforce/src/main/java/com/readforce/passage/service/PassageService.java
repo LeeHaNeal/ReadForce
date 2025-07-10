@@ -311,5 +311,11 @@ public class PassageService {
 		return passageRepository.findAllByClassification_ClassificationName(classificationName, Pageable.unpaged()).getContent();
 		
 	}
+	
+	// 전체 지문 가져오기
+	@Transactional(readOnly = true)
+	public List<Passage> getAllPassages() {
+	    return passageRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+	}
 
 }

@@ -84,6 +84,7 @@ const AdminPage = () => {
         );
     };
 
+    // 테스트 지문 생성
     const handleGenerateTestPassage = async () => {
         setLoadingTestPassage(true);
         try {
@@ -98,6 +99,7 @@ const AdminPage = () => {
         }
     };
 
+    // 테스트 문제 생성
     const handleGenerateTestQuestion = async () => {
         setLoadingTestQuestion(true);
         try {
@@ -207,6 +209,7 @@ const AdminPage = () => {
                 <span style={ADMIN_BUTTONS_LIST}>
                     <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/adminnews")}>뉴스 관리</button>
                     <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminliterature')}>문학 관리</button>
+                    <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminpassage')}>문제 관리</button>
                 </span>
                 <div style={ADMIN_TITLE}>
                     <div>
