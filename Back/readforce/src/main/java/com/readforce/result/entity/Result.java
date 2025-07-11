@@ -90,4 +90,21 @@ public class Result {
 		
 	}
 	
+	public void modifyInformation(Integer learningStreak, Double overallCorrectAnswerRate) {
+		
+		if(learningStreak != null) {
+			
+			this.learningStreak = learningStreak;
+			
+		}
+		
+		if(overallCorrectAnswerRate != null) {
+			
+			this.overallCorrectAnswerRate = overallCorrectAnswerRate;
+			
+		}
+		
+		
+	}
+	
 }
