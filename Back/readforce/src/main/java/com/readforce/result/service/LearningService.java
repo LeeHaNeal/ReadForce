@@ -19,6 +19,7 @@ import com.readforce.passage.entity.Passage;
 import com.readforce.question.dto.QuestionCheckResultDto;
 import com.readforce.question.dto.QuestionMostIncorrectResponseDto;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
+import com.readforce.question.entity.MultipleChoice;
 import com.readforce.question.entity.Question;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
@@ -242,7 +243,7 @@ public class LearningService {
 		List<Learning> latestLearningList = learningRepository.findLatestLearningListForQuestionNoList(topIdList);
 		
 		List<Learning> allLearningListByQuestionNos = learningRepository.findAllByQuestionQuestionNoIn(topIdList);
-
+		
 		Map<Long, List<Learning>> allLearningMapByQuestionNo = allLearningListByQuestionNos.stream()
 				.collect(Collectors.groupingBy(learning -> learning.getQuestion().getQuestionNo()));
 		
@@ -257,10 +258,12 @@ public class LearningService {
 			long correctAttempts = questionLearningList.stream().filter(Learning::getIsCorrect).count();
 
 			double correctAnswerRate = (totalAttempts > 0) ? (double) correctAttempts / totalAttempts : 0.0;
-
+			
+			MultipleChoice multipleChoice = multipleChoiceService.getMultipleChoiceByQuestionNo(questionNo);
+			
 			return QuestionMostIncorrectResponseDto.builder()
 					.questionNo(questionNo)
-					.title(latestLearning.getQuestion().getPassage().getTitle())
+					.title(multipleChoice.getQuestion())
 					.createdAt(latestLearning.getCreatedAt())
 					.isCorrect(latestLearning.getIsCorrect())
 					.correctAnswerRate(correctAnswerRate)

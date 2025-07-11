@@ -66,9 +66,7 @@ public class SecurityConfig {
 				            "/ranking/get-ranking-list",
 				            "/test/**",
 				            "/oauth2/**",
-							"/passage/**",
-							"**"
-
+							"/passage/**"
 					)
 					.permitAll()
 					.anyRequest()

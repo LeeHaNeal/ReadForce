@@ -6,8 +6,6 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,12 +23,15 @@ import com.readforce.administrator.dto.AdministratorModifyRequestDto;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.RoleEnum;
 import com.readforce.member.entity.Member;
+import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
+import com.readforce.result.service.LearningService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -41,6 +42,9 @@ public class AdministratorMemberController {
 	
 	private final MemberService memberService;
 	private final PasswordEncoder passwordEncoder;
+	private final LearningService learningService;
+	private final AttendanceService attendanceService;
+	
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-member-list")
 	public ResponseEntity<List<AdministratorMemberResponseDto>> getAllMemberList(){
@@ -130,21 +134,36 @@ public class AdministratorMemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(memberDto);
 		
 	}
-//	
-//	@GetMapping("/get-total-learning")
-//	public ResponseEntity<List<QuestionSummaryResponseDto>> getTotalLearning(
-//			@RequestParam("")
-//	){
-//		
-//		String email = userDetails.getUsername();
-//		
-//		List<QuestionSummaryResponseDto> totalLearningList = learningService.getTotalLearning(email);
-//		
-//		return ResponseEntity.status(HttpStatus.OK).body(totalLearningList);
-//		
-//	}
+	
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/get-total-learning")
+	public ResponseEntity<List<QuestionSummaryResponseDto>> getTotalLearning(
+			@RequestParam("email")
+			@NotNull(message = MessageCode.EMAIL_NOT_BLANK)
+			@Email
+			String email
+	){
+		
+		List<QuestionSummaryResponseDto> totalLearningList = learningService.getTotalLearning(email);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(totalLearningList);
+		
+	}
 	
 	// 사용자 출석 조회/생성/삭제
+	
+//	@GetMapping("/get-attendance-list-by-email")
+//	public ResponseEntity<List<MemberAttendanceResponseDto>> getAttendanceListByEmail(
+//			@RequestParam("email")
+//			@NotNull(message = MessageCode.EMAIL_NOT_BLANK)
+//			@Email
+//			String email
+//	){
+//		
+//		attendanceService.get
+//		
+//		
+//	}
 	
 	// 사용자 점수 조회/생성/수정/초기화
 	
