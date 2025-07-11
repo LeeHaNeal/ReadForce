@@ -241,7 +241,7 @@ public class LearningService {
 		
 		List<Learning> latestLearningList = learningRepository.findLatestLearningListForQuestionNoList(topIdList);
 		
-		List<Learning> allLearningListByQuestionNos = learningRepository.findAllByQuestionNoIn(topIdList);
+		List<Learning> allLearningListByQuestionNos = learningRepository.findAllByQuestionQuestionNoIn(topIdList);
 
 		Map<Long, List<Learning>> allLearningMapByQuestionNo = allLearningListByQuestionNos.stream()
 				.collect(Collectors.groupingBy(learning -> learning.getQuestion().getQuestionNo()));

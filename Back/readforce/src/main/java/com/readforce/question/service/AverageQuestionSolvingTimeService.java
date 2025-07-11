@@ -15,7 +15,6 @@ import com.readforce.passage.entity.Level;
 import com.readforce.passage.entity.Type;
 import com.readforce.passage.service.CategoryService;
 import com.readforce.passage.service.LanguageService;
-import com.readforce.passage.service.LevelService;
 import com.readforce.passage.service.TypeService;
 import com.readforce.question.entity.AverageQuestionSolvingTime;
 import com.readforce.question.repository.AverageQuestionSolvingTimeRepository;
@@ -30,7 +29,6 @@ public class AverageQuestionSolvingTimeService {
 	private final AgeGroupService ageGroupService;
 	private final CategoryService categoryService;
 	private final TypeService typeService;
-	private final LevelService levelService;
 	private final LanguageService languageService;
 	
 	
@@ -51,12 +49,11 @@ public class AverageQuestionSolvingTimeService {
 	}
 
 	@Transactional
-	public void createAverageQuestionSolvingTime(AdministratorAverageQuestionSolvingTimeRequestDto requestDto) {
+	public void createAverageQuestionSolvingTime(AdministratorAverageQuestionSolvingTimeRequestDto requestDto, Level level) {
 		
 		AgeGroup ageGroup = ageGroupService.getAgeGroupByAgeGroup(requestDto.getAgeGroup());
 		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
 		Type type = typeService.getTypeByType(requestDto.getType());
-		Level level = levelService.getLevelByLevel(requestDto.getLevel());
 		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
 		
 		AverageQuestionSolvingTime averageQuestionSolvingTime = AverageQuestionSolvingTime.builder()

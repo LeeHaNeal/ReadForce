@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +26,7 @@ import com.readforce.common.MessageCode;
 import com.readforce.common.enums.RoleEnum;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
+import com.readforce.question.dto.QuestionSummaryResponseDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -127,9 +130,19 @@ public class AdministratorMemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(memberDto);
 		
 	}
-	
-
-	// 사용자가 푼 모든 문제 가져오기
+//	
+//	@GetMapping("/get-total-learning")
+//	public ResponseEntity<List<QuestionSummaryResponseDto>> getTotalLearning(
+//			@RequestParam("")
+//	){
+//		
+//		String email = userDetails.getUsername();
+//		
+//		List<QuestionSummaryResponseDto> totalLearningList = learningService.getTotalLearning(email);
+//		
+//		return ResponseEntity.status(HttpStatus.OK).body(totalLearningList);
+//		
+//	}
 	
 	// 사용자 출석 조회/생성/삭제
 	
