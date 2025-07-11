@@ -38,19 +38,14 @@ public class RecommendService {
 
 	    List<Long> solvedQuestionNos = learningService.getAllSolvedQuestionNos(member);
 
-	    // ✔️ 로그 추가: 풀었던 문제 목록
+	   
 	    log.info("[RecommendService] Solved question numbers: {}", solvedQuestionNos);
 
 	    MultipleChoiceResponseDto recommendQuestion = multipleChoiceService.getUnsolvedMultipleChoiceQuestion(
-	            member,
-	            language,
-	            weakCategory,
-	            weakType,
-	            optimalLevel,
-	            solvedQuestionNos
+	            member, language,weakCategory,weakType,optimalLevel,solvedQuestionNos
 	    );
 
-	    // ✔️ 로그 추가: 추천한 문제 번호
+	  
 	    log.info("[RecommendService] Recommended question number: {}", recommendQuestion.getQuestionNo());
 
 	    return recommendQuestion;
