@@ -38,14 +38,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChallengeService {
 	
-	private LevelService levelService;
-	private PassageService passageService;
-	private MultipleChoiceService multipleChoiceService;
-	private QuestionService questionService;
-	private ScoreService scoreService;
-	private CategoryService categoryService;
-	private LanguageService languageService;
-	private ClassificationService classificationService;
+	private final LevelService levelService;
+	private final PassageService passageService;
+	private final MultipleChoiceService multipleChoiceService;
+	private final QuestionService questionService;
+	private final ScoreService scoreService;
+	private final CategoryService categoryService;
+	private final LanguageService languageService;
+	private final ClassificationService classificationService;
 	
 	@Transactional
 	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
@@ -87,60 +87,55 @@ public class ChallengeService {
 	@Transactional
 	public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
 
-		double totalScore = 0.0;
-		
-		final long MAX_TIME_SECONDS = 1800;
-		
-		for(Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
-			
-			for(Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
-				
-				Long questionNo = entry.getKey();
-				Integer selectedIndex = entry.getValue();
-				
-				QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
-				
-				boolean isCorrect = checkResult.getIsCorrect();
-				
-				if(isCorrect) {
-					
-					QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
+	    double totalScore = 0.0;
+	    final long MAX_TIME_SECONDS = 1800;
 
-					Level level = levelService.getLevelByLevel(questionInfo.getLevel());
-					
-					double baseScore = level.getLevelNumber() * 4;
-					
-					totalScore += baseScore;
-					
-				}
-				
-			}
-			
-		}
-		
-		long solvingTime = requestDto.getTotalQuestionSolvingTime();
-		if(solvingTime < MAX_TIME_SECONDS) {
-			
-			double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
-			
-			totalScore += timeBonus;
-			
-		}
-		
-		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-		
-		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-		
-		scoreService.createScore(
-				member,
-				totalScore,
-				category,
-				language
-		);
-		
-		return totalScore;
-		
+	    for (Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
+
+	        for (Map.Entry<Long, Integer> entry : resultMap.entrySet()) {
+
+	            Long questionNo = entry.getKey();
+	            Integer selectedIndex = entry.getValue();
+
+	            QuestionCheckResultDto checkResult = multipleChoiceService.checkResult(questionNo, selectedIndex);
+
+	            if (checkResult.getIsCorrect()) {
+
+	                QuestionLevelAndCategoryAndLanguageDto questionInfo = questionService.getQuestionLevelAndCategoryAndLanguage(questionNo);
+
+	                Level level = levelService.getLevelByLevel(questionInfo.getLevel());
+
+	                double baseScore = level.getLevelNumber() * 4;
+
+	                totalScore += baseScore;
+	            }
+	        }
+	    }
+
+	    long solvingTime = requestDto.getTotalQuestionSolvingTime();
+	    if (solvingTime < MAX_TIME_SECONDS) {
+
+	        double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
+
+	        totalScore += timeBonus;
+	    }
+
+	   
+	    totalScore = Math.round(totalScore * 10.0) / 10.0;
+
+	    Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+	    Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+
+	    scoreService.createScore(
+	            member,
+	            totalScore,
+	            category,
+	            language
+	    );
+
+	    return totalScore;
 	}
+
 
 	@Transactional
 	public void updateToChallengePassages() {

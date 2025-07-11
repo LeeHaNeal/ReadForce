@@ -68,6 +68,15 @@ public class QuestionService {
 				.collect(Collectors.toList());
 		
 	}
+
+	@Transactional
+	public void deleteQuestion(Long questionNo) {
+
+		Question question = getQuestion(questionNo);
+		
+		questionRepository.delete(question);
+		
+	}
 	
 
 

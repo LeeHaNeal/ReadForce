@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.LanguageEnum;
+import com.readforce.question.dto.QuestionMostIncorrectResponseDto;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
 import com.readforce.result.service.LearningService;
@@ -113,7 +114,7 @@ public class LearningController {
 	}
 	
 	@GetMapping("/get-most-incorrect-questions")
-	public ResponseEntity<List<QuestionSummaryResponseDto>> getMostIncorrectQuestions(
+	public ResponseEntity<List<QuestionMostIncorrectResponseDto>> getMostIncorrectQuestions(
 			@RequestParam("language")
 			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 			LanguageEnum language,
@@ -122,7 +123,7 @@ public class LearningController {
 			Integer number
 	){
 		
-		List<QuestionSummaryResponseDto> incorrectQuestionList = learningService.getMostIncorrectQuestions(language, number);
+		List<QuestionMostIncorrectResponseDto> incorrectQuestionList = learningService.getMostIncorrectQuestions(language, number);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(incorrectQuestionList);
 		

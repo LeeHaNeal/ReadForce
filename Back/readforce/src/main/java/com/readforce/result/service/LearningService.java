@@ -3,7 +3,7 @@ package com.readforce.result.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +17,7 @@ import com.readforce.member.entity.Member;
 import com.readforce.member.service.MemberService;
 import com.readforce.passage.entity.Passage;
 import com.readforce.question.dto.QuestionCheckResultDto;
+import com.readforce.question.dto.QuestionMostIncorrectResponseDto;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.question.entity.Question;
 import com.readforce.question.service.MultipleChoiceService;
@@ -45,7 +46,7 @@ public class LearningService {
 		
 		Member member = memberService.getActiveMemberByEmail(email);
 		
-		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSlovingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
+		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSolvingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
 		
 		updateResultAndMetric(member);
 		
@@ -228,7 +229,7 @@ public class LearningService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<QuestionSummaryResponseDto> getMostIncorrectQuestions(LanguageEnum language, Integer number) {
+	public List<QuestionMostIncorrectResponseDto> getMostIncorrectQuestions(LanguageEnum language, Integer number) {
 
 		List<Long> topIdList = learningRepository.findMostIncorrectQuestionNosByLanguage(language, PageRequest.of(0, number));
 		
@@ -240,14 +241,33 @@ public class LearningService {
 		
 		List<Learning> latestLearningList = learningRepository.findLatestLearningListForQuestionNoList(topIdList);
 		
-		return topIdList.stream()
-				.map(id -> latestLearningList.stream()
-						.filter(l -> l.getQuestion().getQuestionNo().equals(id))
-						.findFirst()
-						.orElse(null))
-				.filter(Objects::nonNull)
-				.map(QuestionSummaryResponseDto::new)
-				.collect(Collectors.toList());
+		List<Learning> allLearningListByQuestionNos = learningRepository.findAllByQuestionQuestionNoIn(topIdList);
+
+		Map<Long, List<Learning>> allLearningMapByQuestionNo = allLearningListByQuestionNos.stream()
+				.collect(Collectors.groupingBy(learning -> learning.getQuestion().getQuestionNo()));
+		
+		return latestLearningList.stream().map(latestLearning -> {
+			
+			Long questionNo = latestLearning.getQuestion().getQuestionNo();
+			
+			List<Learning> questionLearningList = allLearningMapByQuestionNo.get(questionNo);
+			
+			long totalAttempts = questionLearningList.size();
+			
+			long correctAttempts = questionLearningList.stream().filter(Learning::getIsCorrect).count();
+
+			double correctAnswerRate = (totalAttempts > 0) ? (double) correctAttempts / totalAttempts : 0.0;
+
+			return QuestionMostIncorrectResponseDto.builder()
+					.questionNo(questionNo)
+					.title(latestLearning.getQuestion().getPassage().getTitle())
+					.createdAt(latestLearning.getCreatedAt())
+					.isCorrect(latestLearning.getIsCorrect())
+					.correctAnswerRate(correctAnswerRate)
+					.build();
+			
+		}).collect(Collectors.toList());
+		
 		
 	}
 	

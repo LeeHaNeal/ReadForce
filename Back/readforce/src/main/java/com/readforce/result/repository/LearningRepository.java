@@ -119,5 +119,7 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 	List<Learning> findLatestLearningListForQuestionNoList(
 			@Param("questionNoList") List<Long> questionNoList
 	);
+
+	List<Learning> findAllByQuestionQuestionNoIn(List<Long> topIdList);
 	
 }
