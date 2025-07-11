@@ -46,24 +46,6 @@ const AdminPassageDetail = () => {
                     <div style={metaItem}><strong>생성일</strong><div>{new Date(passage.createdAt).toLocaleString()}</div></div>
                 </div>
                 <div style={passageBox}>{passage.content}</div>
-                {/* {questionList.length > 0 ? (
-                    <div style={passageBox}>
-                        {questionList.map((q, idx) => (
-                            <div key={q.questionNo} style={{ marginBottom: "24px" }}>
-                                <p><strong>{idx + 1}. {q.question}</strong></p>
-                                <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
-                                    {q.choiceList.map((choice) => (
-                                        <li key={choice.choiceIndex} style={{ marginBottom: "6px" }}>
-                                            {String.fromCharCode(65 + choice.choiceIndex)}. {choice.content}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div style={passageBox}>등록된 문제가 없습니다.</div>
-                )} */}
                 <div style={passageBox}>
                     {questionList.map((q, idx) => {
                         const correctChoice = q.choiceList.find(c => c.isCorrect);
