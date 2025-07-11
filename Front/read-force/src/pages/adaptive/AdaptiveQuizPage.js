@@ -7,12 +7,13 @@ const AdaptiveQuizPage = () => {
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [selected, setSelected] = useState(null);
-  const [notFound, setNotFound] = useState(false);  // notFound 초기화
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
         const res = await fetchWithAuth('/recommend/get-recommend?language=KOREAN');
+        console.log("asdfajewrakjdsfkjasbdkhbsdf");
         if (!res.ok) {
           console.error('백엔드 에러 상태 코드:', res.status);
           setNotFound(true);
@@ -21,14 +22,15 @@ const AdaptiveQuizPage = () => {
 
         const data = await res.json();
 
-        // 문제 데이터가 없는 경우
         if (!data || !data.question) {
           console.warn('백엔드에 문제 없음:', data);
           setNotFound(true);
           return;
         }
-
+           
         setQuiz(data);
+   
+      console.log('문제 번호:', data.questionNo ?? '없음');
       } catch (err) {
         console.error('API 통신 오류:', err);
         setNotFound(true);
@@ -50,17 +52,20 @@ const AdaptiveQuizPage = () => {
 
   if (!quiz) return <div className="page-container">로딩 중...</div>;
 
-  const options = quiz.options || [];
+  // choiceList를 content 배열로 변환
+  const options = quiz.choiceList ? quiz.choiceList.map(choice => choice.content) : [];
 
   const handleSubmit = () => {
     if (!selected) return;
 
-    const correct = quiz.correct_answer === selected;
+    // 정답 선택지 찾기
+    const correctChoice = quiz.choiceList.find(choice => choice.isCorrect);
+    const correct = correctChoice && correctChoice.content === selected;
 
     navigate('/adaptive-learning/result', {
       state: {
         isCorrect: correct,
-        explanation: quiz.explanation || "해설 없음",
+        explanation: quiz.explanation || "해설 없음", // 백엔드에 explanation 추가 안 된 경우
         next: '/adaptive-learning/start',
       },
     });
@@ -70,12 +75,13 @@ const AdaptiveQuizPage = () => {
     <div className="quiz-layout">
       <div className="quiz-passage">
         <h3 className="passage-title">🤖 적응력 문제</h3>
-        <p className="passage-text">{quiz.passage || '※ 추가 지문 없음'}</p>
+        <p className="passage-text">{quiz.content || '※ 추가 지문 없음'}</p>
       </div>
 
       <div className="quiz-box">
         <h4 className="question-heading">💡 문제</h4>
         <p className="question-text">{quiz.question}</p>
+
         <div className="quiz-options">
           {options.map((opt, idx) => (
             <button
@@ -93,7 +99,9 @@ const AdaptiveQuizPage = () => {
             className="submit-button"
             disabled={!selected}
             onClick={handleSubmit}
-          >정답 제출</button>
+          >
+            정답 제출
+          </button>
         </div>
       </div>
     </div>

@@ -43,6 +43,8 @@ public class RecommendController {
 
         MultipleChoiceResponseDto recommendQuestion = recommendService.getRecommendQuestion(member, language);
 
+        System.out.println("djfasdhfajsdkfh213123");
+        
         return ResponseEntity.status(HttpStatus.OK).body(recommendQuestion);
     }
 }
