@@ -10,10 +10,11 @@ const ChallengePage = () => {
   return (
     <div className="challenge-wrapper">
 
-      <p className="challenge-info-text">
-        " 카테고리별 오늘의 도전은 단 하루 한 번! "<br />
-        " 20문제, 30분, 당신의 실력을 랭킹으로 증명하세요. "
-      </p>
+     <p className="challenge-info-text">
+      카테고리별 오늘의 도전은 <strong>단 하루 한 번!</strong><br />
+      <span className="highlight">20문제</span>, <span className="highlight">30분</span>,
+      당신의 실력을 <strong>랭킹</strong>으로 증명하세요.
+    </p>
 
       <Lottie animationData={trophyAnimation} loop autoplay className="trophy-animation" />
 

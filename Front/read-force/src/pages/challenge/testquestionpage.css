@@ -10,7 +10,8 @@
 
 .TestQuestion-article-box {
   flex: 1.5;
-  height: 610px;
+  max-height: 500px;
+  min-height: 500px;
   overflow-y: auto;
   padding: 1.5rem;
   background: #fff;
@@ -41,7 +42,8 @@
 
 .TestQuestion-quiz-box {
   width: 100%; 
-  height: 300px;
+  max-height: 500px;
+  min-height: 500px;
   overflow-y: auto;
   padding: 1.5rem;
   background: #fff;
