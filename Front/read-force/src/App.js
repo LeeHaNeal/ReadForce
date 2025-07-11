@@ -24,7 +24,7 @@ import ReadTest from './pages/challenge/readtest';
 import ChallengePage from "./pages/challenge/challengepage";
 import AdminPage from './pages/adminpages/adminpage';
 import ChallengeQuizPage from './pages/challenge/challengeQuizPage';
-import AdminNews from './pages/adminpages/adminnews';
+// import AdminNews from './pages/adminpages/adminnews';
 import AdminNewsDetail from './pages/adminpages/adminnewsdetail';
 import AdminLiterature from './pages/adminpages/adminliterature';
 import AdminLiteratureDetail from './pages/adminpages/adminliteraturedetail';
@@ -32,6 +32,7 @@ import AdminAddParagraph from './pages/adminpages/adminaddparagraph';
 import AdminUserInfo from './pages/adminpages/adminuserinifo';
 import AdminUserAttendance from './pages/adminpages/adminuserattendance';
 import AdminPassage from './pages/adminpages/adminpassage';
+import AdminPassageDetail from './pages/adminpages/AdminPassageDetail';
 
 import TestQuestionPage from './pages/challenge/testquestionpage';
 import TestResultPage from './pages/challenge/testresultpage';
@@ -75,7 +76,6 @@ function App() {
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/challenge/quiz" element={<ChallengeQuizPage />} />
           <Route path="/challenge/today" element={<ChallengeQuizPage />} />
-          <Route path="/adminpage/adminnews" element={<AdminNews />} />
           <Route path="/adminpage/adminnews/:newsNo" element={<AdminNewsDetail />} />
           <Route path="/adminpage/adminliterature" element={<AdminLiterature />} />
           <Route path="/adminpage/adminliterature/:literatureNo" element={<AdminLiteratureDetail />} />
@@ -84,6 +84,7 @@ function App() {
           <Route path="/adminpage/adminuserinfo/:email" element={<AdminUserInfo />} />
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
           <Route path="/adminpage/adminpassage" element={<AdminPassage />} />
+          <Route path="/adminpage/passage/:passageNo" element={<AdminPassageDetail />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />
