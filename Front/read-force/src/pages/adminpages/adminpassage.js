@@ -100,6 +100,25 @@ const AdminPassage = () => {
         }
     };
 
+    // 지문 삭제
+    const handleDeletePassage = async (passageNo) => {
+    const confirmDelete = window.confirm("정말 이 지문을 삭제하시겠습니까?");
+    if (!confirmDelete) return;
+
+    try {
+        const res = await axiosInstance.delete(`/administrator/passage/delete`, {
+            params: { passageNo },
+        });
+
+        alert("성공 : 지문이 삭제되었습니다.");
+        // 삭제 후 리스트 갱신
+        setPassageList(prev => prev.filter(p => p.passageNo !== passageNo));
+    } catch (err) {
+        console.error("실패 : 지문 삭제 중 오류 발생:", err);
+        alert("실패 : 지문 삭제 실패");
+    }
+};
+
     return (
         <>
             {showPassageModal && (
@@ -233,7 +252,7 @@ const AdminPassage = () => {
                                 <td style={tdStyle}>{AUTHOR_LABELS[passage.author]}</td>
                                 <td style={tdStyle}>
                                     <button
-                                        // onClick={() => handleDeletePassage(passage.passageNo)}
+                                        onClick={() => handleDeletePassage(passage.passageNo)}
                                         style={{ color: "red", border: "none", background: "none", cursor: "pointer" }}
                                     >
                                         삭제
@@ -286,7 +305,7 @@ const CATEGORY_LABELS = {
     FAIRY_TALE: "동화",
     VOCABULARY: "사전",
     FACTUAL: "사실",
-    INFERENTIAL: "인퍼뭐노"
+    INFERENTIAL: "추론"
 };
 
 const CLASSIFICATION_LABELS = {
