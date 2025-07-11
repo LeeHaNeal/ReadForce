@@ -19,6 +19,7 @@ import com.readforce.passage.entity.Passage;
 import com.readforce.question.dto.QuestionCheckResultDto;
 import com.readforce.question.dto.QuestionMostIncorrectResponseDto;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
+import com.readforce.question.entity.MultipleChoice;
 import com.readforce.question.entity.Question;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
@@ -258,13 +259,22 @@ public class LearningService {
 
 			double correctAnswerRate = (totalAttempts > 0) ? (double) correctAttempts / totalAttempts : 0.0;
 
-			return QuestionMostIncorrectResponseDto.builder()
-					.questionNo(questionNo)
-					.title(latestLearning.getQuestion().getPassage().getTitle())
-					.createdAt(latestLearning.getCreatedAt())
-					.isCorrect(latestLearning.getIsCorrect())
-					.correctAnswerRate(correctAnswerRate)
-					.build();
+			String questionTitle = "";
+	        if (latestLearning.getQuestion() instanceof MultipleChoice) {
+	        	
+	            MultipleChoice multipleChoice = (MultipleChoice) latestLearning.getQuestion();
+	            
+	        	questionTitle = multipleChoice.getQuestion();
+	        	
+	        }
+
+	        return QuestionMostIncorrectResponseDto.builder()
+	                .questionNo(questionNo)
+	                .title(questionTitle)
+	                .createdAt(latestLearning.getCreatedAt())
+	                .isCorrect(latestLearning.getIsCorrect())
+	                .correctAnswerRate(correctAnswerRate)
+	                .build();
 			
 		}).collect(Collectors.toList());
 		

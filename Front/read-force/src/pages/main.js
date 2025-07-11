@@ -169,25 +169,23 @@ const Main = () => {
               </tbody>
             </table>
           </div>
-
-        <div className="stat-box wrong-articles">
+          <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
             ) : (
               wrongArticles.map((quiz, index) => (
                 <div className="article" key={index} onClick={() => handleQuizClick(quiz)}>
-                  <div className="flag">
-                    {quiz.news_quiz_no ? "📰" : "📚"}
-                  </div>
                   <div>
                     {/* ✅ 지문 제목 (title) */}
                     <div className="subtitle" title={quiz.title}>
                       {quiz.title?.length > 25 ? `${quiz.title.slice(0, 25)}...` : quiz.title}
                     </div>
 
-                    {/* ✅ 오답률 */}
-                    <div className="author">오답률 {quiz.percentage ?? 0}%</div>
+                    {/* ✅ 오답률 = 100 - correctAnswerRate */}
+                    <div className="author">
+                      정답률 {quiz.correctAnswerRate != null ? `${(quiz.correctAnswerRate).toFixed(1)}%` : 'N/A'}
+                    </div>
                   </div>
                 </div>
               ))
