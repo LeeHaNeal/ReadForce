@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import { useEffect } from 'react';
 
 import Main from "./pages/main";
 import MyPage from './pages/myinfo/MyPage';
@@ -22,19 +21,18 @@ import Authcallback from './pages/login/authcallback';
 import ProfileEditPage from './pages/myinfo/ProfileEditPage';
 import ChangePasswordPage from './pages/myinfo/ChangePasswordPage';
 import ReadTest from './pages/challenge/readtest';
-// import ChallengeStartModal from './pages/challenge/ChallengeStartModal';
 import ChallengePage from "./pages/challenge/challengepage";
 import AdminPage from './pages/adminpages/adminpage';
 import ChallengeQuizPage from './pages/challenge/challengeQuizPage';
 import AdminNews from './pages/adminpages/adminnews';
 import AdminNewsDetail from './pages/adminpages/adminnewsdetail';
-// import AdminNewsQuizList from './pages/adminpages/adminnewsquizlist';
 import AdminLiterature from './pages/adminpages/adminliterature';
 import AdminLiteratureDetail from './pages/adminpages/adminliteraturedetail';
-import AdminLiteratureAdd from './pages/adminpages/adminliteratureadd';
 import AdminAddParagraph from './pages/adminpages/adminaddparagraph';
 import AdminUserInfo from './pages/adminpages/adminuserinifo';
 import AdminUserAttendance from './pages/adminpages/adminuserattendance';
+import AdminPassage from './pages/adminpages/adminpassage';
+
 import TestQuestionPage from './pages/challenge/testquestionpage';
 import TestResultPage from './pages/challenge/testresultpage';
 import TestReviewPage from './pages/challenge/testreviewpage';
@@ -45,7 +43,6 @@ import AdaptiveQuizPage from './pages/adaptive/AdaptiveQuizPage';
 import AdaptiveResultPage from './pages/adaptive/AdaptiveResultPage';
 
 function App() {
-
   return (
     <Router>
       <Routes>
@@ -71,21 +68,22 @@ function App() {
           <Route path="/challenge" element={<ChallengePage />} />
           {/* <Route path="/oauth2/redirect" element={<Oauth2redirect />} /> */}
           <Route path="/authcallback" element={<Authcallback />} />
-          <Route path="/social-sign-up" element={<Socialsignup />} />          
+          <Route path="/social-sign-up" element={<Socialsignup />} />
           <Route path="/profile-edit" element={<ProfileEditPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/test-start" element={<ReadTest />} />
           <Route path="/adminpage" element={<AdminPage />} />
           <Route path="/challenge/quiz" element={<ChallengeQuizPage />} />
+          <Route path="/challenge/today" element={<ChallengeQuizPage />} />
           <Route path="/adminpage/adminnews" element={<AdminNews />} />
           <Route path="/adminpage/adminnews/:newsNo" element={<AdminNewsDetail />} />
-          {/* <Route path="/adminpage/adminnews/adminnewsquizlist" element={<AdminNewsQuizList />} /> */}
           <Route path="/adminpage/adminliterature" element={<AdminLiterature />} />
           <Route path="/adminpage/adminliterature/:literatureNo" element={<AdminLiteratureDetail />} />
+          <Route path="/adminpage/adminliterature/add-paragraph" element={<AdminAddParagraph />} />
           <Route path="/adminpage/adminliterature/:literatureNo/add-paragraph" element={<AdminAddParagraph />} />
-          <Route path="/adminpage/adminliterature/adminliteratureadd" element={<AdminLiteratureAdd />} />
           <Route path="/adminpage/adminuserinfo/:email" element={<AdminUserInfo />} />
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
+          <Route path="/adminpage/adminpassage" element={<AdminPassage />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />
@@ -93,7 +91,8 @@ function App() {
           <Route path="/challenge/result" element={<ChallengeResultPage />} />
           <Route path="/adaptive-learning" element={<AdaptiveLearningPage />} />
           <Route path="/adaptive-learning/start" element={<AdaptiveQuizPage />} />
-          <Route path="/adaptive-learning/result" element={<AdaptiveResultPage />} /> 
+          <Route path="/adaptive-learning/result" element={<AdaptiveResultPage />} />
+          <Route path="/questionpage/:id" element={<UniversalQuestionPage />} />
         </Route>
       </Routes>
     </Router>

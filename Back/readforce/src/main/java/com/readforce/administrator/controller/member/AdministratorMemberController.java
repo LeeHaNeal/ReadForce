@@ -38,7 +38,6 @@ public class AdministratorMemberController {
 	
 	private final MemberService memberService;
 	private final PasswordEncoder passwordEncoder;
-
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-member-list")
 	public ResponseEntity<List<AdministratorMemberResponseDto>> getAllMemberList(){

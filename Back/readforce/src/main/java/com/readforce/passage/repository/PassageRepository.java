@@ -56,7 +56,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND t.typeName = :type
 	""")
 
-	List<Passage> findByLanguageAndCategoryAndCategoryAndType(
+	List<Passage> findByLanguageAndClassificationAndCategoryAndType(
 			@Param("language") LanguageEnum language, 
 			@Param("classification") ClassificationEnum classification, 
 			@Param("category") CategoryEnum category,
@@ -78,7 +78,7 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			AND t.typeName = :type
 			AND l.levelNumber = :level
 	""")
-	List<Passage> findByLanguageAndCategoryAndCategoryAndTypeAndLevel(
+	List<Passage> findByLanguageAndClassificationAndCategoryAndTypeAndLevel(
 			@Param("language") LanguageEnum language, 
 			@Param("classification") ClassificationEnum classification, 
 			@Param("category") CategoryEnum category,
@@ -157,7 +157,6 @@ public interface PassageRepository extends JpaRepository<Passage, Long> {
 			WHERE lang.languageName = :language
 			AND cl.classificationName = :classification
 			AND c.categoryName = :category
-			AND t.typeName = :type
 			AND l.levelNumber = :level	
 	""")
 	List<Long> findPassageNoByLanguageAndCategoryAndLevelAndClassification(

@@ -46,6 +46,7 @@ public class ChallengeController {
 			@RequestParam("category")
 			@NotNull(message = MessageCode.CATEGORY_NOT_NULL)
 			CategoryEnum category
+			
 	){
 		
 		List<MultipleChoiceResponseDto> resultList = challengeService.getChallengeQuestionList(language, category);

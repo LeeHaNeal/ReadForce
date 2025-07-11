@@ -19,8 +19,8 @@ public class LearningMultipleChoiceRequestDto {
 	private Integer selectedIndex;
 	
 	@NotNull(message = MessageCode.QUESTION_SOLVING_TIME_NOT_NULL)
-	@Min(value = 11)
-	private Long questionSlovingTime;
+	@Min(value = 10)
+	private Long questionSolvingTime;
 	
 	@NotNull(message = MessageCode.QUESTION_NO_NOT_NULL)
 	private Long questionNo;
