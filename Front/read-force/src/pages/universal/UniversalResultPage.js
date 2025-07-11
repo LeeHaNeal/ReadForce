@@ -29,10 +29,11 @@ const UniversalResultPage = () => {
     }
   };
 
+
   const correctCount = answers.reduce((acc, ans) => {
     const question = quizList.find(q => q.questionNo === ans.questionNo);
     const selected = question?.choiceList[ans.selectedIndex];
-    return acc + (selected?.isAnswer ? 1 : 0);
+    return acc + (selected?.isCorrect ? 1 : 0);
   }, 0);
 
   const formatSeconds = (seconds) => {
@@ -60,11 +61,11 @@ const UniversalResultPage = () => {
         </div>
 
         <div className="ArticleResult-explanation">
-          <h3>📝 문제별 해설</h3>
+          <h3>문제별 해설</h3>
           {answers.map((ans, idx) => {
             const question = quizList.find(q => q.questionNo === ans.questionNo);
             const selected = question?.choiceList[ans.selectedIndex];
-            const isCorrect = selected?.isAnswer;
+            const isCorrect = selected?.isCorrect; // 여기도 수정됨
 
             return (
               <div key={idx} className="explanation-item">
@@ -76,9 +77,12 @@ const UniversalResultPage = () => {
                   </div>
                 </div>
                 <p className={isCorrect ? 'correct' : 'incorrect'}>
-                  {isCorrect ? '정답' : '오답'} | 선택한 보기: {selected?.content || '없음'}
+                  {isCorrect ? '정답' : '오답'} | 선택한 보기 : {selected?.content || '없음'}
                 </p>
-                <button onClick={() => setShowExplanationIndex(showExplanationIndex === idx ? null : idx)}>
+                <button
+                  className="explanation-toggle-btn"
+                  onClick={() => setShowExplanationIndex(showExplanationIndex === idx ? null : idx)}
+                >
                   {showExplanationIndex === idx ? '해설 닫기' : '해설 보기'}
                 </button>
                 {showExplanationIndex === idx && (
