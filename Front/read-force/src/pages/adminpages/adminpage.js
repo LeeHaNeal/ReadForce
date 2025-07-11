@@ -73,6 +73,7 @@ const AdminPage = () => {
         <div style={{ padding: "24px" }}>
             <span style={ADMIN_BUTTONS_LIST}>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminpassage')}>문제 관리</button>
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/average-stat")}>평균 통계</button>            
             </span>
             <div style={ADMIN_TITLE}>
                 <div>
