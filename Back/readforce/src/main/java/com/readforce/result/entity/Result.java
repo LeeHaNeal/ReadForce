@@ -77,6 +77,13 @@ public class Result {
 		
 	}
 	
+	public void resetLearningStreak() {
+		
+		this.learningStreak = 0;
+		
+	}
+	
+	
 	public void updateOverallCorrectAnswerRate(Double overallCorrectAnswerRate) {
 		
 		this.overallCorrectAnswerRate = overallCorrectAnswerRate;
