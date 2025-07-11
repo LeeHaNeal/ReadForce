@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const Main = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("KOREAN");
+  const [selectedCategory, setSelectedCategory] = useState("NEWS");
   const [top5Data, setTop5Data] = useState([]);
   const [wrongArticles, setWrongArticles] = useState([]);
   const navigate = useNavigate();
@@ -56,8 +56,8 @@ const Main = () => {
     debounceRef.current = setTimeout(async () => {
       try {
         const [rankingRes, wrongRes] = await Promise.all([
-          api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`),
-          api.get(`/learning/get-most-incorrect-questions?language=${selectedLanguage}&number=3`),
+          api.get(`/ranking/get-ranking-list?category=${selectedCategory}&language=KOREAN`),
+          api.get(`/learning/get-most-incorrect-questions?language=KOREAN&number=3`),
         ]);
         setTop5Data(rankingRes.data.slice(0, 5));
         setWrongArticles(wrongRes.data);
@@ -68,7 +68,7 @@ const Main = () => {
       }
     }, 600);
     return () => clearTimeout(debounceRef.current);
-  }, [selectedLanguage]);
+  }, [selectedCategory]);
 
   const handleButtonClick = () => {
     if (!currentSlide.buttonLink) return;
@@ -86,8 +86,8 @@ const Main = () => {
           title: quiz.title ?? '',
           summary: quiz.summary ?? '',
           content: quiz.content ?? '',
-          language: selectedLanguage,
-          category: 'NEWS',
+          language: "KOREAN",
+          category: "NEWS",
         },
       },
     });
@@ -111,22 +111,8 @@ const Main = () => {
               <img src={currentSlide.image} alt="슬라이드 이미지" />
             </div>
           </div>
-          <button
-            className="slide-arrow left"
-            onClick={() =>
-              setSlideIndex((prev) => (prev - 1 + slides.length) % slides.length)
-            }
-          >
-            ⮜
-          </button>
-          <button
-            className="slide-arrow right"
-            onClick={() =>
-              setSlideIndex((prev) => (prev + 1) % slides.length)
-            }
-          >
-            ⮞
-          </button>
+          <button className="slide-arrow left" onClick={() => setSlideIndex((prev) => (prev - 1 + slides.length) % slides.length)}>⮜</button>
+          <button className="slide-arrow right" onClick={() => setSlideIndex((prev) => (prev + 1) % slides.length)}>⮞</button>
           <div className="slide-ui">
             <button onClick={() => setIsPaused((prev) => !prev)}>
               {isPaused ? "▶" : "⏸"}
@@ -143,17 +129,19 @@ const Main = () => {
               <h3>🏆 <span className="bold">주간 Top 5</span></h3>
               <button className="ranking-more-btn" onClick={() => navigate('/ranking')}>＋</button>
             </div>
+
             <div className="tabs">
-              {["KOREAN", "JAPANESE", "ENGLISH"].map((lang) => (
+              {["NEWS", "NOVEL", "FAIRY_TALE"].map((cat) => (
                 <button
-                  key={lang}
-                  className={selectedLanguage === lang ? "active" : ""}
-                  onClick={() => setSelectedLanguage(lang)}
+                  key={cat}
+                  className={selectedCategory === cat ? "active" : ""}
+                  onClick={() => setSelectedCategory(cat)}
                 >
-                  {lang === "KOREAN" ? "한국" : lang === "JAPANESE" ? "일본" : "미국"}
+                  {cat === "NEWS" ? "뉴스" : cat === "NOVEL" ? "소설" : "동화"}
                 </button>
               ))}
             </div>
+
             <table className="top5-table">
               <tbody>
                 {top5Data.map((user, idx) => {
@@ -169,6 +157,7 @@ const Main = () => {
               </tbody>
             </table>
           </div>
+
           <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
@@ -177,12 +166,9 @@ const Main = () => {
               wrongArticles.map((quiz, index) => (
                 <div className="article" key={index} onClick={() => handleQuizClick(quiz)}>
                   <div>
-                    {/* ✅ 지문 제목 (title) */}
                     <div className="subtitle" title={quiz.title}>
                       {quiz.title?.length > 25 ? `${quiz.title.slice(0, 25)}...` : quiz.title}
                     </div>
-
-                    {/* ✅ 오답률 = 100 - correctAnswerRate */}
                     <div className="author">
                       정답률 {quiz.correctAnswerRate != null ? `${(quiz.correctAnswerRate).toFixed(1)}%` : 'N/A'}
                     </div>
