@@ -60,4 +60,40 @@ public class Score {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "language_no", nullable = false)
 	private Language language;
+	
+	public void modifyInfo(
+			Member member, 
+			Double score, 
+			Category category,
+			Language language
+	) {
+		
+		if(member != null) {
+			
+			this.member = member;
+			
+		}
+		
+		if(score != null) {
+			
+			this.score = score;
+			
+		}
+		
+		if(category != null) {
+			
+			this.category = category;
+			
+		}
+		
+		if(language != null) {
+			
+			this.language = language;
+			
+		}
+		
+	}
+	
+	
+	
 }

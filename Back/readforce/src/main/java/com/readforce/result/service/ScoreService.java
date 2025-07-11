@@ -8,8 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.readforce.common.MessageCode;
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.LanguageEnum;
+import com.readforce.common.exception.DuplicationException;
+import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Language;
@@ -25,8 +28,22 @@ public class ScoreService {
 	
 	private final ScoreRepository scoreRepository;
 	
+	@Transactional(readOnly = true)
+	public Score getScoreByMemberAndCategoryAndLanguage(Member member, Category category, Language language){
+		
+		return scoreRepository.findByMemberAndCategoryAndLanguage(member, category, language)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.SCORE_NOT_FOUND));
+		
+	}
+	
 	@Transactional
 	public void createScore(Member member, Double totalScore, Category category, Language language) {
+		
+		if(getScoreByMemberAndCategoryAndLanguage(member, category, language) == null) {
+			
+			throw new DuplicationException(MessageCode.SCORE_ALREADY_EXIST);
+			
+		}
 		
 		Score score = Score.builder()
 				.score(totalScore)
@@ -56,6 +73,36 @@ public class ScoreService {
 	public void deleteAll() {
 
 		scoreRepository.deleteAllInBatch();
+		
+	}
+
+	@Transactional("/")
+	public List<Score> getScoreListByEmail(String email) {
+		
+		return scoreRepository.findByMember_Email(email);
+
+	}
+
+	@Transactional
+	public void modifyScoreByEmail(
+			Member member, 
+			Long scoreNo, 
+			Double score, 
+			Category category,
+			Language language
+	) {
+		
+		Score scoreEntity = getScoreByScoreNo(scoreNo);
+		
+		scoreEntity.modifyInfo(member, score, category, language);
+		
+	}
+
+	@Transactional(readOnly = true)
+	private Score getScoreByScoreNo(Long scoreNo) {
+
+		return scoreRepository.findById(scoreNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.SCORE_NOT_FOUND));
 		
 	}
 
