@@ -15,9 +15,10 @@ import com.readforce.passage.service.TypeService;
 import com.readforce.question.dto.MultipleChoiceResponseDto;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.result.service.LearningService;
-
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendService {
@@ -30,18 +31,33 @@ public class RecommendService {
 	
 	@Transactional(readOnly = true)
 	public MultipleChoiceResponseDto getRecommendQuestion(Member member, LanguageEnum language) {
-		
-		CategoryEnum weakCategory = categoryService.findWeakCategory(member, language);
-		
-		TypeEnum weakType = typeService.findWeakType(member, language, weakCategory);
-		
-		Integer optimalLevel = levelService.findOptimalLevel(member, language, weakCategory, weakType);
-		
-		List<Long> solvedPassageNoList = learningService.getAllByMemberWithPassageNo(member);
-		
-		return multipleChoiceService.getUnsolvedMultipleChoiceQuestion(member, language, weakCategory, weakType, optimalLevel, solvedPassageNoList);
 
+	    CategoryEnum weakCategory = categoryService.findWeakCategory(member, language);
+	    TypeEnum weakType = typeService.findWeakType(member, language, weakCategory);
+	    Integer optimalLevel = levelService.findOptimalLevel(member, language, weakCategory, weakType);
+
+	    List<Long> solvedQuestionNos = learningService.getAllSolvedQuestionNos(member);
+
+	    // ✔️ 로그 추가: 풀었던 문제 목록
+	    log.info("[RecommendService] Solved question numbers: {}", solvedQuestionNos);
+
+	    MultipleChoiceResponseDto recommendQuestion = multipleChoiceService.getUnsolvedMultipleChoiceQuestion(
+	            member,
+	            language,
+	            weakCategory,
+	            weakType,
+	            optimalLevel,
+	            solvedQuestionNos
+	    );
+
+	    // ✔️ 로그 추가: 추천한 문제 번호
+	    log.info("[RecommendService] Recommended question number: {}", recommendQuestion.getQuestionNo());
+
+	    return recommendQuestion;
 	}
+
+
+
 
 
 }

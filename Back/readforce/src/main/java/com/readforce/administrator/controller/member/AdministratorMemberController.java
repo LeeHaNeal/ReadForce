@@ -27,6 +27,7 @@ import com.readforce.administrator.dto.AdministratorScoreRequestDto;
 import com.readforce.administrator.dto.AdministratorScoreResponseDto;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.RoleEnum;
+import com.readforce.member.dto.MemberAttendanceResponseDto;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
