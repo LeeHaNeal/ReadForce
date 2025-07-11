@@ -2,6 +2,7 @@ package com.readforce.result.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -30,16 +31,24 @@ public class ResultMetricService {
 	@Transactional(readOnly = true)
 	public void createResultMetric(Result result, Language language, Category category, Type type, Level level) {
 
-		ResultMetric resultMetric = ResultMetric.builder()
-				.result(result)
-				.language(language)
-				.category(category)
-				.type(type)
-				.level(level)
-				.build();
+		Optional<ResultMetric> existingMetric = resultMetricRepository.findMetric(
+				result, language, category, type, level
+		);
 		
-		resultMetricRepository.save(resultMetric);	
-		
+		if(existingMetric.isEmpty()) {
+			
+			ResultMetric resultMetric = ResultMetric.builder()
+					.result(result)
+					.language(language)
+					.category(category)
+					.type(type)
+					.level(level)
+					.build();
+			
+			resultMetricRepository.save(resultMetric);	
+			
+		}
+
 	}
 
 	@Transactional(readOnly = true)
@@ -111,6 +120,22 @@ public class ResultMetricService {
 	public void deleteAllByResult(Result result) {
 
 		resultMetricRepository.deleteAllByResult(result);		
+		
+	}
+
+	@Transactional(readOnly = true)
+	private ResultMetric getResultMetricByResultMetricNo(Long resultMetricNo) {
+
+		return resultMetricRepository.findById(resultMetricNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.RESULT_METRIC_NOT_FOUND));
+		
+	}
+
+	public void modifyResultMetric(Long resultMetricNo, Double correctAnswerRate, Long questionSolvingTimeAverage) {
+
+		ResultMetric resultMetric = getResultMetricByResultMetricNo(resultMetricNo);
+		
+		resultMetric.updateMetric(correctAnswerRate, questionSolvingTimeAverage);
 		
 	}
 

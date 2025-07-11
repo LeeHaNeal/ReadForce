@@ -50,6 +50,8 @@ public final class MessageCode {
 	public static final String ATTENDANCE_NO_NOT_NULL = "NOT0041";
 	public static final String SCORE_NOT_NULL = "NOT0042";
 	public static final String SCORE_NO_NOT_NULL = "NOT0043";
+	public static final String RESULT_NO_NOT_NULL = "NOT0044";
+	
 	
 	
 	
@@ -133,6 +135,11 @@ public final class MessageCode {
 	public static final String DELETE_ATTENDANCE_SUCCESS = "SUC0047";
 	public static final String CREATE_SCORE_SUCCESS = "SUC0048";
 	public static final String MODIFY_SCORE_SUCCESS = "SUC0049";
+	public static final String CREATE_RESULT_SUCCESS = "SUC0050";
+	public static final String MODIFY_RESULT_SUCCESS = "SUC0051";
+	public static final String CREATE_MISSING_RESULT_METRIC_SUCCESS = "SUC0052";
+	public static final String MODIFY_RESULT_METRIC_SUCCESS = "SUC0052";
+	
 	
 	
 	
@@ -176,6 +183,7 @@ public final class MessageCode {
 	public static final String NO_QUESTION_PASSAGE_NOT_FOUND = "NOF0020";
 	public static final String MULTIPLE_CHOICE_NOT_FOUND = "NOF0021";
 	public static final String SCORE_NOT_FOUND = "NOF0022";
+	public static final String RESULT_NOT_FOUND = "NOF0023";
 	
 	
 	

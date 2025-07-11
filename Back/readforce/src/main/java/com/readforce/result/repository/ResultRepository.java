@@ -20,4 +20,6 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
 			@Param("status") StatusEnum status
 	);
 
+	Optional<Result> findByMember_Email(String email);
+
 }
