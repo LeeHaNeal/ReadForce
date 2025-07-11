@@ -7,6 +7,7 @@
   align-items: center;
   gap: 2.5rem;
   text-align: center;
+  margin-bottom: 4rem; 
 }
 
 /* ⬇️ 새로 추가 */
@@ -16,6 +17,12 @@
   line-height: 1.5;
   margin: 0;       
   color: #5A5A5A;
+  margin-top: 2rem;
+}
+
+.highlight {
+  color: #2a8074;
+  font-weight: 700;
 }
 
 /* 트로피 크기를 시안 수준으로 ↓ */
