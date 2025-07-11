@@ -36,43 +36,46 @@
   font-weight: 700;
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
-  color: #0d9488;
+  color: #439395;
   letter-spacing: 0.03em;
 }
 
 .ChallengeStartModal-category,
 .ChallengeStartModal-option-group {
-  margin-bottom: 1.4rem;
+  margin: 0 0 0.6rem;     
+  font-size: 1rem;      
+  font-weight: bold;        
+  color: rgb(93, 93, 93);        
+  letter-spacing: 0.02em;
 }
 
 .ChallengeStartModal-category button,
 .ChallengeStartModal-option-group button {
   margin: 0.4rem 0.35rem;
   padding: 0.75rem 1.5rem;
-  border: 2.5px solid #0d9488;
+  border: 2px solid #439395;
   background: #fff;
   cursor: pointer;
   border-radius: 12px;
   font-weight: 700;
   font-size: 1.1rem;
-  color: #0d9488;
+  color: #439395;
   transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 0 5px transparent;
 }
 
 .ChallengeStartModal-category button:hover,
 .ChallengeStartModal-option-group button:hover {
-  background-color: #0d9488;
+  background-color: #439395;
   color: #fff;
-  box-shadow: 0 0 15px #0d9488cc;
 }
 
 .ChallengeStartModal-category button.selected,
 .ChallengeStartModal-option-group button.selected {
-  background-color: #0d9488;
+  background-color: #439395;
   color: white;
-  border-color: #0d9488;
-  box-shadow: 0 0 18px #0d9488dd;
+  border-color: #439395;
+  box-shadow: 0 0 8px #439395dd;
 }
 
 .ChallengeStartModal-actions {
@@ -96,10 +99,10 @@
 }
 
 .ChallengeStartModal-actions button:first-child {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: white;
+  color: rgb(93, 93, 93);
   box-shadow: none;
-  border: 1.5px solid #cbd5e1;
+  border: 2px solid #cbd5e1;
 }
 
 .ChallengeStartModal-actions button:first-child:hover {
@@ -107,11 +110,11 @@
 }
 
 .ChallengeStartModal-actions button:last-child {
-  background: #0d9488;
+  background: #439395;
   color: white;
-  box-shadow: 0 0 20px #0d9488dd;
+  box-shadow: 0 0 8px #439395dd;
 }
 
 .ChallengeStartModal-actions button:last-child:hover {
-  background: #0b7a74;
+  background: #397f80;
 }
