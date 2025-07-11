@@ -4,13 +4,13 @@ import mainImage from "../assets/image/mainimage.png";
 import slide2Image from "../assets/image/slide2.png";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import fetchWithAuth from '../utils/fetchWithAuth';
 
 const Main = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("KOREAN");
   const [top5Data, setTop5Data] = useState([]);
+  const [wrongArticles, setWrongArticles] = useState([]);
   const navigate = useNavigate();
   const debounceRef = useRef(null);
 
@@ -55,29 +55,20 @@ const Main = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`);
-        setTop5Data(res.data.slice(0, 5));
+        const [rankingRes, wrongRes] = await Promise.all([
+          api.get(`/ranking/get-ranking-list?category=NEWS&language=${selectedLanguage}`),
+          api.get(`/learning/get-most-incorrect-questions?language=${selectedLanguage}&number=3`),
+        ]);
+        setTop5Data(rankingRes.data.slice(0, 5));
+        setWrongArticles(wrongRes.data);
       } catch (err) {
-        console.error("Top5 랭킹 불러오기 실패:", err);
+        console.error("데이터 불러오기 실패:", err);
         setTop5Data([]);
+        setWrongArticles([]);
       }
     }, 600);
     return () => clearTimeout(debounceRef.current);
   }, [selectedLanguage]);
-
-  // useEffect(() => {
-  //   if (debounceRef.current) clearTimeout(debounceRef.current);
-  //   debounceRef.current = setTimeout(async () => {
-  //     try {
-  //       const res = await api.get(`/ranking/get-news-ranking?language=${selectedLanguage}`);
-  //       setTop5Data(res.data.slice(0, 5));
-  //     } catch (err) {
-  //       console.error("Top5 fetch error", err);
-  //       setTop5Data([]);
-  //     }
-  //   }, 600);
-  //   return () => clearTimeout(debounceRef.current);
-  // }, [selectedLanguage]);
 
   const handleButtonClick = () => {
     if (!currentSlide.buttonLink) return;
@@ -86,18 +77,21 @@ const Main = () => {
       : navigate(currentSlide.buttonLink);
   };
 
-  const [wrongArticles, setWrongArticles] = useState([]);
-
-  // useEffect(() => {
-  //   fetchWithAuth('/quiz/get-most-incorrected-quiz')
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setWrongArticles(data);
-  //     })
-  //     .catch(err => {
-  //       console.error("가장 많이 틀린 퀴즈 불러오기 실패:", err);
-  //     });
-  // }, []);
+  const handleQuizClick = (quiz) => {
+    if (!quiz || !quiz.questionNo) return;
+    navigate(`/questionpage/${quiz.questionNo}`, {
+      state: {
+        passage: {
+          passageNo: quiz.questionNo,
+          title: quiz.title ?? '',
+          summary: quiz.summary ?? '',
+          content: quiz.content ?? '',
+          language: selectedLanguage,
+          category: 'NEWS',
+        },
+      },
+    });
+  };
 
   return (
     <div>
@@ -117,7 +111,6 @@ const Main = () => {
               <img src={currentSlide.image} alt="슬라이드 이미지" />
             </div>
           </div>
-
           <button
             className="slide-arrow left"
             onClick={() =>
@@ -126,7 +119,6 @@ const Main = () => {
           >
             ⮜
           </button>
-
           <button
             className="slide-arrow right"
             onClick={() =>
@@ -135,7 +127,6 @@ const Main = () => {
           >
             ⮞
           </button>
-
           <div className="slide-ui">
             <button onClick={() => setIsPaused((prev) => !prev)}>
               {isPaused ? "▶" : "⏸"}
@@ -148,7 +139,10 @@ const Main = () => {
       <section className="stats-section">
         <div className="page-container stat-container">
           <div className="stat-box top5">
-            <h3>🏆 <span className="bold">주간 Top 5</span></h3>
+            <div className="top5-header-row">
+              <h3>🏆 <span className="bold">주간 Top 5</span></h3>
+              <button className="ranking-more-btn" onClick={() => navigate('/ranking')}>＋</button>
+            </div>
             <div className="tabs">
               {["KOREAN", "JAPANESE", "ENGLISH"].map((lang) => (
                 <button
@@ -175,21 +169,25 @@ const Main = () => {
               </tbody>
             </table>
           </div>
-          
-          <div className="stat-box wrong-articles">
+
+        <div className="stat-box wrong-articles">
             <h3>가장 많이 틀린 문제</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
             ) : (
-              Array.isArray(wrongArticles) &&
               wrongArticles.map((quiz, index) => (
-                <div className="article" key={index}>
+                <div className="article" key={index} onClick={() => handleQuizClick(quiz)}>
                   <div className="flag">
                     {quiz.news_quiz_no ? "📰" : "📚"}
                   </div>
                   <div>
-                    <div className="title">{quiz.question_text}</div>
-                    <div className="author">오답률 {quiz.percentage}%</div>
+                    {/* ✅ 지문 제목 (title) */}
+                    <div className="subtitle" title={quiz.title}>
+                      {quiz.title?.length > 25 ? `${quiz.title.slice(0, 25)}...` : quiz.title}
+                    </div>
+
+                    {/* ✅ 오답률 */}
+                    <div className="author">오답률 {quiz.percentage ?? 0}%</div>
                   </div>
                 </div>
               ))

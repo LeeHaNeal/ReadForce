@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import kakaoIcon from '../../assets/image/kakao.png';
 import googleIcon from '../../assets/image/google.png';
@@ -15,37 +15,38 @@ const ProfileEditPage = () => {
   const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const hasFetchedImage = useRef(false); // ✅ 중복 방지
+  const hasFetchedImage = useRef(false);
+  const previewUrlRef = useRef(null); // ✅ 미리보기 URL 추적용
 
-  const fetchProfileImage = useCallback(async () => {
-    try {
-      const res = await axiosInstance.get('/file/get-profile-image', {
-        responseType: 'blob',
-      });
-      const url = URL.createObjectURL(res.data);
-      setProfileImageUrl(url);
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        setProfileImageUrl(defaultProfileImage);
-      } else {
-        console.error('이미지 로딩 실패:', error);
-      }
-    }
-  }, []);
-
+  // ✅ 프로필 이미지 가져오기
   useEffect(() => {
+    let objectUrl = null;
+  
+    const fetchProfileImage = async () => {
+      try {
+        const res = await axiosInstance.get('/file/get-profile-image', {
+          responseType: 'blob',
+        });
+        objectUrl = URL.createObjectURL(res.data);
+        setProfileImageUrl(objectUrl);
+      } catch {
+        // 🔇 어떤 에러든 기본 이미지로 fallback
+        setProfileImageUrl(defaultProfileImage);
+      }
+    };
+  
     if (!hasFetchedImage.current) {
       hasFetchedImage.current = true;
       fetchProfileImage();
     }
+  
     return () => {
-      // ✅ 메모리 누수 방지
-      if (profileImageUrl && profileImageUrl !== defaultProfileImage) {
-        URL.revokeObjectURL(profileImageUrl);
-      }
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     };
-  }, [fetchProfileImage, profileImageUrl]);
+  }, []);
 
+  // ✅ 닉네임 중복 체크
   const checkNicknameDuplicate = async (nickname) => {
     try {
       const res = await axiosInstance.get(`/member/nickname-check?nickname=${nickname}`);
@@ -95,10 +96,11 @@ const ProfileEditPage = () => {
     validateBirthday(formatted);
   };
 
+  // ✅ 프로필 수정 제출
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (nickname && !isNicknameValid) {
-      alert('닉네임 형식이 잘못되었거나 중복입니다. 다시 확인해주세요.');
+      alert('닉네임 형식이 잘못되었거나 중복입니다.');
       return;
     }
     if (birthday && !isBirthdayValid) {
@@ -156,6 +158,10 @@ const ProfileEditPage = () => {
       await axiosInstance.delete('/file/delete-profile-image');
       setProfileImageUrl(defaultProfileImage);
       setSelectedFile(null);
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
+        previewUrlRef.current = null;
+      }
       alert('프로필 이미지가 삭제되었습니다.');
     } catch {
       alert('이미지 삭제 실패');
@@ -187,8 +193,13 @@ const ProfileEditPage = () => {
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (file && file.size <= 5 * 1024 * 1024) {
+                  const previewUrl = URL.createObjectURL(file);
+                  if (previewUrlRef.current) {
+                    URL.revokeObjectURL(previewUrlRef.current);
+                  }
+                  previewUrlRef.current = previewUrl;
+                  setProfileImageUrl(previewUrl);
                   setSelectedFile(file);
-                  setProfileImageUrl(URL.createObjectURL(file));
                 } else {
                   alert('이미지 용량은 5MB 이하여야 합니다.');
                 }
@@ -233,11 +244,7 @@ const ProfileEditPage = () => {
               type="text"
               placeholder="예:YYYY-MM-DD"
               value={birthday}
-              onChange={(e) => {
-                const value = e.target.value;
-                setBirthdayMessage('');
-                handleBirthdayChange(value);
-              }}
+              onChange={(e) => handleBirthdayChange(e.target.value)}
             />
             {birthdayMessage && (
               <span className={`validation-message ${isBirthdayValid ? 'valid' : 'invalid'}`}>
