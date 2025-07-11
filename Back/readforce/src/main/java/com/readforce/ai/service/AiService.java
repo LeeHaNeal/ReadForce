@@ -48,9 +48,10 @@ import com.readforce.question.entity.Choice;
 import com.readforce.question.entity.MultipleChoice;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.question.service.QuestionService;
-
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiService {
@@ -149,29 +150,27 @@ public class AiService {
 
    private Map<String, Object> requestGenerate(String prompt) {
 
-      HttpHeaders httpHeaders = new HttpHeaders();
-      
-      httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-      
-      Map<String, Object> part = Map.of("text", prompt);
-      Map<String, Object> content = Map.of("parts", List.of(part));
-      Map<String, Object> body = Map.of("contents", List.of(content));
-      
-      HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
-      
-      String url = geminiApiUrl + "?key=" + geminiApiKey;
-      
-      try {
-         
-         return restTemplate.postForObject(url, requestEntity, Map.class);
-               
-      } catch(Exception exception){
-         
-         throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
-         
-      }
+	    HttpHeaders httpHeaders = new HttpHeaders();
+	    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-   }
+	    Map<String, Object> part = Map.of("text", prompt);
+	    Map<String, Object> content = Map.of("parts", List.of(part));
+	    Map<String, Object> body = Map.of("contents", List.of(content));
+
+	    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
+
+	    String url = geminiApiUrl + "?key=" + geminiApiKey;
+
+	    try {
+	        return restTemplate.postForObject(url, requestEntity, Map.class);
+
+	    } catch (Exception exception) {
+	        log.error("[Gemini API 호출 실패] url={}, prompt={}, message={}", url, prompt, exception.getMessage(), exception);
+	        throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
+	    }
+
+	}
+
 
 
    private String gernerateTestVocabularyPrompt(Language language, Level level) {
