@@ -164,6 +164,7 @@ public final class MessageCode {
 	public static final String LEARNING_NOT_FOUND = "NOF0018";
 	public static final String CLASSIFICATION_NOT_FOUND = "NOF0019";
 	public static final String NO_QUESTION_PASSAGE_NOT_FOUND = "NOF0020";
+	public static final String MULTIPLE_CHOICE_NOT_FOUND = "NOF0021";
 	
 	
 	

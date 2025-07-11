@@ -116,4 +116,12 @@ public class MultipleChoiceService {
 		
 	}
 
+	@Transactional(readOnly = true)
+	public MultipleChoice getMultipleChoiceByQuestionNo(Long questionNo) {
+
+		return multipleChoiceRepository.findById(questionNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MULTIPLE_CHOICE_NOT_FOUND));
+
+	}
+
 }
