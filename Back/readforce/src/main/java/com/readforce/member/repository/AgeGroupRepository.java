@@ -11,5 +11,4 @@ import com.readforce.member.entity.AgeGroup;
 public interface AgeGroupRepository extends JpaRepository<AgeGroup, Long> {
 
 	Optional<AgeGroup> findByAgeGroup(int ageGroupValue);
-
 }
