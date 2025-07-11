@@ -42,8 +42,10 @@ public final class MessageCode {
 	public static final String SENTENCE_STRUCTURE_NOT_BLANK = "NOT0034";
 	public static final String QUESTION_TYPE_NOT_BLANK = "NOT0035";
 	public static final String PUBLICATION_DATE_NOT_NULL = "NOT0036";
-
-	
+	public static final String AVERAGE_QUESTION_SOLVING_TIME_NOT_NULL = "NOT0037";
+	public static final String AGE_GROUP_NOT_NULL = "NOT0038";
+	public static final String AVERAGE_QUESTION_SOLVING_TIME_NO_NOT_NULL = "NOT0038";
+	public static final String AGE_GROUP_NO_NOT_NULL = "NOT0039";
 	
 	
 	
@@ -115,8 +117,12 @@ public final class MessageCode {
 	public static final String MODIFY_LEVEL_SUCCESS = "SUC0037";
 	public static final String DELETE_LEVEL_SUCCESS = "SUC0038";
 	public static final String DELETE_PASSAGE_SUCCESS = "SUC0039";
-	
-	
+	public static final String DELETE_QUESTION_SUCCESS = "SUC0040";
+	public static final String RETRY_FILE_DELETE_FAILED_FILE = "SUC0041";
+	public static final String CREATE_AVERAGE_QUESTION_SOLVING_TIME_SUCCESS = "SUC0042";
+	public static final String DELETE_AVERAGE_QUESTION_SOLVING_TIME_SUCCESS = "SUC0043";
+	public static final String CREATE_AGE_GROUP_SUCCESS = "SUC0044";
+	public static final String DELETE_AGE_GROUP_SUCCESS = "SUC0045";
 	
 	
 	
