@@ -11,6 +11,7 @@ const AdminPassage = () => {
     const [loadingPassage, setLoadingPassage] = useState(false);
     const [loadingQuestion, setLoadingQuestion] = useState(false);
 
+    // 지문 생성 모달
     const [showPassageModal, setShowPassageModal] = useState(false);
     const [language, setLanguage] = useState("KOREAN");
     const [level, setLevel] = useState(1);
@@ -18,8 +19,23 @@ const AdminPassage = () => {
     const [type, setType] = useState("ECONOMY");
     const [classification, setClassification] = useState("NORMAL");
 
+    // 지문 불러오기
     const [passageList, setPassageList] = useState([]);
     const [count, setCount] = useState(1);
+
+    // 지문 직접 추가 모달
+    const [showUploadModal, setShowUploadModal] = useState(false);
+    const [newPassage, setNewPassage] = useState({
+        title: "",
+        content: "",
+        author: "",
+        language: "KOREAN",
+        classification: "NORMAL",
+        category: "NEWS",
+        type: "ECONOMY",
+        level: 1
+    });
+
     // 지문 불러오기
     useEffect(() => {
         const fetchPassages = async () => {
@@ -72,7 +88,7 @@ const AdminPassage = () => {
                 category,
                 type,
                 classification,
-                 count
+                count
             });
             const data = await res.data;
             alert("성공 : " + data.message);
@@ -102,23 +118,37 @@ const AdminPassage = () => {
 
     // 지문 삭제
     const handleDeletePassage = async (passageNo) => {
-    const confirmDelete = window.confirm("정말 이 지문을 삭제하시겠습니까?");
-    if (!confirmDelete) return;
+        const confirmDelete = window.confirm("정말 이 지문을 삭제하시겠습니까?");
+        if (!confirmDelete) return;
 
-    try {
-        const res = await axiosInstance.delete(`/administrator/passage/delete`, {
-            params: { passageNo },
-        });
+        try {
+            const res = await axiosInstance.delete(`/administrator/passage/delete`, {
+                params: { passageNo },
+            });
 
-        alert("성공 : 지문이 삭제되었습니다.");
-        // 삭제 후 리스트 갱신
-        setPassageList(prev => prev.filter(p => p.passageNo !== passageNo));
-    } catch (err) {
-        console.error("실패 : 지문 삭제 중 오류 발생:", err);
-        alert("실패 : 지문 삭제 실패");
-    }
-};
+            alert("성공 : 지문이 삭제되었습니다.");
+            // 삭제 후 리스트 갱신
+            setPassageList(prev => prev.filter(p => p.passageNo !== passageNo));
+        } catch (err) {
+            console.error("실패 : 지문 삭제 중 오류 발생:", err);
+            alert("실패 : 지문 삭제 실패");
+        }
+    };
 
+    // 지문 직접 등록
+    const handleUploadPassage = async () => {
+        try {
+            const res = await axiosInstance.post("/administrator/passage/upload-passage", newPassage);
+            alert("성공 : 지문 등록 완료!");
+            setShowUploadModal(false);
+            // 다시 목록 불러오기
+            const refreshed = await axiosInstance.get("/passage/get-all-passages");
+            setPassageList(refreshed.data);
+        } catch (err) {
+            console.error("지문 등록 실패:", err);
+            alert("실패 : 등록 실패");
+        }
+    };
     return (
         <>
             {showPassageModal && (
@@ -139,7 +169,7 @@ const AdminPassage = () => {
 
                         </select>
 
-                      <br /><label>난이도:</label>
+                        <br /><label>난이도:</label>
                         <select value={level} onChange={(e) => setLevel(parseInt(e.target.value))}>
                             {[...Array(10)].map((_, idx) => (
                                 <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
@@ -197,6 +227,79 @@ const AdminPassage = () => {
                     </div>
                 </div>
             )}
+            {showUploadModal && (
+                <div style={modalBackdrop}>
+                    <div style={modalBox}>
+                        <h3>지문 직접 등록</h3>
+                        제목
+                        <input type="text" placeholder="제목" value={newPassage.title} onChange={(e) => setNewPassage({ ...newPassage, title: e.target.value })} />
+                        내용
+                        <textarea placeholder="내용" value={newPassage.content} onChange={(e) => setNewPassage({ ...newPassage, content: e.target.value })} />
+                        작성자
+                        <input type="text" placeholder="작성자" value={newPassage.author} onChange={(e) => setNewPassage({ ...newPassage, author: e.target.value })} />
+                        언어
+                        <select value={newPassage.language} onChange={(e) => setNewPassage({ ...newPassage, language: e.target.value })}>
+                            <option value="KOREAN">한국어</option>
+                            <option value="JAPANESE">일본어</option>
+                            <option value="ENGLISH">영어</option>
+                        </select>
+                        카테고리
+                        <select value={newPassage.category} onChange={(e) => setNewPassage({ ...newPassage, category: e.target.value })}>
+                            <option value="NEWS">뉴스</option>
+                            <option value="NOVEL">소설</option>
+                            <option value="FAIRY_TALE">동화</option>
+                            <option value="VOCABULARY">사전</option>
+                            <option value="FACTUAL">사실</option>
+                            <option value="INFERENTIAL">추론</option>
+                        </select>
+                        타입
+                        <select value={newPassage.type} onChange={(e) => setNewPassage({ ...newPassage, type: e.target.value })}>
+                            <option value="1">정치</option>
+                            <option value="2">경제</option>
+                            <option value="3">사회</option>
+                            <option value="4">문화생활</option>
+                            <option value="5">IT과학</option>
+                            <option value="6">세계</option>
+                            <option value="7">스포츠</option>
+                            <option value="8">연예</option>
+                            <option value="9">추리</option>
+                            <option value="10">공상과학</option>
+                            <option value="11">판타지</option>
+                            <option value="12">로맨스</option>
+                            <option value="13">역사</option>
+                            <option value="14">모험</option>
+                            <option value="15">쓰릴러</option>
+                            <option value="16">삶의 조각</option>
+                            <option value="17">전통</option>
+                            <option value="18">정보</option>
+                        </select>
+                        문제 종류
+                        <select value={newPassage.classification} onChange={(e) => setNewPassage({ ...newPassage, classification: e.target.value })}>
+                            <option value="NORMAL">일반</option>
+                            <option value="CHALLENGE">도전</option>
+                            <option value="TEST">테스트</option>
+                        </select>
+                        난이도
+                        <select value={newPassage.level} onChange={(e) => setNewPassage({ ...newPassage, level: parseInt(e.target.value) })}>
+                            <option value={1}>1</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                            <option value={4}>4</option>
+                            <option value={5}>5</option>
+                            <option value={6}>6</option>
+                            <option value={7}>7</option>
+                            <option value={8}>8</option>
+                            <option value={9}>9</option>
+                            <option value={10}>10</option>
+                        </select>
+
+                        <div style={{ marginTop: "12px", display: "flex", gap: "12px" }}>
+                            <button onClick={handleUploadPassage}>등록</button>
+                            <button onClick={() => setShowUploadModal(false)}>닫기</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div style={{ padding: "24px" }}>
                 <button onClick={() => navigate("/adminpage")} style={backbtn}>뒤로가기</button>
                 <div style={ADMIN_PASSAGE_TITLE}>
@@ -216,7 +319,9 @@ const AdminPassage = () => {
                         <button style={ADMIN_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
                             {loadingQuestion ? '생성 중...' : '일반 문제 생성'}
                         </button>
-                    </div>
+                        <button style={ADMIN_BUTTONS_2} onClick={() => setShowUploadModal(true)}>
+                            지문 직접 등록
+                        </button>                    </div>
                 </div>
                 <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
                     <thead>
@@ -249,7 +354,7 @@ const AdminPassage = () => {
                                     {passage.createdAt ? new Date(passage.createdAt).toLocaleDateString() : "-"}
                                 </td>
                                 <td style={tdStyle}>{CLASSIFICATION_LABELS[passage.classification]}</td>
-                                <td style={tdStyle}>{AUTHOR_LABELS[passage.author]}</td>
+                                <td style={tdStyle}>{AUTHOR_LABELS[passage.author] || passage.author}</td>
                                 <td style={tdStyle}>
                                     <button
                                         onClick={() => handleDeletePassage(passage.passageNo)}
@@ -334,6 +439,26 @@ const ADMIN_BUTTONS = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer"
+};
+
+const ADMIN_BUTTONS_2 = {
+    marginBottom: "16px",
+    padding: "8px 16px",
+    backgroundColor: "red",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer"
+}
+
+const modalBackdrop = {
+    position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+    backgroundColor: "rgba(0,0,0,0.4)", display: "flex", justifyContent: "center", alignItems: "center"
+};
+
+const modalBox = {
+    backgroundColor: "white", padding: "20px", borderRadius: "8px",
+    width: "500px", display: "flex", flexDirection: "column", gap: "10px"
 };
 
 export default AdminPassage;
