@@ -73,7 +73,11 @@ const AdminPage = () => {
         <div style={{ padding: "24px" }}>
             <span style={ADMIN_BUTTONS_LIST}>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate('/adminpage/adminpassage')}>문제 관리</button>
-                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/average-stat")}>평균 통계</button>            
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/average-stat")}>평균 통계</button>
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/category-edit")}>카테고리 편집</button>
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/classification-edit")}>분류 편집</button>
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/language")}>언어 편집</button>
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/level")}>난이도 편집</button>
             </span>
             <div style={ADMIN_TITLE}>
                 <div>
