@@ -179,30 +179,50 @@
   background-color: #e0e0e0;
 }
 
-@media (max-width: 768px) {
-  .quiz-layout {
-    flex-direction: column;
-  }
+/* ───────── 375px 이하 화면 전용 ───────── */
+@media (max-width: 375px) {
 
   .quiz-passage,
   .quiz-box {
-    width: 100%;
+    width: 100% !important;      /* ← 가로 100 %  */
+    max-width: 343px !important;
+    min-height: 400px !important; /* 높이 400px(예시) */
+    max-height: 400px !important;
+    overflow-y: auto;
+    padding: 1rem;
+    box-sizing: border-box;      /* 패딩 포함한 폭 계산 */
   }
 
-  .quiz-notfound-container {
-    padding: 1.5rem 1rem;
+  /* ❷ 레이아웃 컨테이너 좌우 패딩 조금만 */
+  .quiz-layout {
+    padding: 0 8px;
   }
 
-  .quiz-notfound-container .warning {
-    font-size: 1.1rem;
+  /* ❸ 글자·버튼 크기는 앞서 준 값 유지 */
+  .passage-title   { font-size: 16px; }
+  .passage-text    { font-size: 13px; }
+  .question-heading{ font-size: 15px; }
+  .question-text   { font-size: 14px; }
+  .quiz-option     { font-size: 13px; padding: 10px; }
+  .submit-button   { font-size: 14px; padding: 10px; }
+  .quiz-timer      { font-size: 12px; }
+  .clock-icon      { width: 14px; height: 14px; }
+
+
+
+  /* ③ 선택지 버튼 여백·글자 ↓ */
+  .quiz-option {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 
-  .quiz-notfound-container .description {
-    font-size: 0.95rem;
+  /* ④ 제출·다음 버튼 크기 ↓ */
+  .submit-button {
+    font-size: 14px;
+    padding: 10px 14px;
   }
 
-  .quiz-notfound-container .go-back-button {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
+  /* ⑤ 타이머 아이콘·글자 ↓ */
+  .clock-icon { width: 14px; height: 14px; }
+  .quiz-timer { font-size: 12px; }
 }
