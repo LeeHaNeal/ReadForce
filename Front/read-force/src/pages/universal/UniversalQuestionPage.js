@@ -207,6 +207,12 @@ const UniversalQuestionPage = () => {
 
   const currentQuiz = quizList[currentIndex];
 
+  const formatTime = (seconds) => {
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   useEffect(() => {
     const newStart = Date.now();
     setStartTime(newStart);
@@ -330,10 +336,11 @@ const UniversalQuestionPage = () => {
           <h4 className="question-heading">💡 문제 {currentIndex + 1}</h4>
           <div className="quiz-timer">
             <img src={clockImg} alt="clock" className="clock-icon" />
-            {elapsedSeconds}s
+            {formatTime(elapsedSeconds)}
           </div>
         </div>
 
+        <div className="quiz-content">
         <p className="question-text">{currentQuiz.question}</p>
 
         <div className="quiz-options">
@@ -346,8 +353,8 @@ const UniversalQuestionPage = () => {
               {String.fromCharCode(65 + idx)}. {choice.content}
             </button>
           ))}
+          </div>
         </div>
-
         <div className="quiz-button-container">
           <button
             className="submit-button"

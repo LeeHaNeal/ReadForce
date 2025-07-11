@@ -46,6 +46,14 @@ public final class MessageCode {
 	public static final String AGE_GROUP_NOT_NULL = "NOT0038";
 	public static final String AVERAGE_QUESTION_SOLVING_TIME_NO_NOT_NULL = "NOT0038";
 	public static final String AGE_GROUP_NO_NOT_NULL = "NOT0039";
+	public static final String ATTENDANCE_DATE_NOT_NULL = "NOT0040";
+	public static final String ATTENDANCE_NO_NOT_NULL = "NOT0041";
+	public static final String SCORE_NOT_NULL = "NOT0042";
+	public static final String SCORE_NO_NOT_NULL = "NOT0043";
+	public static final String RESULT_NO_NOT_NULL = "NOT0044";
+	
+	
+	
 	
 	
 	
@@ -123,6 +131,15 @@ public final class MessageCode {
 	public static final String DELETE_AVERAGE_QUESTION_SOLVING_TIME_SUCCESS = "SUC0043";
 	public static final String CREATE_AGE_GROUP_SUCCESS = "SUC0044";
 	public static final String DELETE_AGE_GROUP_SUCCESS = "SUC0045";
+	public static final String ADD_ATTENDANCE_SUCCESS = "SUC0046";
+	public static final String DELETE_ATTENDANCE_SUCCESS = "SUC0047";
+	public static final String CREATE_SCORE_SUCCESS = "SUC0048";
+	public static final String MODIFY_SCORE_SUCCESS = "SUC0049";
+	public static final String CREATE_RESULT_SUCCESS = "SUC0050";
+	public static final String MODIFY_RESULT_SUCCESS = "SUC0051";
+	public static final String CREATE_MISSING_RESULT_METRIC_SUCCESS = "SUC0052";
+	public static final String MODIFY_RESULT_METRIC_SUCCESS = "SUC0052";
+	
 	
 	
 	
@@ -165,6 +182,8 @@ public final class MessageCode {
 	public static final String CLASSIFICATION_NOT_FOUND = "NOF0019";
 	public static final String NO_QUESTION_PASSAGE_NOT_FOUND = "NOF0020";
 	public static final String MULTIPLE_CHOICE_NOT_FOUND = "NOF0021";
+	public static final String SCORE_NOT_FOUND = "NOF0022";
+	public static final String RESULT_NOT_FOUND = "NOF0023";
 	
 	
 	
@@ -187,6 +206,7 @@ public final class MessageCode {
 	public static final String EMAIL_ALREADY_USED = "DUP0013";
 	public static final String NICKNAME_ALREADY_USED = "DUP0014";
 	public static final String TEST_QUESTION_ALREADY_SOLVED = "DUP0015";
+	public static final String SCORE_ALREADY_EXIST = "DUP0016";
 	
 	
 	

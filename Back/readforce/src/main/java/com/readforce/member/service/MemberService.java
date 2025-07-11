@@ -132,12 +132,20 @@ public class MemberService {
 				
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public Member getActiveMemberByEmail(String email) {
 
 		return memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 				
+	}
+	
+	@Transactional(readOnly = true)
+	public Member getMemberByEmail(String email) {
+		
+		return memberRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+		
 	}
 	
 	@Transactional
@@ -537,6 +545,17 @@ public class MemberService {
 		redisTemplate.delete(PrefixEnum.REFRESH.getContent() + email);
 		
 		memberRepository.delete(member);		
+		
+	}
+
+	@Transactional
+	public void createMissingResultMetricByEmail(String email) {
+
+		Member member = getActiveMemberByEmail(email);
+		
+		Result result = resultService.getActiveMemberResultByEmail(email);
+		
+		createResultMetricsForMember(member, result);
 		
 	}
 

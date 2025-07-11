@@ -33,6 +33,11 @@ import AdminUserInfo from './pages/adminpages/adminuserinifo';
 import AdminUserAttendance from './pages/adminpages/adminuserattendance';
 import AdminPassage from './pages/adminpages/adminpassage';
 import AdminPassageDetail from './pages/adminpages/AdminPassageDetail';
+import AdminAverageStat from './pages/adminpages/AdminAverageStat';
+import AdminCategoryEdit from './pages/adminpages/AdminCategoryEdit';
+import AdminClassificationEdit from './pages/adminpages/AdminClassificationEdit';
+import AdminLanguagePage from './pages/adminpages/AdminLanguagePage';
+import AdminLevelEdit from './pages/adminpages/adminLevelEdit';
 
 import TestQuestionPage from './pages/challenge/testquestionpage';
 import TestResultPage from './pages/challenge/testresultpage';
@@ -85,6 +90,11 @@ function App() {
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
           <Route path="/adminpage/adminpassage" element={<AdminPassage />} />
           <Route path="/adminpage/passage/:passageNo" element={<AdminPassageDetail />} />
+          <Route path="/adminpage/average-stat" element={<AdminAverageStat />} />
+          <Route path="/adminpage/category-edit" element={<AdminCategoryEdit />} />
+          <Route path="/adminpage/classification-edit" element={<AdminClassificationEdit />} />
+          <Route path="/adminpage/language" element={<AdminLanguagePage />} />
+          <Route path="/adminpage/level" element={<AdminLevelEdit />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />

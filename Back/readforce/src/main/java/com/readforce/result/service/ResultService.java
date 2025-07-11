@@ -62,5 +62,30 @@ public class ResultService {
 		return resultRepository.findByMember_EmailAndMember_Status(email, StatusEnum.ACTIVE);
 		
 	}
+	
+	@Transactional(readOnly = true)
+	public Result getResultByEmail(String email) {
 
+		return resultRepository.findByMember_Email(email)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.RESULT_NOT_FOUND));
+
+	}
+
+	@Transactional
+	public void modifyResult(Long resultNo, Integer learningStreak, Double overallCorrectAnswerRate) {
+		
+		Result result = getResultByResultNo(resultNo);
+		
+		result.modifyInformation(learningStreak, overallCorrectAnswerRate);
+		
+	}
+
+	@Transactional
+	private Result getResultByResultNo(Long resultNo) {
+
+		return resultRepository.findById(resultNo)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.RESULT_NOT_FOUND));
+		
+	}
+	
 }

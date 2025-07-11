@@ -411,31 +411,33 @@ const TestQuestionPage = () => {
   if (!question) return <div>문제를 불러오는 중...</div>;
 
   return (
-    <div className="TestQuestion-layout">
-      <div className="TestQuestion-article-box">
-        <h3 className="TestQuestion-article-title">{question.article.title}</h3>
-        <p className="TestQuestion-article-content">{question.article.content}</p>
-      </div>
+      <div className="TestQuestion-layout">
+    <div className="TestQuestion-article-box">
+      <h3 className="TestQuestion-article-title">{question.article.title}</h3>
+      <p className="TestQuestion-article-content">{question.article.content}</p>
+    </div>
 
-      <div className="TestQuestion-right-container">
+    <div className="TestQuestion-right-container">
+      <div className="TestQuestion-quiz-box">
+        
+        {/* 타이머도 이 박스 안에 넣기 */}
         <div className="TestQuestion-timer">⏱️ 남은 시간: {timeLeft}초</div>
 
-        <div className="TestQuestion-quiz-box">
-          <h4 className="TestQuestion-quiz-title">문제</h4>
-          <p className="TestQuestion-quiz-question">{question.quiz.questionText}</p>
+        <h4 className="TestQuestion-quiz-title">문제</h4>
+        <p className="TestQuestion-quiz-question">{question.quiz.questionText}</p>
 
-          {question.quiz.choices.map((opt, idx) => (
-            <button
-              key={idx}
-              className={`TestQuestion-quiz-option ${selected === idx ? 'selected' : ''}`}
-              onClick={() => handleSelect(idx)}
-              disabled={isSubmitting}
-            >
-              {String.fromCharCode(65 + idx)}. {opt}
-            </button>
-          ))}
-        </div>
+        {question.quiz.choices.map((opt, idx) => (
+          <button
+            key={idx}
+            className={`TestQuestion-quiz-option ${selected === idx ? 'selected' : ''}`}
+            onClick={() => handleSelect(idx)}
+            disabled={isSubmitting}
+          >
+            {String.fromCharCode(65 + idx)}. {opt}
+          </button>
+        ))}
 
+        {/* 제출 버튼도 quiz-box 안에 함께 넣기 */}
         <div className="TestQuestion-controls">
           <button
             className="TestQuestion-submit"
@@ -447,6 +449,8 @@ const TestQuestionPage = () => {
         </div>
       </div>
     </div>
+  </div>
+
   );
 };
 

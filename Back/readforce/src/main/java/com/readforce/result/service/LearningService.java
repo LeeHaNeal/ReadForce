@@ -124,6 +124,7 @@ public class LearningService {
 
 		return learningRepository.findAllByMember(member).stream()
 				.map(learning -> learning.getQuestion().getPassage().getPassageNo())
+				.distinct()
 				.collect(Collectors.toList());
 
 	}
