@@ -305,7 +305,7 @@ const CATEGORY_LABELS = {
     FAIRY_TALE: "동화",
     VOCABULARY: "사전",
     FACTUAL: "사실",
-    INFERENTIAL: "인퍼뭐노"
+    INFERENTIAL: "추론"
 };
 
 const CLASSIFICATION_LABELS = {

@@ -32,6 +32,7 @@ import AdminAddParagraph from './pages/adminpages/adminaddparagraph';
 import AdminUserInfo from './pages/adminpages/adminuserinifo';
 import AdminUserAttendance from './pages/adminpages/adminuserattendance';
 import AdminPassage from './pages/adminpages/adminpassage';
+import AdminPassageDetail from './pages/adminpages/AdminPassageDetail';
 
 import TestQuestionPage from './pages/challenge/testquestionpage';
 import TestResultPage from './pages/challenge/testresultpage';
@@ -83,6 +84,7 @@ function App() {
           <Route path="/adminpage/adminuserinfo/:email" element={<AdminUserInfo />} />
           <Route path="/adminpage/adminuserinfo/:email/attendance" element={<AdminUserAttendance />} />
           <Route path="/adminpage/adminpassage" element={<AdminPassage />} />
+          <Route path="/adminpage/passage/:passageNo" element={<AdminPassageDetail />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />
