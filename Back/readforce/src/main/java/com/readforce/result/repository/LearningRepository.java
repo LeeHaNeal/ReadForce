@@ -122,4 +122,16 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 
 	List<Learning> findAllByQuestionQuestionNoIn(List<Long> topIdList);
 	
+	
+	@Query("""
+			SELECT l
+			FROM Learning l
+			JOIN FETCH l.question q
+			JOIN FETCH q.passage p
+			WHERE l.member = :member
+	""")
+	List<Learning> findAllWithDetailsByMember(
+			@Param("member") Member member
+	);
+	
 }
