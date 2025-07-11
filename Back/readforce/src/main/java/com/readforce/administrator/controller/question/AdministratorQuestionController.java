@@ -2,6 +2,7 @@ package com.readforce.administrator.controller.question;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,10 +31,12 @@ public class AdministratorQuestionController {
 		Long questionNo
 	){
 		
-		//questionService.deleteQuestion(questionNo);
+		questionService.deleteQuestion(questionNo);
 		
-		
-		return null;
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.DELETE_QUESTION_SUCCESS
+		));
+
 	}
 	
 	
