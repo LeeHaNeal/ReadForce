@@ -132,12 +132,20 @@ public class MemberService {
 				
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public Member getActiveMemberByEmail(String email) {
 
 		return memberRepository.findByEmailAndStatus(email, StatusEnum.ACTIVE)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
 				
+	}
+	
+	@Transactional(readOnly = true)
+	public Member getMemberByEmail(String email) {
+		
+		return memberRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.MEMBER_NOT_FOUND));
+		
 	}
 	
 	@Transactional

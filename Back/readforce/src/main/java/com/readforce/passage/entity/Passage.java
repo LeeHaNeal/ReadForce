@@ -80,6 +80,7 @@ public class Passage {
 	@JoinColumn(name = "classification_no", nullable = false)
 	private Classification classification;
 	
+	@Builder.Default
 	@OneToMany(mappedBy = "passage", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Question> questionList = new ArrayList<>();
 	

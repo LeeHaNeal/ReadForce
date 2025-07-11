@@ -2,6 +2,7 @@ package com.readforce.administrator.controller.member;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.administrator.dto.AdministratorAddMemberRequestDto;
+import com.readforce.administrator.dto.AdministratorAttendanceRequestDto;
 import com.readforce.administrator.dto.AdministratorMemberResponseDto;
 import com.readforce.administrator.dto.AdministratorModifyRequestDto;
+import com.readforce.administrator.dto.AdministratorScoreModifyRequestDto;
+import com.readforce.administrator.dto.AdministratorScoreRequestDto;
+import com.readforce.administrator.dto.AdministratorScoreResponseDto;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.RoleEnum;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
+import com.readforce.passage.entity.Category;
+import com.readforce.passage.entity.Language;
+import com.readforce.passage.service.CategoryService;
+import com.readforce.passage.service.LanguageService;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.result.service.LearningService;
+import com.readforce.result.service.ScoreService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -44,6 +54,9 @@ public class AdministratorMemberController {
 	private final PasswordEncoder passwordEncoder;
 	private final LearningService learningService;
 	private final AttendanceService attendanceService;
+	private final ScoreService scoreService;
+	private final CategoryService categoryService;
+	private final LanguageService languageService;
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-member-list")
@@ -150,22 +163,111 @@ public class AdministratorMemberController {
 		
 	}
 	
-	// 사용자 출석 조회/생성/삭제
+	@GetMapping("/get-attendance-list-by-email")
+	public ResponseEntity<List<MemberAttendanceResponseDto>> getAttendanceListByEmail(
+			@RequestParam("email")
+			@NotNull(message = MessageCode.EMAIL_NOT_BLANK)
+			@Email
+			String email
+	){
+		
+		List<MemberAttendanceResponseDto> attendanceList = attendanceService.getAttendanceListByEmail(email).stream()
+				.map(MemberAttendanceResponseDto::new)
+				.collect(Collectors.toList());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(attendanceList);
+		
+	}
 	
-//	@GetMapping("/get-attendance-list-by-email")
-//	public ResponseEntity<List<MemberAttendanceResponseDto>> getAttendanceListByEmail(
-//			@RequestParam("email")
-//			@NotNull(message = MessageCode.EMAIL_NOT_BLANK)
-//			@Email
-//			String email
-//	){
-//		
-//		attendanceService.get
-//		
-//		
-//	}
+	@PostMapping("/add-attendance-by-email")
+	public ResponseEntity<Map<String, String>> addAttendanceByEmail(
+			@Valid @RequestBody AdministratorAttendanceRequestDto requestDto
+	){
+		
+		attendanceService.addAttendance(requestDto.getEmail(), requestDto.getAttendanceDate());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.ADD_ATTENDANCE_SUCCESS
+		));
+		
+	}
 	
-	// 사용자 점수 조회/생성/수정/초기화
+	@DeleteMapping("/delete-attendance-by-email")
+	public ResponseEntity<Map<String, String>> deleteAttendanceByEmail(
+		@RequestParam("attendanceNo")
+		@NotNull(message = MessageCode.ATTENDANCE_NO_NOT_NULL)
+		Long attendanceNo
+	){
+		
+		attendanceService.deleteAttendance(attendanceNo);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.DELETE_ATTENDANCE_SUCCESS
+		));
+		
+	}
+	
+	@GetMapping("/get-score-list-by-email")
+	public ResponseEntity<List<AdministratorScoreResponseDto>> getScoreListByEmail(
+			@RequestParam("email")
+			@NotNull(message = MessageCode.EMAIL_NOT_BLANK)
+			@Email
+			String email
+	){
+		
+		List<AdministratorScoreResponseDto> scoreList = scoreService.getScoreListByEmail(email).stream()
+				.map(AdministratorScoreResponseDto::new)
+				.collect(Collectors.toList());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(scoreList);
+		
+	}
+	
+	@PostMapping("/create-score-by-email")
+	public ResponseEntity<Map<String, String>> createScoreByEmail(
+			@Valid @RequestBody AdministratorScoreRequestDto requestDto
+	){
+		
+		Member member = memberService.getMemberByEmail(requestDto.getEmail());
+		
+		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+		
+		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+		
+		scoreService.createScore(member, requestDto.getScore(), category, language);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.CREATE_SCORE_SUCCESS
+		));
+				
+	}
+	
+	@PatchMapping("/modify-score-by-email")
+	public ResponseEntity<Map<String, String>> modifyScoreByEmail(
+			@Valid @RequestBody AdministratorScoreModifyRequestDto requestDto
+	){
+		
+		Member member = memberService.getMemberByEmail(requestDto.getEmail());
+		
+		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+		
+		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+				
+		
+		scoreService.modifyScoreByEmail(
+				member, 
+				requestDto.getScoreNo(), 
+				requestDto.getScore(),
+				category,
+				language);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.MODIFY_SCORE_SUCCESS
+		));
+		
+	}
+
+	
 	
 	// 사용자 성과 조회/생성/수정/초기화
 	
