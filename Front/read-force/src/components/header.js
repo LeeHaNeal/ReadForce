@@ -75,7 +75,7 @@ const Header = () => {
 
         <div className="header-center">
           <nav className="nav">
-            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>뉴스</Link>
             <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
             <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
             <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
@@ -135,7 +135,7 @@ const Header = () => {
       {showMobileMenu && (
         <div className="mobile-menu">
           <nav className="nav">
-            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>기사</Link>
+            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>뉴스</Link>
             <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
             <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
             <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>

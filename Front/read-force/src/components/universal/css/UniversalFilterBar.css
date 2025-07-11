@@ -1,4 +1,3 @@
-/* 전체 레이아웃 */
 .UniversalFilterBar-layout {
   display: flex;
   justify-content: space-between;
@@ -8,7 +7,6 @@
   gap: 12px;
 }
 
-/* 공통 영역 설정 */
 .UniversalFilterBar-left,
 .UniversalFilterBar-center,
 .UniversalFilterBar-right {
@@ -17,9 +15,8 @@
   gap: 8px;
 }
 
-/* 왼쪽: 정렬 버튼 */
 .UniversalFilterBar-left {
-  flex: 0.8;
+  flex: 0.6;
 }
 
 .UniversalFilterBar-sort-button {
@@ -36,9 +33,8 @@
   color: #333;
 }
 
-/* 가운데: 카테고리 해시태그 */
 .UniversalFilterBar-center {
-  flex: 2.6;
+  flex: 3;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -61,15 +57,13 @@
   color: #439395;
 }
 
-/* 오른쪽: 레벨 선택 영역 */
 .UniversalFilterBar-right {
-  flex: 0.6;
+  flex: 0.4;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
 
-/* 모바일 대응 */
 @media (max-width: 600px) {
   .UniversalFilterBar-layout {
     flex-direction: column;
@@ -81,7 +75,7 @@
   .UniversalFilterBar-center,
   .UniversalFilterBar-right {
     width: 100%;
-    justify-content: center; /* ← 가운데 정렬로 통일 */
+    justify-content: center;
   }
 
   .UniversalFilterBar-sort-button {
@@ -99,7 +93,7 @@
   }
 
   .level-select-dropdown {
-    width: 100%; /* ← 부모 div 너비 고정 */
+    width: 100%; 
   }
 }
 
