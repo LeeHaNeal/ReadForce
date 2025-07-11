@@ -22,11 +22,18 @@ import com.readforce.administrator.dto.AdministratorAddMemberRequestDto;
 import com.readforce.administrator.dto.AdministratorAttendanceRequestDto;
 import com.readforce.administrator.dto.AdministratorMemberResponseDto;
 import com.readforce.administrator.dto.AdministratorModifyRequestDto;
+import com.readforce.administrator.dto.AdministratorResultMetricModifyRequestDto;
+import com.readforce.administrator.dto.AdministratorResultMetricRequestDto;
+import com.readforce.administrator.dto.AdministratorResultMetricResponseDto;
+import com.readforce.administrator.dto.AdministratorResultModifyRequestDto;
+import com.readforce.administrator.dto.AdministratorResultRequestDto;
+import com.readforce.administrator.dto.AdministratorResultResponseDto;
 import com.readforce.administrator.dto.AdministratorScoreModifyRequestDto;
 import com.readforce.administrator.dto.AdministratorScoreRequestDto;
 import com.readforce.administrator.dto.AdministratorScoreResponseDto;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.RoleEnum;
+import com.readforce.member.dto.MemberAttendanceResponseDto;
 import com.readforce.member.entity.Member;
 import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
@@ -35,7 +42,10 @@ import com.readforce.passage.entity.Language;
 import com.readforce.passage.service.CategoryService;
 import com.readforce.passage.service.LanguageService;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
+import com.readforce.result.entity.Result;
 import com.readforce.result.service.LearningService;
+import com.readforce.result.service.ResultMetricService;
+import com.readforce.result.service.ResultService;
 import com.readforce.result.service.ScoreService;
 
 import jakarta.validation.Valid;
@@ -57,6 +67,8 @@ public class AdministratorMemberController {
 	private final ScoreService scoreService;
 	private final CategoryService categoryService;
 	private final LanguageService languageService;
+	private final ResultService resultService;
+	private final ResultMetricService resultMetricService;
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-member-list")
@@ -228,7 +240,7 @@ public class AdministratorMemberController {
 			@Valid @RequestBody AdministratorScoreRequestDto requestDto
 	){
 		
-		Member member = memberService.getMemberByEmail(requestDto.getEmail());
+		Member member = memberService.getActiveMemberByEmail(requestDto.getEmail());
 		
 		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
 		
@@ -247,7 +259,7 @@ public class AdministratorMemberController {
 			@Valid @RequestBody AdministratorScoreModifyRequestDto requestDto
 	){
 		
-		Member member = memberService.getMemberByEmail(requestDto.getEmail());
+		Member member = memberService.getActiveMemberByEmail(requestDto.getEmail());
 		
 		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
 		
@@ -267,15 +279,104 @@ public class AdministratorMemberController {
 		
 	}
 
+	@GetMapping("/get-result-by-email")
+	public ResponseEntity<AdministratorResultResponseDto> getResultByEmail(
+			@RequestParam("email")
+			@NotBlank(message = MessageCode.EMAIL_NOT_BLANK)
+			@Email
+			String email
+	){
+		
+		Result result = resultService.getResultByEmail(email);
+		
+		AdministratorResultResponseDto resultDto = AdministratorResultResponseDto.builder()
+				.resultNo(result.getResultNo())
+				.learningStreak(result.getLearningStreak())
+				.overallCorrectAnswerRate(result.getOverallCorrectAnswerRate())
+				.createdAt(result.getCreatedAt())
+				.lastModifiedAt(result.getLastModifiedAt())
+				.email(result.getMember().getEmail())
+				.build();
+		
+		return ResponseEntity.status(HttpStatus.OK).body(resultDto);
+		
+	}
 	
+	@PostMapping("/create-result-by-email")
+	public ResponseEntity<Map<String, String>> createResultByEmail(
+			@Valid @RequestBody AdministratorResultRequestDto requestDto
+	){
+		
+		Member member = memberService.getActiveMemberByEmail(requestDto.getEmail());
+		
+		resultService.create(member);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.CREATE_RESULT_SUCCESS
+		));
+		
+	}
 	
-	// 사용자 성과 조회/생성/수정/초기화
+	@PatchMapping("/modify-result-by-email")
+	public ResponseEntity<Map<String, String>> mdoifyResultByEmail(
+			@Valid @RequestBody AdministratorResultModifyRequestDto requestDto
+	){
+		
+		resultService.modifyResult(requestDto.getResultNo(), requestDto.getLearningStreak(), requestDto.getOverallCorrectAnswerRate());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.MODIFY_RESULT_SUCCESS
+		));
+		
+	}
 	
-	// 사용자 성과 세부 측정 지표 조회/생성/수정/초기화
+	@GetMapping("/get-result-metric-list-by-email")
+	public ResponseEntity<List<AdministratorResultMetricResponseDto>> getResultMetricListByEmail(
+			@RequestParam("email")
+			@NotBlank(message = MessageCode.EMAIL_NOT_BLANK)
+			@Email
+			String email
+	){
+		
+		Result result = resultService.getResultByEmail(email);
+		
+		List<AdministratorResultMetricResponseDto> resultMetricList = 
+				resultMetricService.getAllByResult(result).stream()
+				.map(AdministratorResultMetricResponseDto::new)
+				.collect(Collectors.toList());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(resultMetricList);
+		
+	}
 	
+	@PostMapping("/create-missing-result-metric-by-email")
+	public ResponseEntity<Map<String, String>> createMissingResultMetricByEmail(
+			@Valid @RequestBody AdministratorResultMetricRequestDto requestDto	
+	){
+				
+		memberService.createMissingResultMetricByEmail(requestDto.getEmail());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.CREATE_MISSING_RESULT_METRIC_SUCCESS
+		));
+		
+	}
 	
-	
-	
-	
+	@PatchMapping("/modify-result-metric")
+	public ResponseEntity<Map<String, String>> modifyResultMetric(
+			@Valid @RequestBody AdministratorResultMetricModifyRequestDto requestDto
+	){
+		
+		resultMetricService.modifyResultMetric(
+				requestDto.getResultMetricNo(),
+				requestDto.getCorrectAnswerRate(),
+				requestDto.getQuestionSolvingTimeAverage());
+		
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.MODIFY_RESULT_METRIC_SUCCESS
+		));
+		
+	}
 	
 }

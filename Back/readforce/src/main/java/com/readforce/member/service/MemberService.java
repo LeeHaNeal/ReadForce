@@ -548,6 +548,17 @@ public class MemberService {
 		
 	}
 
+	@Transactional
+	public void createMissingResultMetricByEmail(String email) {
+
+		Member member = getActiveMemberByEmail(email);
+		
+		Result result = resultService.getActiveMemberResultByEmail(email);
+		
+		createResultMetricsForMember(member, result);
+		
+	}
+
 
 	
 	
