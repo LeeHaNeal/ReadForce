@@ -13,6 +13,7 @@ const AdaptiveQuizPage = () => {
     const fetchQuiz = async () => {
       try {
         const res = await fetchWithAuth('/recommend/get-recommend?language=KOREAN');
+        console.log("asdfajewrakjdsfkjasbdkhbsdf");
         if (!res.ok) {
           console.error('백엔드 에러 상태 코드:', res.status);
           setNotFound(true);
@@ -26,8 +27,10 @@ const AdaptiveQuizPage = () => {
           setNotFound(true);
           return;
         }
-
+           
         setQuiz(data);
+   
+      console.log('문제 번호:', data.questionNo ?? '없음');
       } catch (err) {
         console.error('API 통신 오류:', err);
         setNotFound(true);
