@@ -120,6 +120,6 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 			@Param("questionNoList") List<Long> questionNoList
 	);
 
-	List<Learning> findAllByQuestionNoIn(List<Long> topIdList);
+	List<Learning> findAllByQuestionQuestionNoIn(List<Long> topIdList);
 	
 }

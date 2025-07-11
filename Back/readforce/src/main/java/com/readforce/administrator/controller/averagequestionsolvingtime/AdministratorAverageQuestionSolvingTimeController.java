@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.readforce.administrator.dto.AdministratorAverageQuestionSolvingTimeRequestDto;
 import com.readforce.administrator.dto.AdministratorAverageQuetionSolvingTimeResponseDto;
 import com.readforce.common.MessageCode;
+import com.readforce.passage.entity.Level;
+import com.readforce.passage.service.LevelService;
 import com.readforce.question.service.AverageQuestionSolvingTimeService;
 
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AdministratorAverageQuestionSolvingTimeController {
 
 	private final AverageQuestionSolvingTimeService averageQuestionSolvingTimeService;
+	private final LevelService levelService;
 
 	@GetMapping("/get-all-list")
 	public ResponseEntity<List<AdministratorAverageQuetionSolvingTimeResponseDto>> getAllList(){
@@ -48,8 +51,9 @@ public class AdministratorAverageQuestionSolvingTimeController {
 	public ResponseEntity<Map<String, String>> create(
 			@Valid @RequestBody AdministratorAverageQuestionSolvingTimeRequestDto requestDto
 	){
+		Level level = levelService.getLevelByLevel(requestDto.getLevel());
 		
-		averageQuestionSolvingTimeService.createAverageQuestionSolvingTime(requestDto);
+		averageQuestionSolvingTimeService.createAverageQuestionSolvingTime(requestDto, level);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
 				MessageCode.MESSAGE_CODE, MessageCode.CREATE_AVERAGE_QUESTION_SOLVING_TIME_SUCCESS
