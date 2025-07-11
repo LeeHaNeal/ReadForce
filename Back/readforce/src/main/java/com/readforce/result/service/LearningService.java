@@ -243,7 +243,7 @@ public class LearningService {
 		List<Learning> latestLearningList = learningRepository.findLatestLearningListForQuestionNoList(topIdList);
 		
 		List<Learning> allLearningListByQuestionNos = learningRepository.findAllByQuestionQuestionNoIn(topIdList);
-
+		
 		Map<Long, List<Learning>> allLearningMapByQuestionNo = allLearningListByQuestionNos.stream()
 				.collect(Collectors.groupingBy(learning -> learning.getQuestion().getQuestionNo()));
 		
@@ -258,23 +258,16 @@ public class LearningService {
 			long correctAttempts = questionLearningList.stream().filter(Learning::getIsCorrect).count();
 
 			double correctAnswerRate = (totalAttempts > 0) ? (double) correctAttempts / totalAttempts : 0.0;
-
-			String questionTitle = "";
-	        if (latestLearning.getQuestion() instanceof MultipleChoice) {
-	        	
-	            MultipleChoice multipleChoice = (MultipleChoice) latestLearning.getQuestion();
-	            
-	        	questionTitle = multipleChoice.getQuestion();
-	        	
-	        }
-
-	        return QuestionMostIncorrectResponseDto.builder()
-	                .questionNo(questionNo)
-	                .title(questionTitle)
-	                .createdAt(latestLearning.getCreatedAt())
-	                .isCorrect(latestLearning.getIsCorrect())
-	                .correctAnswerRate(correctAnswerRate)
-	                .build();
+			
+			MultipleChoice multipleChoice = multipleChoiceService.getMultipleChoiceByQuestionNo(questionNo);
+			
+			return QuestionMostIncorrectResponseDto.builder()
+					.questionNo(questionNo)
+					.title(multipleChoice.getQuestion())
+					.createdAt(latestLearning.getCreatedAt())
+					.isCorrect(latestLearning.getIsCorrect())
+					.correctAnswerRate(correctAnswerRate)
+					.build();
 			
 		}).collect(Collectors.toList());
 		
