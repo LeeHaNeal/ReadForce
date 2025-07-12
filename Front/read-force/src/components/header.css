@@ -230,7 +230,79 @@
     display: none;
   }
 
+  .header-inner {
+    padding-left: 30px;   /* 원하는 만큼—8‒20 px 사이에서 조절 */
+  }
+
   .hamburger {
     display: block;
+    margin-bottom: 10px;
   }
+
+  /* ❶ 모바일 메뉴 전체 */
+.mobile-menu {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  z-index: 999;
+  padding: 20px 16px;      /* 좌우·상단 여백 넉넉히 */
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+/* ❷ 상위 네비게이션 그룹 */
+.mobile-menu .menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;               /* 항목 간 간격(터치 영역) */
+  margin-bottom: 24px;     /* 그룹 간 여백 */
+}
+
+/* ❸ 메뉴 항목 기본 스타일 */
+.mobile-menu a,
+.mobile-menu div {
+  font-size: 18px;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  padding: 4px 0;          /* 클릭 여백 (라인 내부) */
+  margin-left: 10px;
+}
+
+/* ❹ 터치 피드백 */
+.mobile-menu a:hover,
+.mobile-menu div:hover {
+  color: #0f766e;
+  border-radius: 4px;
+}
+
+/* ❺ 구분선 대신 흐린 타이틀 라벨(선택 사항) */
+.menu-section-title {
+  font-size: 14px;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 8px;
+  pointer-events: none;     /* 클릭·터치 무시 */
+  user-select: none;
+}
+
+/* ===== body 스크롤 차단 ===== */
+.no-scroll {
+  overflow: hidden;
+  height: 100vh;      /* iOS 사파리까지 안전하게 */
+}
+
+/* ===== 모바일 메뉴 항목을 세로 그룹화 ===== */
+.mobile-menu .menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
 }

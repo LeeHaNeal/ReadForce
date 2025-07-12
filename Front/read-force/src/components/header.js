@@ -17,6 +17,15 @@ const Header = () => {
   const provider = localStorage.getItem("social_provider");
 
   useEffect(() => {
+    if (showMobileMenu) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => document.body.classList.remove("no-scroll");
+  }, [showMobileMenu]);
+
+  useEffect(() => {
     const updateNickname = () => {
       const storedNickname = localStorage.getItem("nickname");
       setNickname(storedNickname || "사용자");
@@ -61,6 +70,26 @@ const Header = () => {
       navigate("/");
     }
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setShowMobileMenu(false); // 데스크톱으로 전환되면 강제로 닫음
+        document.body.classList.remove("no-scroll"); // 스크롤 잠금도 해제
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (showMobileMenu) {
+      document.body.classList.add("no-scroll"); // 모바일 메뉴 열릴 때
+    } else {
+      document.body.classList.remove("no-scroll"); // 닫힐 때 해제
+    }
+  }, [showMobileMenu]);
 
   return (
     <header className="header">
@@ -132,17 +161,34 @@ const Header = () => {
         </div>
       </div>
 
-      {showMobileMenu && (
-        <div className="mobile-menu">
-          <nav className="nav">
-            <Link to="/article" className={`nav-item ${currentPath.startsWith('/article') ? 'active' : ''}`}>뉴스</Link>
-            <Link to="/novel" className={`nav-item ${currentPath.startsWith('/novel') ? 'active' : ''}`}>소설</Link>
-            <Link to="/fairytale" className={`nav-item ${currentPath.startsWith('/fairytale') ? 'active' : ''}`}>동화</Link>
-            <Link to="/challenge" className={`nav-item ${currentPath.startsWith('/challenge') ? 'active' : ''}`}>문해력 도전</Link>
-            <Link to="/adaptive-learning" className={`nav-item ${currentPath.startsWith('/adaptive-learning') ? 'active' : ''}`}>적응력 학습</Link>
-          </nav>
+    {/* 모바일 메뉴: 햄버거 클릭 시 */}
+    {showMobileMenu && (
+      <div className="mobile-menu">
+        {/* 메인 네비게이션 */}
+        <div className="menu-group">
+          <Link to="/article"           onClick={() => setShowMobileMenu(false)}>뉴스</Link>
+          <Link to="/novel"             onClick={() => setShowMobileMenu(false)}>소설</Link>
+          <Link to="/fairytale"         onClick={() => setShowMobileMenu(false)}>동화</Link>
+          <Link to="/challenge"         onClick={() => setShowMobileMenu(false)}>문해력도전</Link>
+          <Link to="/adaptive-learning" onClick={() => setShowMobileMenu(false)}>적응형학습</Link>
         </div>
-      )}
+
+        <div className="menu-section-title">계정</div>
+        <div className="menu-group">
+          {isLoggedIn ? (
+            <>
+              <div onClick={() => { setShowMobileMenu(false); navigate('/mypage'); }}>마이페이지</div>
+              <div onClick={handleLogout}>로그아웃</div>
+            </>
+          ) : (
+            <>
+              <div onClick={() => { setShowMobileMenu(false); navigate('/login'); }}>로그인</div>
+              <div onClick={() => { setShowMobileMenu(false); navigate('/signup/signupchoice'); }}>회원가입</div>
+            </>
+          )}
+        </div>
+      </div>
+    )}
     </header>
   );
 };

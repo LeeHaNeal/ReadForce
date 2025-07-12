@@ -7,8 +7,9 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 200px;
+  height: auto !important;
   position: relative; /* 배지 absolute 위치를 위해 필요 */
+  margin-top: 20px;
 }
 
 .UniversalCard-card:hover {
@@ -28,20 +29,21 @@
 }
 
 .UniversalCard-content {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 20px 0 0 10px;
+  max-width: calc(100% - 120px);
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.5;
-  max-height: calc(1.5em * 2);
-  color: #555;
-  font-size: 15px;
-  margin: 12px 0 0 0;
-  margin-top: 20px;
-  margin-left: 10px;
-  max-width: calc(100% - 120px);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  color: #454545;
+  height: auto !important;
+  max-height: none !important;
 }
+
 
 .UniversalCard-button {
   padding: 10px 15px;
@@ -102,39 +104,59 @@
   margin-left: 10px;
 }
 
+/* ───────── 모바일 전용 (≤480px) ───────── */
 @media (max-width: 480px) {
+
+  /* 카드 기본 */
   .UniversalCard-card {
-    padding: 16px;
+    padding: 18px;
+    margin-bottom: 0px;
     height: auto;
   }
 
+  /* (1) 제목만 포함된 헤더 */
+  .UniversalCard-header {
+    order: 1;               /* 제일 위 */
+    margin-bottom: 6px;
+  }
   .UniversalCard-title {
-    font-size: 16px;
+    font-size: 17px;
+    line-height: 1.4;
+    margin: 0;
+    word-break: break-word;
+    max-height: calc(1.4em * 3); /* 두 줄까지만 */
+    overflow: hidden;
+    max-width: 100%;   /* 데스크톱에서 걸린 120px 여유 폭 해제 */
+    width: 73%;
   }
 
-  .UniversalCard-content {
-    font-size: 14px;
-    max-height: calc(1.5em * 4);
-    max-width: 100%;
-  }
-
-  .UniversalCard-button {
-    font-size: 14px;
-    padding: 8px 12px;
-  }
-
-  .UniversalCard-badge {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-
-  .UniversalCard-category {
-    font-size: 13px;
-  }
-
+  /* (2) 카테고리·버튼·배지 한 줄 */
   .UniversalCard-footer {
-    flex-direction: column;
-    align-items: flex-start;
+    order: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 8px;
   }
+
+  .UniversalCard-category {        /* # 정치 */
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .UniversalCard-button {          /* 문제 풀기 */
+    padding: 6px 14px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .UniversalCard-badge {           /* 10단계 */
+    padding: 6px 12px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* (3) 본문 요약 숨김 */
+  .UniversalCard-content { display: none; }
 }
