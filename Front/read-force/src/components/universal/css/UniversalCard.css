@@ -7,8 +7,9 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 200px;
+  height: auto !important;
   position: relative; /* 배지 absolute 위치를 위해 필요 */
+  margin-top: 20px;
 }
 
 .UniversalCard-card:hover {
@@ -28,20 +29,21 @@
 }
 
 .UniversalCard-content {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 20px 0 0 10px;
+  max-width: calc(100% - 120px);
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.5;
-  max-height: calc(1.5em * 2);
-  color: #555;
-  font-size: 15px;
-  margin: 12px 0 0 0;
-  margin-top: 20px;
-  margin-left: 10px;
-  max-width: calc(100% - 120px);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  color: #454545;
+  height: auto !important;
+  max-height: none !important;
 }
+
 
 .UniversalCard-button {
   padding: 10px 15px;
@@ -108,7 +110,7 @@
   /* 카드 기본 */
   .UniversalCard-card {
     padding: 18px;
-    margin-bottom: 28px;
+    margin-bottom: 0px;
     height: auto;
   }
 
