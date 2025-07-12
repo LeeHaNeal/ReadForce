@@ -7,6 +7,7 @@ const AdaptiveLearningPage = () => {
   const nickname = localStorage.getItem('nickname') || '사용자';
 
 return (
+  <main className="adaptive-narrow">
     <div className="adaptive-learning-container">
       <div className="adaptive-content-wrapper">
         <div className="robot-section">
@@ -24,6 +25,7 @@ return (
         </div>
       </div>
     </div>
+    </main>
   );
 };
 

@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 64px 16px;
+  padding: 94px 16px;
   min-height: 60vh;
 }
 
@@ -14,6 +14,11 @@
   flex-direction: column; /* 모바일은 세로 */
   align-items: center;
   gap: 2rem;
+}
+
+main.adaptive-narrow {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* 로봇 애니메이션 */
