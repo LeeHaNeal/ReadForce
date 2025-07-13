@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.ai.dto.AiGeneratePassageRequestDto;
 import com.readforce.ai.service.AiService;
+import com.readforce.common.MessageCode;
 import com.readforce.common.enums.LanguageEnum;
 
 import jakarta.validation.Valid;
@@ -33,8 +34,11 @@ public class AiController {
             @RequestParam("language")
             @NotNull LanguageEnum language
     ) {
+    	
         aiService.generateTestVocabulary(language);
-        return ResponseEntity.ok(Map.of("message", " 테스트 지문 생성 성공 ✅"));
+        
+        return ResponseEntity.ok(Map.of(MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_PASSAGE_SUCCESS));
+        
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -43,8 +47,11 @@ public class AiController {
             @RequestParam("language")
             @NotNull LanguageEnum language
     ) {
+    	
         aiService.generateTestQuestion(language);
-        return ResponseEntity.ok(Map.of("message", " 테스트 문제 생성 성공 ✅"));
+        
+        return ResponseEntity.ok(Map.of(MessageCode.MESSAGE_CODE, MessageCode.GENERATE_TEST_QUESTION_SUCCESS));
+        
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,14 +59,20 @@ public class AiController {
     public ResponseEntity<Map<String, String>> generatePassage(
             @Valid @RequestBody AiGeneratePassageRequestDto aiGeneratePassageRequestDto
     ) {
+    	
         aiService.generatePassage(aiGeneratePassageRequestDto);
-        return ResponseEntity.ok(Map.of("message", " 지문 생성 성공 (" + aiGeneratePassageRequestDto.getCount() + "개 ✅)"));
+        
+        return ResponseEntity.ok(Map.of(MessageCode.MESSAGE_CODE, MessageCode.GENERATE_PASSAGE_SUCCESS));
+ 
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/generate-question")
     public ResponseEntity<Map<String, String>> generateQuestion() {
+    	
         aiService.generateQuestion();
-        return ResponseEntity.ok(Map.of("message", " 문제 생성 성공 ✅"));
+        
+        return ResponseEntity.ok(Map.of(MessageCode.MESSAGE_CODE, MessageCode.GENERATE_QUESTION_SUCCESS));
+        
     }
 }

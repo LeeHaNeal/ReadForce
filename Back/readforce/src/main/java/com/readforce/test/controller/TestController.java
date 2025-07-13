@@ -36,7 +36,9 @@ public class TestController {
 			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 			LanguageEnum language
 	){
+		
 		QuestionTestResponseDto startQuestion = testService.getTestQuestion(language, CategoryEnum.VOCABULARY, 6);
+		
 		return ResponseEntity.status(HttpStatus.OK).body(startQuestion);
 		
 	}

@@ -175,6 +175,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-attendance-list-by-email")
 	public ResponseEntity<List<MemberAttendanceResponseDto>> getAttendanceListByEmail(
 			@RequestParam("email")
@@ -191,6 +192,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add-attendance-by-email")
 	public ResponseEntity<Map<String, String>> addAttendanceByEmail(
 			@Valid @RequestBody AdministratorAttendanceRequestDto requestDto
@@ -204,6 +206,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/delete-attendance-by-email")
 	public ResponseEntity<Map<String, String>> deleteAttendanceByEmail(
 		@RequestParam("attendanceNo")
@@ -219,6 +222,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-score-list-by-email")
 	public ResponseEntity<List<AdministratorScoreResponseDto>> getScoreListByEmail(
 			@RequestParam("email")
@@ -235,6 +239,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create-score-by-email")
 	public ResponseEntity<Map<String, String>> createScoreByEmail(
 			@Valid @RequestBody AdministratorScoreRequestDto requestDto
@@ -254,6 +259,7 @@ public class AdministratorMemberController {
 				
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/modify-score-by-email")
 	public ResponseEntity<Map<String, String>> modifyScoreByEmail(
 			@Valid @RequestBody AdministratorScoreModifyRequestDto requestDto
@@ -279,6 +285,7 @@ public class AdministratorMemberController {
 		
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-result-by-email")
 	public ResponseEntity<AdministratorResultResponseDto> getResultByEmail(
 			@RequestParam("email")
@@ -302,6 +309,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create-result-by-email")
 	public ResponseEntity<Map<String, String>> createResultByEmail(
 			@Valid @RequestBody AdministratorResultRequestDto requestDto
@@ -317,6 +325,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/modify-result-by-email")
 	public ResponseEntity<Map<String, String>> mdoifyResultByEmail(
 			@Valid @RequestBody AdministratorResultModifyRequestDto requestDto
@@ -330,6 +339,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-result-metric-list-by-email")
 	public ResponseEntity<List<AdministratorResultMetricResponseDto>> getResultMetricListByEmail(
 			@RequestParam("email")
@@ -349,6 +359,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create-missing-result-metric-by-email")
 	public ResponseEntity<Map<String, String>> createMissingResultMetricByEmail(
 			@Valid @RequestBody AdministratorResultMetricRequestDto requestDto	
@@ -362,6 +373,7 @@ public class AdministratorMemberController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/modify-result-metric")
 	public ResponseEntity<Map<String, String>> modifyResultMetric(
 			@Valid @RequestBody AdministratorResultMetricModifyRequestDto requestDto

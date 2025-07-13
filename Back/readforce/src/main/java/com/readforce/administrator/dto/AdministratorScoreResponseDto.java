@@ -7,12 +7,10 @@ import com.readforce.result.entity.Score;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class AdministratorScoreResponseDto {
 
 	private Long scoreNo;

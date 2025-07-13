@@ -108,10 +108,10 @@ public class LevelService {
 
 	private Integer[] findOptimalLevelRange(String email, LanguageEnum language, CategoryEnum weakCategory, TypeEnum weakType) {
 
-	    Result result = resultService.getActiveMemberResultByEmail(email);
+		Result result = resultService.getActiveMemberResultByEmail(email);
+		
 	    List<ResultMetric> metricList = resultMetricService.getAllByResultAndLanguage_Language(result, language);
 
-	    // 💡 category 와 type 을 직접 enum 비교로 수정
 	    Map<Integer, Double> levelCorrectRateMap = metricList.stream()
 	        .filter(metric -> metric.getCategory() != null && metric.getCategory().getCategoryName() == weakCategory)
 	        .filter(metric -> metric.getType() != null && metric.getType().getTypeName() == weakType)
@@ -122,14 +122,10 @@ public class LevelService {
 	            (rate1, rate2) -> rate1
 	        ));
 
-	    // ❗ 로그로 데이터 확인 (Logger 사용 권장)
-	    levelCorrectRateMap.forEach((level, rate) -> {
-	        System.out.println("[DEBUG] Level: " + level + ", CorrectRate: " + rate);
-	    });
-
-	    // ✅ skilledLevel 찾기
 	    Integer skilledLevel = null;
+	    
 	    for (double threshold = 0.80; threshold >= 0.0; threshold -= 0.05) {
+	    	
 	        final double currentThreshold = threshold;
 
 	        Optional<Integer> skilledLevelOptional = levelCorrectRateMap.entrySet().stream()
@@ -138,23 +134,28 @@ public class LevelService {
 	            .max(Comparator.naturalOrder());
 
 	        if (skilledLevelOptional.isPresent()) {
+	        	
 	            skilledLevel = skilledLevelOptional.get();
+	            
 	            break;
 	        }
+	        
 	    }
 
-	    // ❗ skilledLevel 못 찾은 경우 fallback
 	    if (skilledLevel == null) {
-	        System.out.println("[Fallback] skilledLevel 을 찾지 못함. 가장 낮은 level 로 fallback 처리.");
+	    	
 	        skilledLevel = levelCorrectRateMap.keySet().stream()
 	            .min(Integer::compareTo)
-	            .orElse(1);  // 데이터가 아예 없는 경우 기본값 1
+	            .orElse(1);
+	        
 	    }
 
-	    // ✅ challengeLevel 찾기
 	    Integer challengeLevel = null;
+	    
 	    for (double threshold = 0.50; threshold >= 0.0; threshold -= 0.05) {
-	        final Integer finalSkilledLevel = skilledLevel;
+	       
+	    	final Integer finalSkilledLevel = skilledLevel;
+	    	
 	        final double currentThreshold = threshold;
 
 	        Optional<Integer> challengeLevelOptional = levelCorrectRateMap.entrySet().stream()
@@ -163,19 +164,22 @@ public class LevelService {
 	            .min(Comparator.naturalOrder());
 
 	        if (challengeLevelOptional.isPresent()) {
+	        	
 	            challengeLevel = challengeLevelOptional.get();
+	           
 	            break;
+	            
 	        }
 	    }
 
-	    // ❗ challengeLevel 못 찾은 경우 fallback
 	    if (challengeLevel == null) {
-	        System.out.println("[Fallback] challengeLevel 을 찾지 못함. skilledLevel + 1 로 fallback 처리.");
+
 	        challengeLevel = skilledLevel + 1;
+	        
 	    }
 
-	    System.out.println("[결과] skilledLevel: " + skilledLevel + ", challengeLevel: " + challengeLevel);
 	    return new Integer[]{skilledLevel, challengeLevel};
+	    
 	}
 
 
