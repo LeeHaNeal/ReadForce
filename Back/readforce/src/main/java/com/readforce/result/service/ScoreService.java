@@ -39,7 +39,7 @@ public class ScoreService {
 	@Transactional
 	public void createScore(Member member, Double totalScore, Category category, Language language) {
 		
-		if(getScoreByMemberAndCategoryAndLanguage(member, category, language) == null) {
+		if(getScoreByMemberAndCategoryAndLanguage(member, category, language) != null) {
 			
 			throw new DuplicationException(MessageCode.SCORE_ALREADY_EXIST);
 			
@@ -76,7 +76,7 @@ public class ScoreService {
 		
 	}
 
-	@Transactional("/")
+	@Transactional(readOnly = true)
 	public List<Score> getScoreListByEmail(String email) {
 		
 		return scoreRepository.findByMember_Email(email);

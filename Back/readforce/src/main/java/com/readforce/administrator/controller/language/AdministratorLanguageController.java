@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ public class AdministratorLanguageController {
 
 	private final LanguageService languageService;
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-list")
 	public ResponseEntity<List<AdministratorLanguageResponseDto>> getAllList(){
 		
@@ -44,6 +46,7 @@ public class AdministratorLanguageController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create")
 	public ResponseEntity<Map<String, String>> create(
 			@Valid @RequestBody AdministratorLanguageRequestDto requestDto
@@ -57,6 +60,7 @@ public class AdministratorLanguageController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/modify")
 	public ResponseEntity<Map<String, String>> modify(
 			@Valid @RequestBody AdministratorLanguageModifyRequestDto requestDto
@@ -70,6 +74,7 @@ public class AdministratorLanguageController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/delete")
 	public ResponseEntity<Map<String, String>> delete(
 			@RequestParam("languageNo")

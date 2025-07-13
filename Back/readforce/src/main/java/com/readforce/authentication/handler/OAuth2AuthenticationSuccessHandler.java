@@ -57,9 +57,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			HttpServletResponse httpServletResponse,
 			Authentication authentication
 	) throws IOException, ServletException {
-		
-		System.out.println("11111111111111111111111111111111");
-		
+				
 		OAuth2UserDto oAuth2UserDto = (OAuth2UserDto) authentication.getPrincipal();
 		
 		boolean isNewUser = oAuth2UserDto.isNewUser();
@@ -76,7 +74,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 		String targetUrl;
 		
 		if(isNewUser) {
-			System.out.println("2222222222222222222222222222");
 				
 			String temporalToken = UUID.randomUUID().toString();
 			
@@ -107,11 +104,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 					.build()
 					.toUriString();
 						
-		} else {System.out.println("3333333333333333333333333333333333");
-		
+		} else {		
 			
 			final UserDetails userDetails = authenticationService.loadUserByUsername(email);
+			
 			final String accessToken = jwtUtil.generateAccessToken(userDetails);
+			
 			final String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 			
 			Member member = memberService.getActiveMemberByEmail(email);
@@ -140,9 +138,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 					new ObjectMapper().writeValueAsString(tokenMap),
 					Duration.ofMinutes(3)
 			);
-			
-			System.out.println("Successhandler:    "+temporalToken);
-			
+						
 			authenticationService.storeRefreshToken(email, refreshToken);
 			
 			attendanceService.recordAttendance(email);
@@ -154,7 +150,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 			
 			
 		}
-		System.out.println("999999999999999999999999999");
+
 		httpServletResponse.sendRedirect(targetUrl);
 			
 	}

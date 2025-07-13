@@ -125,12 +125,6 @@ public class LearningController {
 		
 		List<QuestionMostIncorrectResponseDto> incorrectQuestionList = learningService.getMostIncorrectQuestions(language, number);
 		
-		for(QuestionMostIncorrectResponseDto q : incorrectQuestionList) {
-			
-			System.out.println("sadfasdf : " + q.getTitle());
-			
-		}
-		
 		return ResponseEntity.status(HttpStatus.OK).body(incorrectQuestionList);
 		
 	}

@@ -43,6 +43,7 @@ public class AdministratorPassageController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/delete")
 	public ResponseEntity<Map<String, String>> delete(
 		@RequestParam("passageNo")

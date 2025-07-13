@@ -127,7 +127,6 @@ public class AttendanceService {
 		
 		Collections.sort(attendanceDateList);
 		
-		int maxStreak = 0;
 		int currentStreak = 0;
 		
 		if(!attendanceDateList.isEmpty()) {
@@ -158,6 +157,7 @@ public class AttendanceService {
 			
 		}
 		
+		result.modifyInformation(currentStreak, null);
 		
 	}
 	
