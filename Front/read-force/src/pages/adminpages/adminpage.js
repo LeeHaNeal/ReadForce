@@ -5,6 +5,12 @@ import axiosInstance from '../../api/axiosInstance';
 const AdminPage = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [birthday, setBirthday] = useState('');
+    const [role, setRole] = useState('USER');
 
     useEffect(() => {
         const nickname = localStorage.getItem("nickname");
@@ -14,7 +20,6 @@ const AdminPage = () => {
         }
     }, []);
 
-    // 모든 회원정보 불러오기
     const fetchUsers = async () => {
         try {
             const res = await axiosInstance.get("/administrator/member/get-all-member-list");
@@ -33,11 +38,9 @@ const AdminPage = () => {
         fetchUsers();
     }, []);
 
-    // 계정 상태 변경
     const handleChangeStatus = async (email, newStatus) => {
         try {
-            const res = await axiosInstance.patch("/administrator/member/modify", { email, status: newStatus });
-
+            await axiosInstance.patch("/administrator/member/modify", { email, status: newStatus });
             updateUserStatus(email, newStatus);
         } catch (err) {
             console.error(err);
@@ -45,11 +48,10 @@ const AdminPage = () => {
         }
     };
 
-    // 회원 삭제
     const handleDelete = async (email) => {
         if (!window.confirm("정말로 이 회원을 삭제하시겠습니까?")) return;
         try {
-            const res = await axiosInstance.delete(`/administrator/member/delete`, {
+            await axiosInstance.delete(`/administrator/member/delete`, {
                 params: { email },
             });
 
@@ -69,6 +71,30 @@ const AdminPage = () => {
         );
     };
 
+    const handleAddMember = async (e) => {
+        e.preventDefault();
+        try {
+            await axiosInstance.post("/administrator/member/add-member", {
+                email,
+                password,
+                nickname,
+                birthday,
+                role
+            });
+            alert("멤버가 추가되었습니다.");
+            setShowAddForm(false);
+            setEmail('');
+            setPassword('');
+            setNickname('');
+            setBirthday('');
+            setRole('USER');
+            fetchUsers();
+        } catch (error) {
+            console.error("멤버 추가 실패:", error);
+            alert("멤버 추가 실패");
+        }
+    };
+
     return (
         <div style={{ padding: "24px" }}>
             <span style={ADMIN_BUTTONS_LIST}>
@@ -78,15 +104,49 @@ const AdminPage = () => {
                 <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/classification-edit")}>분류 편집</button>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/language")}>언어 편집</button>
                 <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/level")}>난이도 편집</button>
+                <button style={ADMIN_BUTTONS} onClick={() => navigate("/adminpage/age-group")}>연령대 관리</button>
             </span>
+
             <div style={ADMIN_TITLE}>
-                <div>
-                    <h2>회원 관리</h2>
-                </div>
-                <div>
-                    <button style={ADMIN_AI_BUTTONS}>맴버 추가</button>
-                </div>
+                <h2>회원 관리</h2>
+                {/* <button style={ADMIN_AI_BUTTONS} onClick={() => setShowAddForm(true)}>멤버 추가</button> */}
             </div>
+
+           {/* {showAddForm && (
+                    <div style={overlay}>
+                        <form onSubmit={handleAddMember} style={centeredForm}>
+                            <h3 style={formTitle}>멤버 추가</h3>
+                            <div style={formGroup}>
+                                <label style={formLabel}>이메일</label>
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={formInput} />
+                            </div>
+                            <div style={formGroup}>
+                                <label style={formLabel}>비밀번호</label>
+                                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={formInput} />
+                            </div>
+                            <div style={formGroup}>
+                                <label style={formLabel}>닉네임</label>
+                                <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required style={formInput} />
+                            </div>
+                            <div style={formGroup}>
+                                <label style={formLabel}>생일</label>
+                                <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} style={formInput} />
+                            </div>
+                            <div style={formGroup}>
+                                <label style={formLabel}>권한</label>
+                                <select value={role} onChange={(e) => setRole(e.target.value)} style={formInput}>
+                                    <option value="USER">USER</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                </select>
+                            </div>
+                            <div style={formButtonGroup}>
+                                <button type="submit" style={submitButton}>저장</button>
+                                <button type="button" onClick={() => setShowAddForm(false)} style={cancelButton}>취소</button>
+                            </div>
+                        </form>
+                    </div>
+                )} */}
+
             <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
                 <thead>
                     <tr>
@@ -124,7 +184,8 @@ const AdminPage = () => {
                             <td style={tdStyle}>{user.socialProvider || "-"}</td>
                             <td style={tdStyle}>{user.role}</td>
                             <td style={{
-                                color: user.status === "ACTIVE" ? "green" : "red", border: "1px solid #ddd",
+                                color: user.status === "ACTIVE" ? "green" : "red",
+                                border: "1px solid #ddd",
                                 padding: "8px",
                             }}>
                                 {user.status === "ACTIVE" ? "활성화" : "비활성화"}
@@ -160,7 +221,7 @@ const AdminPage = () => {
 const ADMIN_BUTTONS_LIST = {
     display: "flex",
     gap: "8px"
-}
+};
 
 const ADMIN_BUTTONS = {
     marginBottom: "16px",
@@ -200,5 +261,76 @@ const ADMIN_AI_BUTTONS = {
     borderRadius: "4px",
     cursor: "pointer"
 };
+const overlay = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+};
+
+const centeredForm = {
+    backgroundColor: '#fafafa',
+    padding: '24px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+    width: '90%',
+    maxWidth: '400px',
+};
+
+const formTitle = {
+    marginBottom: '20px',
+    fontSize: '18px',
+    fontWeight: 'bold',
+};
+
+const formGroup = {
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: '16px',
+};
+
+const formLabel = {
+    marginBottom: '6px',
+    fontSize: '14px',
+    fontWeight: '500',
+};
+
+const formInput = {
+    padding: '8px 12px',
+    fontSize: '14px',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
+};
+
+const formButtonGroup = {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '8px',
+};
+
+const submitButton = {
+    backgroundColor: '#007BFF',
+    color: '#fff',
+    border: 'none',
+    padding: '8px 16px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+};
+
+const cancelButton = {
+    backgroundColor: '#6c757d',
+    color: '#fff',
+    border: 'none',
+    padding: '8px 16px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+};
+
 
 export default AdminPage;
