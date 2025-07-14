@@ -38,6 +38,7 @@ import AdminCategoryEdit from './pages/adminpages/AdminCategoryEdit';
 import AdminClassificationEdit from './pages/adminpages/AdminClassificationEdit';
 import AdminLanguagePage from './pages/adminpages/AdminLanguagePage';
 import AdminLevelEdit from './pages/adminpages/adminLevelEdit';
+import AdminAgeGroup from './pages/adminpages/AdminAgeGroup';
 
 import TestQuestionPage from './pages/challenge/testquestionpage';
 import TestResultPage from './pages/challenge/testresultpage';
@@ -95,6 +96,7 @@ function App() {
           <Route path="/adminpage/classification-edit" element={<AdminClassificationEdit />} />
           <Route path="/adminpage/language" element={<AdminLanguagePage />} />
           <Route path="/adminpage/level" element={<AdminLevelEdit />} />
+           <Route path="/adminpage/age-group" element={<AdminAgeGroup />} />
           <Route path="/test-question" element={<TestQuestionPage />} />
           <Route path="/test-result" element={<TestResultPage />} />
           <Route path="/test-review" element={<TestReviewPage />} />
