@@ -26,22 +26,25 @@ export default function Login() {
       const data = await response.json();
       console.log("로그인 응답 데이터", data);
 
-      if (response.ok) {
-        const token = data.ACCESS_TOKEN;
-        const refreshToken = data.REFRESH_TOKEN;
-        const nickname = data.NICKNAME;
+if (response.ok) {
+  // ② 필드명 양쪽 다 시도
+  const token        = data.ACCESS_TOKEN  || data.accessToken;
+  const refreshToken = data.REFRESH_TOKEN || data.refreshToken;
+  const nickname     = data.NICKNAME      || data.nickname;
 
-        // JWT 토큰에서 이메일 추출
-        const decoded = jwtDecode(token);
-        const email = decoded.sub;
+  if (!token) {
+    setError('서버에서 토큰을 받지 못했습니다.');
+    return;
+  }
 
-        // localStorage 저장
-        localStorage.setItem('token', token);
-        localStorage.setItem('refresh_token', refreshToken);
-        localStorage.setItem('nickname', nickname);
-        localStorage.setItem('email', email);
+  const { sub: email, exp } = jwtDecode(token);
 
-        navigate('/');
+  localStorage.setItem('token', token);
+  localStorage.setItem('refresh_token', refreshToken);
+  localStorage.setItem('nickname', nickname);
+  localStorage.setItem('email', email);
+
+  navigate('/'); 
       } else {
         setError(data.message || '로그인에 실패했습니다.');
       }
