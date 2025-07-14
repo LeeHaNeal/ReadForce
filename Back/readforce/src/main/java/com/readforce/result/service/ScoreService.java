@@ -39,7 +39,7 @@ public class ScoreService {
 	@Transactional
 	public void createScore(Member member, Double totalScore, Category category, Language language) {
 		
-		if(getScoreByMemberAndCategoryAndLanguage(member, category, language) != null) {
+		if(scoreRepository.findByMemberAndCategoryAndLanguage(member, category, language).isPresent()) {
 			
 			throw new DuplicationException(MessageCode.SCORE_ALREADY_EXIST);
 			

@@ -67,7 +67,8 @@ public class SecurityConfig {
 				            "/email/verify-verification-code-for-sign-up",
 				            "/email/send-password-reset-link",
 				            "/ranking/get-ranking-list",
-							"/learning/get-most-incorrect-questions",
+				            "/learning/get-most-incorrect-questions",
+
 				            "/test/**",
 				            "/oauth2/**",
 							"/passage/**"

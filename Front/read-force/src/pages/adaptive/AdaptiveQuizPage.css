@@ -1,9 +1,10 @@
 /* ───────── 기본 = 모바일(≤375 px) ───────── */
 .quiz-layout {
   display: flex;
-  flex-direction: column;          /* 세로 스택 */
+  flex-direction: column;
   gap: 1.5rem;
   padding: 0 16px;
+  max-width: 100%;
 }
 
 .quiz-passage,
@@ -14,6 +15,8 @@
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,.05);
   padding: 1.25rem;
+  overflow-y: auto;
+  max-height: 90vh; /* 모바일에서 전체 화면 높이 대비 제한 */
 }
 
 /* 지문 영역 */
@@ -60,6 +63,14 @@
 .submit-button:hover    { background:#0f766e; }
 .submit-button:disabled { background:#ccc;   cursor:not-allowed; }
 
+/* 10초 대기 메시지 */
+.wait-message {
+  text-align: center;
+  font-size: 16px;
+  color: #ff8800;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
 
 /* ‘문제 없음’ 화면 */
 .quiz-notfound-container {
@@ -82,8 +93,8 @@
 /* ───────── 태블릿 이상 ≥768 px ───────── */
 @media (min-width:768px){
   .quiz-layout      { flex-direction: row; gap: 2rem; padding: 0 20px; }
-  .quiz-passage      { flex:1;  max-height:500px; }
-  .quiz-box          { width:40%; min-width:280px; height:500px; }
+  .quiz-passage      { flex:1; max-height: 500px; overflow-y: auto; }
+  .quiz-box          { width: 40%; min-width: 280px; max-height: 500px; overflow-y: auto; }
 
   .passage-title     { font-size: 1.15rem; }
   .passage-text      { font-size: .95rem;  }
@@ -97,8 +108,8 @@
 /* ───────── 데스크톱 이상 ≥1024 px ───────── */
 @media (min-width:1024px){
   .quiz-layout      { gap: 2.5rem; padding: 0 24px; }
-  .quiz-passage      { max-height:600px; }
-  .quiz-box          { width:38%; min-width:320px; height:600px; padding:1.5rem; }
+  .quiz-passage      { max-height: 600px; }
+  .quiz-box          { width: 38%; min-width: 320px; max-height: 600px; padding: 1.5rem; }
 
   .passage-title     { font-size: 1.25rem; }
   .passage-text      { font-size: 1rem;    }

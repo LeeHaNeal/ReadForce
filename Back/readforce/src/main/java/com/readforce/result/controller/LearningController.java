@@ -37,6 +37,8 @@ public class LearningController {
 			@Valid @RequestBody LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
+		System.out.println("asdasdasdasdasdasdasdasdasdassd123123123123123    "
+				+ learningMultipleChoiceRequestDto.getSelectedIndex());
 		
 		String email = userDetails.getUsername();
 		
