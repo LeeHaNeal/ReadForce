@@ -34,7 +34,7 @@ const UniversalQuestionPage = () => {
     setElapsedSeconds(0);
     setIsWaiting(false); // 대기 없이 바로 가능하게 설정
 
-    /*
+    
     const timer = setInterval(() => {
       const secondsPassed = Math.floor((Date.now() - newStart) / 1000);
       setElapsedSeconds(secondsPassed);
@@ -48,7 +48,7 @@ const UniversalQuestionPage = () => {
       clearInterval(timer);
       clearTimeout(waitTimer);
     };
-    */
+    
   }, [currentIndex]);
 
   useEffect(() => {
