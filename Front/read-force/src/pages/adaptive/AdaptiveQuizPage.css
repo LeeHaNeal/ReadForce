@@ -108,3 +108,12 @@
   .quiz-option       { font-size: 1rem;    }
   .submit-button     { font-size: 1.1rem;  }
 }
+
+
+.wait-message {
+  text-align: center;
+  font-size: 16px;
+  color: #ff8800;
+  margin-bottom: 10px;
+  font-weight: bold;
+}

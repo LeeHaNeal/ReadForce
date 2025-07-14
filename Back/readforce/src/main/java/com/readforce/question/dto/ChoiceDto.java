@@ -13,7 +13,6 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class ChoiceDto {
-	private final Long choiceNo;   
 	
 	private final Integer choiceIndex;
 	
@@ -24,7 +23,7 @@ public class ChoiceDto {
 	private final String explanation;
 	
 	public ChoiceDto(Choice choice) {
-		this.choiceNo = choice.getChoiceNo();    
+		
 		this.choiceIndex = choice.getChoiceIndex();
 		this.content = choice.getContent();
 		this.isCorrect = choice.getIsCorrect();
