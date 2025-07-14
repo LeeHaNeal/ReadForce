@@ -120,7 +120,7 @@
     margin-bottom: 6px;
   }
   .UniversalCard-title {
-    font-size: 17px;
+    font-size: 15px;
     line-height: 1.4;
     margin: 0;
     word-break: break-word;
@@ -140,7 +140,7 @@
   }
 
   .UniversalCard-category {        /* # 정치 */
-    font-size: 13px;
+    font-size: 15px;
     white-space: nowrap;
     flex-shrink: 0;
   }
