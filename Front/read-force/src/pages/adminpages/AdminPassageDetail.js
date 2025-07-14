@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 
 const AdminPassageDetail = () => {
@@ -9,6 +8,7 @@ const AdminPassageDetail = () => {
     const passage = state?.passage;
 
     const [questionList, setQuestionList] = useState([]);
+    const [generating, setGenerating] = useState(false);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -27,14 +27,44 @@ const AdminPassageDetail = () => {
         }
     }, [passage?.passageNo]);
 
+    const handleGenerateQuestionForPassage = async () => {
+        if (!passage?.passageNo) return alert("지문 번호를 찾을 수 없습니다.");
+
+        setGenerating(true);
+        try {
+            await axiosInstance.post("/ai/generate-question-by-passage-no", {
+                passageNo: passage.passageNo
+            });
+            alert("성공: 문제 생성 완료!");
+
+            // 문제 목록 새로고침
+            const refreshed = await axiosInstance.get("/multiple_choice/get-multiple-choice-question-list", {
+                params: { passageNo: passage.passageNo }
+            });
+            setQuestionList(refreshed.data);
+        } catch (err) {
+            console.error("문제 생성 실패:", err);
+            alert("실패: 문제 생성 중 오류가 발생했습니다.");
+        } finally {
+            setGenerating(false);
+        }
+    };
+
     if (!passage) {
         return <div style={containerStyle}>지문 정보를 불러오지 못했습니다.</div>;
     }
 
     return (
         <div style={containerStyle}>
-            <button onClick={() => navigate(-1)} style={backBtnStyle}>뒤로가기</button>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+                <button onClick={() => navigate(-1)} style={backBtnStyle}>뒤로가기</button>
+                <button onClick={handleGenerateQuestionForPassage} style={{ ...backBtnStyle, backgroundColor: "#007bff" }} disabled={generating}>
+                    {generating ? "생성 중..." : "문제 생성"}
+                </button>
+            </div>
+
             <h2>{passage.title}</h2>
+
             <div style={infoBox}>
                 <div style={metaContainerStyle}>
                     <div style={metaItem}><strong>지문 번호</strong><div>{passage.passageNo}</div></div>
@@ -45,11 +75,12 @@ const AdminPassageDetail = () => {
                     <div style={metaItem}><strong>작성자</strong><div>{AUTHOR_LABELS[passage.author] || passage.author}</div></div>
                     <div style={metaItem}><strong>생성일</strong><div>{new Date(passage.createdAt).toLocaleString()}</div></div>
                 </div>
+
                 <div style={passageBox}>{passage.content}</div>
+
                 <div style={passageBox}>
                     {questionList.map((q, idx) => {
                         const correctChoice = q.choiceList.find(c => c.isCorrect);
-
                         return (
                             <div key={q.questionNo} style={{ marginBottom: "32px" }}>
                                 <p><strong>Q{idx + 1}. {q.question}</strong></p>
@@ -75,6 +106,8 @@ const AdminPassageDetail = () => {
     );
 };
 
+// ------------------- Styles -------------------
+
 const containerStyle = {
     padding: "24px",
     maxWidth: "800px",
@@ -82,7 +115,6 @@ const containerStyle = {
 };
 
 const backBtnStyle = {
-    marginBottom: "20px",
     padding: "8px 16px",
     backgroundColor: "#6c757d",
     color: "white",
@@ -135,12 +167,9 @@ const CLASSIFICATION_LABELS = {
 const metaContainerStyle = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    // gap: "12px",
-    // padding: "16px",
     backgroundColor: "#f9f9f9",
     borderRadius: "8px",
     marginBottom: "20px",
-    // boxShadow: "0 0 5px rgba(0,0,0,0.1)"
 };
 
 const metaItem = {
