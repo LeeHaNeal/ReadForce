@@ -5,6 +5,7 @@ import java.time.Period;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.MessageCode;
@@ -32,11 +33,17 @@ public class AgeGroupService {
 		
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public AgeGroup getAgeGroupByAgeGroup(Integer ageGroup) {
 		
 		return ageGroupRepository.findByAgeGroup(ageGroup)
-				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.AGE_GROUP_NOT_FOUND));
+				.orElseGet(() -> {
+					
+					AgeGroup newAgeGroup = AgeGroup.builder().ageGroup(ageGroup).build();
+					
+					return ageGroupRepository.save(newAgeGroup);
+					
+				});
 
 	}
 

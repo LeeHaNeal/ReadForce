@@ -261,154 +261,260 @@ public class AiService {
         Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
         
         Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+        
         Type type = typeService.getTypeByType(requestDto.getType());
+        
         int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
 
         for (int i = 0; i < count; i++) {
-            String prompt = promptService.generatePassagePrompt(requestDto);
+            
+        	String prompt = promptService.generatePassagePrompt(requestDto);
+            
             String responseText = requestGenerate(prompt);
+            
             String content = cleanJsonString(responseText);
             
             GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
 
             if (parsedResult != null) {
-                passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), category, level, language, classification, type);
+                
+            	passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), category, level, language, classification, type);
+            
             }
             
             try {
+            	
                 Thread.sleep(2000);
+                
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                
+            	Thread.currentThread().interrupt();
+            
             }
+            
         }
+        
     }
     
     private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {
-        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
-            return null;
+        
+    	if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+           
+        	return null;
+            
         }
+        
         try {
-            JsonNode rootNode = objectMapper.readTree(requestResult);
+            
+        	JsonNode rootNode = objectMapper.readTree(requestResult);
+            
             if (rootNode.isArray() && rootNode.size() > 0) {
-                return objectMapper.treeToValue(rootNode.get(0), GeminiGeneratePassageResponseDto.class);
+                
+            	return objectMapper.treeToValue(rootNode.get(0), GeminiGeneratePassageResponseDto.class);
+            
             } else if (rootNode.isObject()){
-                return objectMapper.treeToValue(rootNode, GeminiGeneratePassageResponseDto.class);
+                
+            	return objectMapper.treeToValue(rootNode, GeminiGeneratePassageResponseDto.class);
+            
             }
+            
             return null;
+            
         } catch (Exception exception) {
-            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+            
+        	throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+        
         }
+        
     }
 
     @Transactional
     public void generateQuestion() {
-        List<Passage> noQuestionPassageList = passageService.getNoQuestionPassage();
+        
+    	List<Passage> noQuestionPassageList = passageService.getNoQuestionPassage();
+        
         for (Passage passage : noQuestionPassageList) {
-            String prompt = promptService.generateQuestionPrompt(passage);
+           
+        	String prompt = promptService.generateQuestionPrompt(passage);
+            
             String responseText = requestGenerate(prompt);
+            
             String content = cleanJsonString(responseText);
+            
             List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
+           
             for (GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
-                saveMultipleChoiceQuestion(passage, parsedResult);
+                
+            	saveMultipleChoiceQuestion(passage, parsedResult);
+                
             }
+            
             try {
-                Thread.sleep(2000);
+               
+            	Thread.sleep(2000);
+            	
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                
+            	Thread.currentThread().interrupt();
+                
                 log.error("Thread sleep interrupted", e);
+            
             }
+            
         }
+        
     }
 
     private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
-        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
-            return Collections.emptyList();
+       
+    	if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            
+        	return Collections.emptyList();
+        
         }
+        
         try {
-            JsonNode rootNode = objectMapper.readTree(requestResult);
+            
+        	JsonNode rootNode = objectMapper.readTree(requestResult);
+            
             if (rootNode.isArray()) {
-                return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+               
+            	return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+            
             } else {
-                return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class));
+                
+            	return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class));
+            
             }
+       
         } catch (Exception exception) {
-            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+            
+        	throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+        
         }
+        
     }
 
     @Transactional
     public void generateTestQuestion(LanguageEnum languageEnum) {
-        Language language = languageService.getLangeageByLanguage(languageEnum);
+        
+    	Language language = languageService.getLangeageByLanguage(languageEnum);
+        
         Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
+        
         List<CategoryEnum> testCategoryList = List.of(CategoryEnum.VOCABULARY, CategoryEnum.FACTUAL, CategoryEnum.INFERENTIAL);
 
         for (CategoryEnum testCategory : testCategoryList) {
-            if (testCategory == CategoryEnum.VOCABULARY) {
-                List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
+            
+        	if (testCategory == CategoryEnum.VOCABULARY) {
+                
+            	List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
+                
                 if (unusedPassageList.isEmpty()) continue;
                 
                 PassageResponseDto randomPassageDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
+                
                 Passage passage = passageService.getPassageByPassageNo(randomPassageDto.getPassageNo());
                 
                 String prompt = promptService.gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
+                
                 String responseText = requestGenerate(prompt);
+                
                 String content = cleanJsonString(responseText);
+               
                 List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
                 
                 for (GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
-                    saveMultipleChoiceQuestion(passage, parsedResult);
+                    
+                	saveMultipleChoiceQuestion(passage, parsedResult);
+               
                 }
+           
             } else {
-                for (Level level : levelService.getAllLevelList()) {
-                    String prompt = (testCategory == CategoryEnum.FACTUAL)
+                
+            	for (Level level : levelService.getAllLevelList()) {
+                    
+                	String prompt = (testCategory == CategoryEnum.FACTUAL)
                             ? promptService.generateTestFactualPassageAndQuestionPrompt(language, level)
                             : promptService.generateTestInferentialPassageAndQuestionPrompt(language, level);
                     
                     String responseText = requestGenerate(prompt);
+                    
                     String content = cleanJsonString(responseText);
+                    
                     List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
                     
                     for (GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
-                        Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
+                        
+                    	Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
+                        
                         Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification, null);
+                        
                         saveMultipleChoiceQuestion(newPassage, parsedResult);
+                    
                     }
+                    
                     try {
-                        Thread.sleep(2000);
+                      
+                    	Thread.sleep(2000);
+                    	
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                       
+                    	Thread.currentThread().interrupt();
+                    	
                     }
+                    
                 }
+                
             }
+        
         }
+        
     }
 
     private List<GeminiGenerateTestPassageAndQuestionResponseDto> parsePassageAndQuestionResponse(String requestResult) {
-		try {
+		
+    	try {
+			
 			JsonNode rootNode = objectMapper.readTree(requestResult);
+			
 			if(rootNode.isArray()) {
+				
 				return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageAndQuestionResponseDto>>() {});
+			
 			} else {
+				
 				return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class));
+			
 			}
+			
 		} catch(Exception exception) {
+			
 			return Collections.emptyList();
+		
 		}
+		
 	}
     
     private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateTestPassageAndQuestionResponseDto parsedResult) {
-		List<Choice> choiceList = new ArrayList<>();
+		
+    	List<Choice> choiceList = new ArrayList<>();
+		
 		Map<String, String> explanationMap = parsedResult.getExplanation();
 
 		for(int i = 0; i < parsedResult.getChoiceList().size(); i++) {
+			
 			boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
+			
 			String explanationText = isCorrect ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.") : explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
+			
 			Choice choice = Choice.builder()
 					.choiceIndex(i)
 					.content(parsedResult.getChoiceList().get(i))
 					.isCorrect(isCorrect)
 					.explanation(explanationText)
 					.build();
+			
 			choiceList.add(choice);
 		}
 
@@ -417,21 +523,31 @@ public class AiService {
 				.question(parsedResult.getQuestion())
 				.choiceList(choiceList)
 				.build();
+		
 		multipleChoiceService.saveMultipleChoice(multipleChoice);
-	}
+	
+    }
 
     private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateQuestionResponseDto parsedResult) {
-		List<Choice> choiceList = new ArrayList<>();
+		
+    	List<Choice> choiceList = new ArrayList<>();
+		
 		Map<String, Object> explanationMap = parsedResult.getExplanation();
 
 		for(int i = 0; i < parsedResult.getChoiceList().size(); i++) {
+			
 			boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
 			
             String explanationText;
+            
             if (isCorrect) {
-                explanationText = explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.").toString();
+                
+            	explanationText = explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.").toString();
+           
             } else {
+            	
                 explanationText = explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.").toString();
+                
             }
 
 			Choice choice = Choice.builder()
@@ -440,7 +556,9 @@ public class AiService {
 					.isCorrect(isCorrect)
 					.explanation(explanationText)
 					.build();
+			
 			choiceList.add(choice);
+			
 		}
 
 		MultipleChoice multipleChoice = MultipleChoice.builder()
@@ -448,7 +566,9 @@ public class AiService {
 				.question(parsedResult.getQuestion())
 				.choiceList(choiceList)
 				.build();
+		
 		multipleChoiceService.saveMultipleChoice(multipleChoice);
+		
 	}
 
     @Transactional
