@@ -19,6 +19,8 @@ public class AdministratorLevelResponseDto {
 	
 	private Integer paragraphCount;
 	
+	private String vocabularyLevel;
+	
 	private String sentenceStructure;
 	
 	private String questionType;
@@ -32,6 +34,7 @@ public class AdministratorLevelResponseDto {
 		this.levelNo = level.getLevelNo();
 		this.level = level.getLevelNumber();
 		this.paragraphCount = level.getParagraphCount();
+		this.vocabularyLevel = level.getVocabularyLevel();
 		this.sentenceStructure = level.getSentenceStructure();
 		this.questionType = level.getQuestionType();
 		this.createdAt = level.getCreatedAt();

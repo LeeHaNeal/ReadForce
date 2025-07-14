@@ -8,5 +8,4 @@ public enum CategoryEnum {
 	VOCABULARY,
 	FACTUAL,
 	INFERENTIAL
-	
 }
