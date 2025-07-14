@@ -54,6 +54,7 @@ public class SecurityConfig {
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
 			.authorizeHttpRequests(
 					auth -> auth.requestMatchers(
+							"/",
 							"/authentication/sign-in",
 							"/authentication/reissue-refresh-token",
 							"/authentication/get-tokens",
@@ -66,6 +67,7 @@ public class SecurityConfig {
 				            "/email/verify-verification-code-for-sign-up",
 				            "/email/send-password-reset-link",
 				            "/ranking/get-ranking-list",
+							"/learning/get-most-incorrect-questions",
 				            "/test/**",
 				            "/oauth2/**",
 							"/passage/**"
