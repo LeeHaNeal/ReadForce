@@ -3,11 +3,11 @@ import api from '../../api/axiosInstance';
 import './RankingPage.css';
 
 const categories = [
-  { label: '소설', category: 'NOVEL', language: 'KOREAN', scoreKey: 'novel' },
-  { label: '동화', category: 'FAIRY_TALE', language: 'KOREAN', scoreKey: 'fairytale' },
+  { label: '뉴스(한국어)', category: 'NEWS', language: 'KOREAN', scoreKey: 'korean_news' },
   { label: '뉴스(영어)', category: 'NEWS', language: 'ENGLISH', scoreKey: 'english_news' },
   { label: '뉴스(일본어)', category: 'NEWS', language: 'JAPANESE', scoreKey: 'japanese_news' },
-  { label: '뉴스(한국어)', category: 'NEWS', language: 'KOREAN', scoreKey: 'korean_news' },
+  { label: '소설', category: 'NOVEL', language: 'KOREAN', scoreKey: 'novel' },
+  { label: '동화', category: 'FAIRY_TALE', language: 'KOREAN', scoreKey: 'fairytale' },
 ];
 
 const RankingPage = () => {
