@@ -147,33 +147,118 @@ public class AiService {
     }
     
     private String cleanJsonString(String rawText) {
-    	
-        if (rawText == null) return "{}";
-        
-        String cleanedText = rawText.replaceAll("```json", "").replaceAll("```", "").trim();
-        
-        int firstBracket = cleanedText.indexOf('{');
-        
-        int firstSquareBracket = cleanedText.indexOf('[');
-
-        if (firstBracket == -1 && firstSquareBracket == -1) return "{}";
-
-        int startIndex = (firstBracket != -1 && firstSquareBracket != -1) ? Math.min(firstBracket, firstSquareBracket) : Math.max(firstBracket, firstSquareBracket);
-       
-        char startChar = cleanedText.charAt(startIndex);
-        
-        char endChar = (startChar == '{') ? '}' : ']';
-        
-        int lastIndex = cleanedText.lastIndexOf(endChar);
-
-        if (lastIndex > startIndex) {
-
-        	return cleanedText.substring(startIndex, lastIndex + 1);
-        
+        if (rawText == null || rawText.trim().isEmpty()) {
+            log.warn("cleanJsonString: null 또는 빈 문자열 입력");
+            return "{}";
         }
         
-        return "{}";
+        try {
+            // 기본 정리
+            String cleanedText = rawText.replaceAll("```json", "").replaceAll("```", "").trim();
+            
+            // 제어 문자 이스케이프 처리 추가
+            cleanedText = escapeControlCharacters(cleanedText);
+            
+            // 로깅 추가
+            log.debug("cleanJsonString: 정리 전 텍스트: {}", rawText);
+            log.debug("cleanJsonString: 정리 후 텍스트: {}", cleanedText);
+            
+            int firstBracket = cleanedText.indexOf('{');
+            int firstSquareBracket = cleanedText.indexOf('[');
+            
+            if (firstBracket == -1 && firstSquareBracket == -1) {
+                log.warn("cleanJsonString: JSON 시작 문자({, [)를 찾을 수 없음");
+                return "{}";
+            }
+            
+            int startIndex = (firstBracket != -1 && firstSquareBracket != -1) 
+                ? Math.min(firstBracket, firstSquareBracket) 
+                : Math.max(firstBracket, firstSquareBracket);
+            
+            char startChar = cleanedText.charAt(startIndex);
+            char endChar = (startChar == '{') ? '}' : ']';
+            
+            int lastIndex = cleanedText.lastIndexOf(endChar);
+            
+            if (lastIndex > startIndex) {
+                String result = cleanedText.substring(startIndex, lastIndex + 1);
+                log.debug("cleanJsonString: 최종 결과: {}", result);
+                return result;
+            } else {
+                log.warn("cleanJsonString: 올바른 JSON 끝 문자를 찾을 수 없음");
+                return "{}";
+            }
+            
+        } catch (Exception e) {
+            log.error("cleanJsonString: 문자열 정리 중 오류 발생", e);
+            return "{}";
+        }
+    }
+    
+    private String escapeControlCharacters(String text) {
+        if (text == null) return null;
         
+        StringBuilder sb = new StringBuilder();
+        boolean insideString = false;
+        boolean escapeNext = false;
+        
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            
+            if (escapeNext) {
+                sb.append(c);
+                escapeNext = false;
+                continue;
+            }
+            
+            if (c == '\\') {
+                sb.append(c);
+                escapeNext = true;
+                continue;
+            }
+            
+            if (c == '"' && !escapeNext) {
+                insideString = !insideString;
+                sb.append(c);
+                continue;
+            }
+            
+            if (insideString) {
+                // 문자열 내부에서 제어 문자 이스케이프 처리
+                switch (c) {
+                    case '\n':
+                        sb.append("\\n");
+                        break;
+                    case '\r':
+                        sb.append("\\r");
+                        break;
+                    case '\t':
+                        sb.append("\\t");
+                        break;
+                    case '\b':
+                        sb.append("\\b");
+                        break;
+                    case '\f':
+                        sb.append("\\f");
+                        break;
+                    case '\0':
+                        sb.append("\\u0000");
+                        break;
+                    default:
+                        // 기타 제어 문자 처리
+                        if (Character.isISOControl(c)) {
+                            sb.append(String.format("\\u%04x", (int) c));
+                        } else {
+                            sb.append(c);
+                        }
+                        break;
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        
+        return sb.toString();
     }
 
     @Transactional
@@ -253,79 +338,163 @@ public class AiService {
 
     @Transactional
     public void generatePassage(AiGeneratePassageRequestDto requestDto) {
-    	
+        
         Level level = levelService.getLevelByLevel(requestDto.getLevel());
-        
         Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-        
         Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
-        
         Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-        
         Type type = typeService.getTypeByType(requestDto.getType());
         
         int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
 
         for (int i = 0; i < count; i++) {
             
-        	String prompt = promptService.generatePassagePrompt(requestDto);
-            
-            String responseText = requestGenerate(prompt);
-            
-            String content = cleanJsonString(responseText);
-            
-            GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
-
-            if (parsedResult != null) {
+            try {
+                String prompt = promptService.generatePassagePrompt(requestDto);
                 
-            	passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), category, level, language, classification, type);
-            
+                String responseText = requestGenerate(prompt);
+                
+                if (responseText == null || responseText.trim().isEmpty()) {
+                    log.warn("generatePassage: Gemini API에서 빈 응답 수신 - 시도 {}/{}", i + 1, count);
+                    continue;
+                }
+                
+                String content = cleanJsonString(responseText);
+                
+                GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
+
+                if (parsedResult != null) {
+                    // 추가 검증
+                    if (parsedResult.getTitle() == null || parsedResult.getTitle().trim().isEmpty()) {
+                        log.warn("generatePassage: 제목이 없는 응답 무시 - 시도 {}/{}", i + 1, count);
+                        continue;
+                    }
+                    
+                    if (parsedResult.getContent() == null || parsedResult.getContent().trim().isEmpty()) {
+                        log.warn("generatePassage: 내용이 없는 응답 무시 - 시도 {}/{}", i + 1, count);
+                        continue;
+                    }
+                    
+                    passageService.savePassage(
+                        parsedResult.getTitle(), 
+                        parsedResult.getContent(), 
+                        NameEnum.GEMINI.name(), 
+                        LocalDate.now(), 
+                        category, 
+                        level, 
+                        language, 
+                        classification, 
+                        type
+                    );
+                    
+                    log.info("generatePassage: 지문 생성 성공 - 시도 {}/{}", i + 1, count);
+                } else {
+                    log.warn("generatePassage: 파싱 결과가 null - 시도 {}/{}", i + 1, count);
+                }
+                
+            } catch (JsonException e) {
+                log.error("generatePassage: JSON 처리 오류 - 시도 {}/{}", i + 1, count, e);
+                // JSON 오류는 계속 진행
+                
+            } catch (Exception e) {
+                log.error("generatePassage: 예상하지 못한 오류 - 시도 {}/{}", i + 1, count, e);
+                // 다른 오류도 계속 진행하되, 심각한 오류는 중단할 수 있음
             }
             
             try {
-            	
                 Thread.sleep(2000);
-                
             } catch (InterruptedException e) {
-                
-            	Thread.currentThread().interrupt();
-            
+                Thread.currentThread().interrupt();
+                log.warn("generatePassage: Thread sleep 중단됨");
+                break;
             }
-            
         }
-        
     }
     
     private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {
-        
-    	if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
-           
-        	return null;
-            
+        // 1. 입력 검증 강화
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            log.warn("parsePassageResponse: 빈 응답 또는 null 응답 수신");
+            return null;
         }
         
         try {
+            // 2. JSON 파싱 전 로깅
+            log.debug("parsePassageResponse: JSON 파싱 시작");
             
-        	JsonNode rootNode = objectMapper.readTree(requestResult);
+            // 3. ObjectMapper 설정으로 제어 문자 허용
+            ObjectMapper lenientMapper = objectMapper.copy();
+            lenientMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
             
-            if (rootNode.isArray() && rootNode.size() > 0) {
+            JsonNode rootNode = lenientMapper.readTree(requestResult);
+            
+            // 4. 배열 처리
+            if (rootNode.isArray()) {
+                if (rootNode.size() == 0) {
+                    log.warn("parsePassageResponse: 빈 배열 수신");
+                    return null;
+                }
                 
-            	return objectMapper.treeToValue(rootNode.get(0), GeminiGeneratePassageResponseDto.class);
-            
-            } else if (rootNode.isObject()){
+                JsonNode firstElement = rootNode.get(0);
+                if (firstElement.isNull()) {
+                    log.warn("parsePassageResponse: 배열의 첫 번째 요소가 null");
+                    return null;
+                }
                 
-            	return objectMapper.treeToValue(rootNode, GeminiGeneratePassageResponseDto.class);
-            
+                return lenientMapper.treeToValue(firstElement, GeminiGeneratePassageResponseDto.class);
+                
+            } else if (rootNode.isObject()) {
+                // 빈 객체 체크
+                if (rootNode.size() == 0) {
+                    log.warn("parsePassageResponse: 빈 객체 수신");
+                    return null;
+                }
+                
+                return lenientMapper.treeToValue(rootNode, GeminiGeneratePassageResponseDto.class);
+            } else {
+                log.warn("parsePassageResponse: 예상하지 못한 JSON 타입 - nodeType: {}", rootNode.getNodeType());
+                return null;
             }
             
+        } catch (com.fasterxml.jackson.core.JsonParseException e) {
+            log.error("parsePassageResponse: JSON 파싱 오류 - 잘못된 JSON 형식", e);
+            log.error("parsePassageResponse: 문제가 된 JSON 내용 (처음 1000자): {}", 
+                      requestResult.length() > 1000 ? requestResult.substring(0, 1000) + "..." : requestResult);
+            
+            // 추가 정리 시도
+            try {
+                String repairedJson = repairJsonString(requestResult);
+                log.info("parsePassageResponse: JSON 복구 시도");
+                return objectMapper.readValue(repairedJson, GeminiGeneratePassageResponseDto.class);
+            } catch (Exception repairException) {
+                log.error("parsePassageResponse: JSON 복구 실패", repairException);
+                return null;
+            }
+            
+        } catch (Exception e) {
+            log.error("parsePassageResponse: 예상하지 못한 오류 발생", e);
+            log.error("parsePassageResponse: 문제가 된 JSON 내용 (처음 1000자): {}", 
+                      requestResult.length() > 1000 ? requestResult.substring(0, 1000) + "..." : requestResult);
             return null;
-            
-        } catch (Exception exception) {
-            
-        	throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
-        
         }
+    }
+    
+    private String repairJsonString(String jsonString) {
+        // 기본 정리
+        String cleaned = jsonString.replaceAll("```json", "").replaceAll("```", "").trim();
         
+        // 제어 문자를 공백으로 치환 (문자열 내부가 아닌 경우)
+        cleaned = cleaned.replaceAll("[\u0000-\u001F\u007F]", " ");
+        
+        // 연속된 공백을 하나로 합치기
+        cleaned = cleaned.replaceAll("\\s+", " ");
+        
+        // 이스케이프되지 않은 개행 문자 처리
+        cleaned = cleaned.replaceAll("(?<!\\\\)\\n", "\\\\n");
+        cleaned = cleaned.replaceAll("(?<!\\\\)\\r", "\\\\r");
+        cleaned = cleaned.replaceAll("(?<!\\\\)\\t", "\\\\t");
+        
+        return cleaned;
     }
 
     @Transactional
@@ -366,33 +535,41 @@ public class AiService {
     }
 
     private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
-       
-    	if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
-            
-        	return Collections.emptyList();
-        
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            return Collections.emptyList();
         }
         
         try {
+            ObjectMapper lenientMapper = objectMapper.copy();
+            lenientMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
             
-        	JsonNode rootNode = objectMapper.readTree(requestResult);
+            JsonNode rootNode = lenientMapper.readTree(requestResult);
             
             if (rootNode.isArray()) {
-               
-            	return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
-            
+                return lenientMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
             } else {
-                
-            	return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class));
-            
+                return Collections.singletonList(lenientMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class));
             }
        
         } catch (Exception exception) {
+            log.error("parseQuestionResponse: JSON 파싱 오류", exception);
+            log.error("parseQuestionResponse: 문제가 된 JSON 내용: {}", requestResult);
             
-        	throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
-        
+            // 복구 시도
+            try {
+                String repairedJson = repairJsonString(requestResult);
+                JsonNode rootNode = objectMapper.readTree(repairedJson);
+                
+                if (rootNode.isArray()) {
+                    return objectMapper.readValue(repairedJson, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+                } else {
+                    return Collections.singletonList(objectMapper.readValue(repairedJson, GeminiGenerateQuestionResponseDto.class));
+                }
+            } catch (Exception repairException) {
+                log.error("parseQuestionResponse: JSON 복구 실패", repairException);
+                return Collections.emptyList();
+            }
         }
-        
     }
 
     @Transactional
