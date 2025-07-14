@@ -6,10 +6,12 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class GeminiGenerateQuestionResponseDto {
 
 	private String question;
@@ -18,6 +20,6 @@ public class GeminiGenerateQuestionResponseDto {
 	
 	private String correctAnswerIndex;
 	
-	private Map<String, String> explanation;
+	private Map<String, Object> explanation;
 	
 }

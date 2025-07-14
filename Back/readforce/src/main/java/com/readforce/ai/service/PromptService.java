@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PromptService {
 
-	private LevelService levelService;
+	private final LevelService levelService;
 
 	public String gernerateTestVocabularyPrompt(Language language, Level level) {
 
@@ -38,7 +38,7 @@ public class PromptService {
 				{
 				  "title": "단어",
 				  "content": "단어의 뜻",
-				  "level": "난이도 1 (초등 저학년)"
+				  "level": "난이도 %d (%s)"
 				}
 				
 				## 잘못된 응답 형식 (JSON 배열):
@@ -46,13 +46,21 @@ public class PromptService {
 				  {
 				    "title": "단어",
 				    "content": "단어의 뜻",
-				    "level": "난이도 1 (초등 저학년)"
+				    "level": "난이도 %d (%s)"
 				  }
 				]
 				
 				이제 규칙에 맞춰 '난이도 %d (%s)' 수준의 단어를 생성해 주세요.
 				
-				""", level.getLevelNumber(), level.getVocabularyLevel(), level.getLevelNumber(), level.getVocabularyLevel());
+				""", 
+				level.getLevelNumber(), 
+				level.getVocabularyLevel(), 
+				level.getLevelNumber(), 
+				level.getVocabularyLevel(),
+				level.getLevelNumber(), 
+				level.getVocabularyLevel(), 
+				level.getLevelNumber(), 
+				level.getVocabularyLevel());
 		break;
      
 		default:

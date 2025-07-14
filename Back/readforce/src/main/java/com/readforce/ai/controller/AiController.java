@@ -15,6 +15,7 @@ import com.readforce.ai.dto.AiGeneratePassageRequestDto;
 import com.readforce.ai.service.AiService;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.LanguageEnum;
+import com.readforce.question.dto.QuestionRequestDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -75,4 +76,17 @@ public class AiController {
         return ResponseEntity.ok(Map.of(MessageCode.MESSAGE_CODE, MessageCode.GENERATE_QUESTION_SUCCESS));
         
     }
+    
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/generate-question-by-passage-no")
+    public ResponseEntity<Map<String, String>> generateQuestionByPassageNo(
+    		@Valid @RequestBody QuestionRequestDto requestDto
+    ){
+    	
+    	aiService.generateQuestionByPassageNo(requestDto.getPassageNo());
+    	
+    	return ResponseEntity.ok(Map.of(MessageCode.MESSAGE_CODE, MessageCode.GENERATE_QUESTION_SUCCESS));
+    	
+    }
+    
 }

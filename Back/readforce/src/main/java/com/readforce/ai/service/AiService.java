@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -55,269 +56,360 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class AiService {
-   
-	private final LevelService levelService;
-	private final CategoryService categoryService;
-	private final LanguageService languageService;
-	private final RestTemplate restTemplate;
-	private final PassageService passageService;
-	private final ObjectMapper objectMapper;
-	private final ClassificationService classificationService;
-	private final QuestionService questionService;
-	private final MultipleChoiceService multipleChoiceService;
-	private final TypeService typeService;
-	private final PromptService promptService;
-   
-	@Value("${gemini.api.key}")
-	private String geminiApiKey;
-   
-	@Value("${gemini.api.url}")
-	private String geminiApiUrl;
-   
-	@Transactional
-	public void generateTestVocabulary(LanguageEnum languageEnum) {
-      
-		Language language = languageService.getLangeageByLanguage(languageEnum);
-      
-		List<Level> levelList = levelService.getAllLevelList();
-      
-		Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
 
-         
-		for(Level level : levelList) {
-			
-			String prompt = promptService.gernerateTestVocabularyPrompt(language, level);
+    private final LevelService levelService;
+    private final CategoryService categoryService;
+    private final LanguageService languageService;
+    private final RestTemplate restTemplate;
+    private final PassageService passageService;
+    private final ObjectMapper objectMapper;
+    private final ClassificationService classificationService;
+    private final QuestionService questionService;
+    private final MultipleChoiceService multipleChoiceService;
+    private final TypeService typeService;
+    private final PromptService promptService;
 
-			Map<String, Object> requestResult = requestGenerate(prompt);
+    @Value("${gemini.api.key}")
+    private String geminiApiKey;
 
-			String content = extractContentFromResponse(requestResult);
-			
-			List<GeminiGenerateTestPassageResponseDto> parsedResultList = parsingResponse(content);
+    @Value("${gemini.api.url}")
+    private String geminiApiUrl;
 
-			for(GeminiGenerateTestPassageResponseDto parsedResult : parsedResultList) {
+    private String requestGenerate(String prompt) {
+        String url = geminiApiUrl + "?key=" + geminiApiKey;
 
-				String author = NameEnum.GEMINI.name();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        
+        List<Map<String, String>> safetySettings = List.of(
+            Map.of("category", "HARM_CATEGORY_HARASSMENT", "threshold", "BLOCK_NONE"),
+            Map.of("category", "HARM_CATEGORY_HATE_SPEECH", "threshold", "BLOCK_NONE"),
+            Map.of("category", "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold", "BLOCK_NONE"),
+            Map.of("category", "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold", "BLOCK_NONE")
+        );
 
-				LocalDate publicationDate = LocalDate.now();
-	             
-	            Category categoryEntity = categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY);
+        Map<String, Object> requestBody = Map.of(
+            "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))),
+            "safetySettings", safetySettings
+        );
 
-	            passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification, null);
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
 
-			}
+        try {
+        	
+            Map<String, Object> response = restTemplate.postForObject(url, requestEntity, Map.class);
+            
+            return extractContentFromResponse(response);
+            
+        } catch (HttpClientErrorException e) {
+        	
+            log.error("Gemini API 호출 실패: Status Code = {}, Response Body = {}", e.getStatusCode(), e.getResponseBodyAsString());
+            
+            log.error("Request Body: {}", requestBody);
+            
+            throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
+            
+        } catch (Exception exception) {
+        	
+            log.error("Gemini API 호출 중 알 수 없는 오류 발생", exception);
+            
+            throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
+            
+        }
+    }
 
-			try {
+    private String extractContentFromResponse(Map<String, Object> response) {
+    	
+        try {
+        	
+            JsonNode rootNode = objectMapper.valueToTree(response);
+            
+            JsonNode textNode = rootNode.path("candidates").get(0).path("content").path("parts").get(0).path("text");
+            
+            if (textNode.isMissingNode()) {
+            	
+                log.warn("응답에서 'text' 필드를 찾을 수 없습니다. 응답: {}", response);
+                
+                return "{}";
+                
+            }
+            
+            return cleanJsonString(textNode.asText());
+            
+        } catch (Exception exception) {
+        	
+            log.error("Gemini API 응답 파싱 중 오류 발생", exception);
+            
+            return "{}";
+            
+        }
+        
+    }
+    
+    private String cleanJsonString(String rawText) {
+    	
+        if (rawText == null) return "{}";
+        
+        String cleanedText = rawText.replaceAll("```json", "").replaceAll("```", "").trim();
+        
+        int firstBracket = cleanedText.indexOf('{');
+        
+        int firstSquareBracket = cleanedText.indexOf('[');
 
-				Thread.sleep(1000);
+        if (firstBracket == -1 && firstSquareBracket == -1) return "{}";
 
-			} catch(InterruptedException exception){
+        int startIndex = (firstBracket != -1 && firstSquareBracket != -1) ? Math.min(firstBracket, firstSquareBracket) : Math.max(firstBracket, firstSquareBracket);
+       
+        char startChar = cleanedText.charAt(startIndex);
+        
+        char endChar = (startChar == '{') ? '}' : ']';
+        
+        int lastIndex = cleanedText.lastIndexOf(endChar);
 
-				Thread.currentThread().interrupt();
+        if (lastIndex > startIndex) {
 
-			}
+        	return cleanedText.substring(startIndex, lastIndex + 1);
+        
+        }
+        
+        return "{}";
+        
+    }
 
-		}
-      
-   }
-   
-   
-	private List<GeminiGenerateTestPassageResponseDto> parsingResponse(String requestResult) {
+    @Transactional
+    public void generateTestVocabulary(LanguageEnum languageEnum) {
+        
+    	Language language = languageService.getLangeageByLanguage(languageEnum);
+        
+    	List<Level> levelList = levelService.getAllLevelList();
+        
+    	Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
 
+        for (Level level : levelList) {
+            
+        	String prompt = promptService.gernerateTestVocabularyPrompt(language, level);
+           
+            try {
+               
+            	String responseText = requestGenerate(prompt);
+
+            	String content = cleanJsonString(responseText);
+                
+            	List<GeminiGenerateTestPassageResponseDto> parsedResultList = parseTestPassageResponse(content);
+
+                for (GeminiGenerateTestPassageResponseDto parsedResult : parsedResultList) {
+                    
+                	passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY), level, language, classification, null);
+                
+                }
+                
+                Thread.sleep(2000);
+                
+            } catch (InterruptedException exception) {
+            	
+                Thread.currentThread().interrupt();
+                
+                log.error("Thread sleep interrupted", exception);
+                
+            } catch (ApiException exception) {
+            	
+                log.error("Failed to call Gemini API for level {}: {}", level.getLevelNumber(), exception.getMessage());
+                
+            }
+            
+        }
+        
+    }
+    
+    private List<GeminiGenerateTestPassageResponseDto> parseTestPassageResponse(String requestResult) {
+    	
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+        	
+            return Collections.emptyList();
+            
+        }
+        
+        try {
+        	
+            JsonNode rootNode = objectMapper.readTree(requestResult);
+            
+            if (rootNode.isArray()) {
+            	
+                return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageResponseDto>>() {});
+           
+            } else {
+            	
+                return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class));
+           
+            }
+            
+        } catch (Exception exception) {
+        	
+            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+            
+        }
+        
+    }
+
+    @Transactional
+    public void generatePassage(AiGeneratePassageRequestDto requestDto) {
+    	
+        Level level = levelService.getLevelByLevel(requestDto.getLevel());
+        
+        Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+        
+        Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
+        
+        Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+        Type type = typeService.getTypeByType(requestDto.getType());
+        int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
+
+        for (int i = 0; i < count; i++) {
+            String prompt = promptService.generatePassagePrompt(requestDto);
+            String responseText = requestGenerate(prompt);
+            String content = cleanJsonString(responseText);
+            
+            GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
+
+            if (parsedResult != null) {
+                passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), category, level, language, classification, type);
+            }
+            
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    
+    private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            return null;
+        }
+        try {
+            JsonNode rootNode = objectMapper.readTree(requestResult);
+            if (rootNode.isArray() && rootNode.size() > 0) {
+                return objectMapper.treeToValue(rootNode.get(0), GeminiGeneratePassageResponseDto.class);
+            } else if (rootNode.isObject()){
+                return objectMapper.treeToValue(rootNode, GeminiGeneratePassageResponseDto.class);
+            }
+            return null;
+        } catch (Exception exception) {
+            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+        }
+    }
+
+    @Transactional
+    public void generateQuestion() {
+        List<Passage> noQuestionPassageList = passageService.getNoQuestionPassage();
+        for (Passage passage : noQuestionPassageList) {
+            String prompt = promptService.generateQuestionPrompt(passage);
+            String responseText = requestGenerate(prompt);
+            String content = cleanJsonString(responseText);
+            List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
+            for (GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
+                saveMultipleChoiceQuestion(passage, parsedResult);
+            }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Thread sleep interrupted", e);
+            }
+        }
+    }
+
+    private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            return Collections.emptyList();
+        }
+        try {
+            JsonNode rootNode = objectMapper.readTree(requestResult);
+            if (rootNode.isArray()) {
+                return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+            } else {
+                return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class));
+            }
+        } catch (Exception exception) {
+            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+        }
+    }
+
+    @Transactional
+    public void generateTestQuestion(LanguageEnum languageEnum) {
+        Language language = languageService.getLangeageByLanguage(languageEnum);
+        Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
+        List<CategoryEnum> testCategoryList = List.of(CategoryEnum.VOCABULARY, CategoryEnum.FACTUAL, CategoryEnum.INFERENTIAL);
+
+        for (CategoryEnum testCategory : testCategoryList) {
+            if (testCategory == CategoryEnum.VOCABULARY) {
+                List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
+                if (unusedPassageList.isEmpty()) continue;
+                
+                PassageResponseDto randomPassageDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
+                Passage passage = passageService.getPassageByPassageNo(randomPassageDto.getPassageNo());
+                
+                String prompt = promptService.gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
+                String responseText = requestGenerate(prompt);
+                String content = cleanJsonString(responseText);
+                List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
+                
+                for (GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
+                    saveMultipleChoiceQuestion(passage, parsedResult);
+                }
+            } else {
+                for (Level level : levelService.getAllLevelList()) {
+                    String prompt = (testCategory == CategoryEnum.FACTUAL)
+                            ? promptService.generateTestFactualPassageAndQuestionPrompt(language, level)
+                            : promptService.generateTestInferentialPassageAndQuestionPrompt(language, level);
+                    
+                    String responseText = requestGenerate(prompt);
+                    String content = cleanJsonString(responseText);
+                    List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
+                    
+                    for (GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
+                        Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
+                        Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification, null);
+                        saveMultipleChoiceQuestion(newPassage, parsedResult);
+                    }
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }
+    }
+
+    private List<GeminiGenerateTestPassageAndQuestionResponseDto> parsePassageAndQuestionResponse(String requestResult) {
 		try {
-
 			JsonNode rootNode = objectMapper.readTree(requestResult);
-
 			if(rootNode.isArray()) {
-
-				return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageResponseDto>>() {});
-
-			} else {
-
-				GeminiGenerateTestPassageResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class);
-
-				return Collections.singletonList(singleDto);
-
-			}
-
-		} catch(Exception exception) {
-
-			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-
-		}
-
-	}
-
-	private Map<String, Object> requestGenerate(String prompt) {
-
-		HttpHeaders httpHeaders = new HttpHeaders();
-	    
-	    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-	    Map<String, Object> part = Map.of("text", prompt);
-	    
-	    Map<String, Object> content = Map.of("parts", List.of(part));
-	    
-	    Map<String, Object> body = Map.of("contents", List.of(content));
-
-	    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
-
-	    String url = geminiApiUrl + "?key=" + geminiApiKey;
-
-	    try {
-	    	
-	        return restTemplate.postForObject(url, requestEntity, Map.class);
-	        
-
-	    } catch (Exception exception) {
-	    	
-	        log.error("Gemini API 호출 실패 url={}, prompt={}, message={}", url, prompt, exception.getMessage(), exception);
-	        
-	        throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
-	        
-	    }
-
-	}
-
-
-
-   
-
-	@Transactional
-	public void generateTestQuestion(LanguageEnum languageEnum) {
-
-		Language language = languageService.getLangeageByLanguage(languageEnum);
-
-		Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
-
-		List<CategoryEnum> testCategoryList = new ArrayList<CategoryEnum>();
-
-		testCategoryList.add(CategoryEnum.VOCABULARY);
-
-		testCategoryList.add(CategoryEnum.FACTUAL);
-
-		testCategoryList.add(CategoryEnum.INFERENTIAL);
-
-		for(CategoryEnum testCategory : testCategoryList) {
-
-			if(testCategory == CategoryEnum.VOCABULARY) {
-
-				List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
-
-				if(unusedPassageList.isEmpty()) {
-
-					continue;
-
-				}
-
-				PassageResponseDto randomPassagDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
-
-				Passage passage = passageService.getPassageByPassageNo(randomPassagDto.getPassageNo());
-
-				String prompt = promptService.gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
-
-				Map<String, Object> requestResult = requestGenerate(prompt);
-
-				String content = extractContentFromResponse(requestResult);
-
-				List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
-
-				for(GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
-
-					saveMultipleChoiceQuestion(passage, parsedResult);
-
-				}
-
-			} else {
-
-				for(Level level : levelService.getAllLevelList()) {
-
-					String prompt = (testCategory == CategoryEnum.FACTUAL)
-							? promptService.generateTestFactualPassageAndQuestionPrompt(language, level)
-									: promptService.generateTestInferentialPassageAndQuestionPrompt(language, level);
-
-					Map<String, Object> requestResult = requestGenerate(prompt);
-
-					String content = extractContentFromResponse(requestResult);
-
-					List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
-
-					for(GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
-
-						Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
-
-						Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification, null);
-
-						saveMultipleChoiceQuestion(newPassage, parsedResult);
-
-					}
-
-					try {
-
-						Thread.sleep(1000);
-
-					} catch(InterruptedException exception){
-
-						Thread.currentThread().interrupt();
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-
-	private List<GeminiGenerateTestPassageAndQuestionResponseDto> parsePassageAndQuestionResponse(String requestResult) {
-
-		try {
-
-			JsonNode rootNode = objectMapper.readTree(requestResult);
-
-			if(rootNode.isArray()) {
-
 				return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageAndQuestionResponseDto>>() {});
-
 			} else {
-
-				GeminiGenerateTestPassageAndQuestionResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class);
-
-				return Collections.singletonList(singleDto);
-
+				return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class));
 			}
-
 		} catch(Exception exception) {
-
 			return Collections.emptyList();
-
 		}
-
 	}
-
-	private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateTestPassageAndQuestionResponseDto parsedResult) {
-
+    
+    private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateTestPassageAndQuestionResponseDto parsedResult) {
 		List<Choice> choiceList = new ArrayList<>();
-
 		Map<String, String> explanationMap = parsedResult.getExplanation();
 
-		for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
-
+		for(int i = 0; i < parsedResult.getChoiceList().size(); i++) {
 			boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
-
-			String explanationText = isCorrect
-					? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.")
-							: explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
-
+			String explanationText = isCorrect ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.") : explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
 			Choice choice = Choice.builder()
 					.choiceIndex(i)
 					.content(parsedResult.getChoiceList().get(i))
-					.isCorrect(i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()))
+					.isCorrect(isCorrect)
 					.explanation(explanationText)
 					.build();
-
 			choiceList.add(choice);
-
 		}
 
 		MultipleChoice multipleChoice = MultipleChoice.builder()
@@ -325,34 +417,30 @@ public class AiService {
 				.question(parsedResult.getQuestion())
 				.choiceList(choiceList)
 				.build();
-
 		multipleChoiceService.saveMultipleChoice(multipleChoice);
-
 	}
 
-	private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateQuestionResponseDto parsedResult) {
-
+    private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateQuestionResponseDto parsedResult) {
 		List<Choice> choiceList = new ArrayList<>();
-      
-		Map<String, String> explanationMap = parsedResult.getExplanation();
+		Map<String, Object> explanationMap = parsedResult.getExplanation();
 
-		for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
-
+		for(int i = 0; i < parsedResult.getChoiceList().size(); i++) {
 			boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
+			
+            String explanationText;
+            if (isCorrect) {
+                explanationText = explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.").toString();
+            } else {
+                explanationText = explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.").toString();
+            }
 
-			String explanationText = isCorrect
-					? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.")
-							: explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
-         
 			Choice choice = Choice.builder()
 					.choiceIndex(i)
 					.content(parsedResult.getChoiceList().get(i))
-					.isCorrect(i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()))
+					.isCorrect(isCorrect)
 					.explanation(explanationText)
 					.build();
-
 			choiceList.add(choice);
-
 		}
 
 		MultipleChoice multipleChoice = MultipleChoice.builder()
@@ -360,224 +448,28 @@ public class AiService {
 				.question(parsedResult.getQuestion())
 				.choiceList(choiceList)
 				.build();
-
 		multipleChoiceService.saveMultipleChoice(multipleChoice);
-
 	}
 
-	@Transactional
-	public void generatePassage(AiGeneratePassageRequestDto requestDto) {
+    @Transactional
+	public void generateQuestionByPassageNo(Long passageNo) {
 
-		Level level = levelService.getLevelByLevel(requestDto.getLevel());
-       
-		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-       
-		Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
-       
-		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-       
-		Type type = typeService.getTypeByType(requestDto.getType());
+    	Passage passage = passageService.getPassageByPassageNo(passageNo);
+    	
+    	String prompt = promptService.generateQuestionPrompt(passage);
+    	
+    	String responseText = requestGenerate(prompt);
+    	
+    	String content = cleanJsonString(responseText);
+    	
+    	List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
 
-		int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
-
-		for (int i = 0; i < count; i++) {
-
-			String prompt = promptService.generatePassagePrompt(requestDto);
-           
-			Map<String, Object> requestResult = requestGenerate(prompt);
-           
-			String content = extractContentFromResponse(requestResult);
-           
-			GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
-
-			passageService.savePassage(
-					parsedResult.getTitle(),
-                    parsedResult.getContent(),
-                    NameEnum.GEMINI.name(),
-                    LocalDate.now(),
-                    category,
-                    level,
-                    language,
-                    classification,
-                    type
-			);
-
-			try {
-				
-				Thread.sleep(3000);
-
-			} catch (InterruptedException exception) {
-				
-				Thread.currentThread().interrupt();
-
-			}
-
-		}
-   
+    	for(GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
+    		
+    		saveMultipleChoiceQuestion(passage, parsedResult);
+    		
+    	}
+    	
 	}
-
-	private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {
-
-		try {
-
-			JsonNode rootNode = objectMapper.readTree(requestResult);
-
-			if(rootNode.isArray()) {
-
-				List<GeminiGeneratePassageResponseDto> list = objectMapper.readValue(requestResult, new TypeReference<List<GeminiGeneratePassageResponseDto>>() {});
-
-				if(!list.isEmpty()) {
-
-					return list.get(0);
-
-				}
-
-				throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-
-			} else {
-
-				return objectMapper.readValue(requestResult, GeminiGeneratePassageResponseDto.class);
-
-			}
-
-		} catch(Exception exception) {
-
-			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-
-		}
-
-	}
-
-	public void generateQuestion() {
-
-		List<Passage> noQuestionPassageList = passageService.getNoQuestionPassage();
-
-		for(Passage passage : noQuestionPassageList) {
-
-			String prompt = promptService.generateQuestionPrompt(passage);
-
-			Map<String, Object> requestResult = requestGenerate(prompt);
-	         
-			String content = extractContentFromResponse(requestResult);
-
-			List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
-
-			for(GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
-
-				saveMultipleChoiceQuestion(passage, parsedResult);
-
-			}         
-
-		}
-
-	}
-
-	private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
-
-		try {
-
-			JsonNode rootNode = objectMapper.readTree(requestResult);
-
-			if(rootNode.isArray()) {
-
-				return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
-
-			} else {
-
-				GeminiGenerateQuestionResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class);
-
-				return Collections.singletonList(singleDto);
-
-			}
-
-		} catch(Exception exception) {
-
-			throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-
-		}
-
-	}
-
-	private String extractContentFromResponse(Map<String, Object> response) {
-
-		if(response != null && response.containsKey("candidates")) {
-
-			List<Map<String, Object>> candidates = (List<Map<String, Object>>)response.get("candidates");
-
-			if(candidates != null && !candidates.isEmpty()) {
-
-				Map<String, Object> firstCandidate = candidates.get(0);
-
-				if(firstCandidate.containsKey("content")) {
-
-					Map<String, Object> content = (Map<String, Object>)firstCandidate.get("content");
-
-					if(content.containsKey("parts")) {
-
-						List<Map<String, Object>> parts = (List<Map<String, Object>>)content.get("parts");
-
-						if(parts != null && !parts.isEmpty()) {
-
-							Map<String, Object> firstPart = parts.get(0);
-
-							if(firstPart.containsKey("text")) {
-
-								String text = (String)firstPart.get("text");
-
-								int firstBracket = text.indexOf('{');
-								
-								int firstSquareBracket = text.indexOf('[');
-
-								if(firstBracket == -1 && firstSquareBracket == -1) {
-
-									return "{}";
-
-								}
-
-								int startIndex = -1;
-
-								if(firstBracket != -1 && firstSquareBracket != -1) {
-
-									startIndex = Math.min(firstBracket, firstSquareBracket);
-
-								} else if(firstBracket != -1) {
-
-									startIndex = firstBracket;
-
-								} else {
-
-									startIndex = firstSquareBracket;
-
-								}
-
-								int lastBracket = text.lastIndexOf('}');
-                        
-								int lastSquareBracket = text.lastIndexOf(']');
-								
-								int endIndex = Math.max(lastBracket, lastSquareBracket);
-
-								if(endIndex == -1) {
-
-									return "{}";
-
-								}
-	                        
-								return text.substring(startIndex, endIndex + 1);
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return "{}";
-
-	}
-  
+    
 }

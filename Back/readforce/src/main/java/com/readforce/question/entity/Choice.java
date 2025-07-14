@@ -42,7 +42,7 @@ public class Choice {
 	@Column(nullable = false)
 	private Boolean isCorrect;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String explanation;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
