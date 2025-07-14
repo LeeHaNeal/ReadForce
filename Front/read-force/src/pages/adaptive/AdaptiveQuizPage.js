@@ -37,8 +37,7 @@ const AdaptiveQuizPage = () => {
       }
     };
 
-    fetchQuiz();
-  }, []);
+    fetchQuiz();}, []);
 
   if (notFound) {
     return (
@@ -110,8 +109,7 @@ const AdaptiveQuizPage = () => {
               onClick={() => setSelected(opt)}
             >
               {String.fromCharCode(65 + idx)}. {opt}
-            </button>
-          ))}
+            </button>))}
         </div>
 
         <div className="quiz-button-container">
