@@ -23,6 +23,9 @@ const AdminPassage = () => {
     const [passageList, setPassageList] = useState([]);
     const [count, setCount] = useState(1);
 
+    // 챌린지 문제 전환
+    const [loadingChallenge, setLoadingChallenge] = useState(false);
+
     // 지문 직접 추가 모달
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [newPassage, setNewPassage] = useState({
@@ -116,6 +119,18 @@ const AdminPassage = () => {
         }
     };
 
+    const handleUpdateToChallenge = async () => {
+    setLoadingChallenge(true);
+    try {
+        const res = await axiosInstance.post("/challenge/update-to-challenges");
+        alert("성공: 챌린지 문제로 업데이트 완료!");
+    } catch (err) {
+        console.error("챌린지 문제 변환 실패:", err);
+        alert("실패: 챌린지 문제 변환 중 오류가 발생했습니다.");
+    } finally {
+        setLoadingChallenge(false);
+    }
+};
     // 지문 삭제
     const handleDeletePassage = async (passageNo) => {
         const confirmDelete = window.confirm("정말 이 지문을 삭제하시겠습니까?");
@@ -318,6 +333,9 @@ const AdminPassage = () => {
                         </button>
                         <button style={ADMIN_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
                             {loadingQuestion ? '생성 중...' : '일반 문제 생성'}
+                        </button>
+                         <button style={ADMIN_BUTTONS} onClick={handleUpdateToChallenge} disabled={loadingChallenge}>
+                            {loadingChallenge ? '변환 중...' : '챌린지 문제 변환'}
                         </button>
                         <button style={ADMIN_BUTTONS_2} onClick={() => setShowUploadModal(true)}>
                             지문 직접 등록

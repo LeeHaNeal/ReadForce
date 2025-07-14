@@ -18,7 +18,7 @@ const UniversalQuestionPage = () => {
 
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [isWaiting, setIsWaiting] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(true);
 
   const currentQuiz = quizList[currentIndex];
 
@@ -28,13 +28,14 @@ const UniversalQuestionPage = () => {
     return `${m}:${s}`;
   };
 
+  // 문제 진입 시 타이머 및 대기 상태 초기화
   useEffect(() => {
     const newStart = Date.now();
     setStartTime(newStart);
     setElapsedSeconds(0);
-    setIsWaiting(false); // 대기 없이 바로 가능하게 설정
+    setIsWaiting(true);
+    setSelected(null); // 선택 초기화
 
-    
     const timer = setInterval(() => {
       const secondsPassed = Math.floor((Date.now() - newStart) / 1000);
       setElapsedSeconds(secondsPassed);
@@ -48,9 +49,9 @@ const UniversalQuestionPage = () => {
       clearInterval(timer);
       clearTimeout(waitTimer);
     };
-    
   }, [currentIndex]);
 
+  // passage 및 문제 리스트 로드
   useEffect(() => {
     const loadedPassage = location.state?.passage || {
       passageNo: Number(id),
@@ -110,7 +111,6 @@ const UniversalQuestionPage = () => {
     ];
 
     setAnswers(updatedAnswers);
-    setSelected(null);
 
     if (currentIndex < quizList.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -158,11 +158,18 @@ const UniversalQuestionPage = () => {
         <div className="quiz-content">
           <p className="question-text">{currentQuiz.question}</p>
 
+          {isWaiting && (
+            <div className="wait-message">
+              ⏳ 선택은 10초 후에 가능합니다...
+            </div>
+          )}
+
           <div className="quiz-options">
             {currentQuiz.choiceList.map((choice, idx) => (
               <button
                 key={idx}
                 className={`quiz-option ${selected === idx ? 'selected' : ''}`}
+                disabled={isWaiting}
                 onClick={() => setSelected(idx)}
               >
                 {String.fromCharCode(65 + idx)}. {choice.content}
@@ -170,10 +177,11 @@ const UniversalQuestionPage = () => {
             ))}
           </div>
         </div>
+
         <div className="quiz-button-container">
           <button
             className="submit-button"
-            disabled={selected === null /* || isWaiting */}
+            disabled={selected === null}
             onClick={handleNext}
           >
             {currentIndex < quizList.length - 1 ? '다음 문제' : '제출'}
