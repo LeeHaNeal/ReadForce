@@ -44,6 +44,8 @@ if (response.ok) {
   localStorage.setItem('nickname', nickname);
   localStorage.setItem('email', email);
 
+  window.dispatchEvent(new Event("nicknameUpdated"));
+
   navigate('/'); 
       } else {
         setError(data.message || '로그인에 실패했습니다.');
