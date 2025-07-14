@@ -160,7 +160,7 @@ const UniversalQuestionPage = () => {
 
           {isWaiting && (
             <div className="wait-message">
-              ⏳ 선택은 10초 후에 가능합니다...
+             ⏳ 선택은 {Math.max(0, 10 - elapsedSeconds)}초 후에 가능합니다.
             </div>
           )}
 
