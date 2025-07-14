@@ -151,9 +151,13 @@ public class RateLimitingService {
 		}
 		
 		LocalDateTime now = LocalDateTime.now();
+		
 		LocalDateTime midnignt = now.toLocalDate().plusDays(1).atStartOfDay();
+		
 		Duration durationUntilMidnight = Duration.between(now, midnignt);
+		
 		String key = PrefixEnum.CHALLENGE_LIMIT.getContent() + email + ":" + category.toString() + ":" + language.toString();
+		
 		ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 		
 		if(valueOperations.get(key) != null) {

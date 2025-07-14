@@ -15,10 +15,9 @@ import com.readforce.passage.service.TypeService;
 import com.readforce.question.dto.MultipleChoiceResponseDto;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.result.service.LearningService;
-import lombok.extern.slf4j.Slf4j;
+
 import lombok.RequiredArgsConstructor;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendService {
@@ -33,22 +32,19 @@ public class RecommendService {
 	public MultipleChoiceResponseDto getRecommendQuestion(Member member, LanguageEnum language) {
 
 	    CategoryEnum weakCategory = categoryService.findWeakCategory(member, language);
+	    
 	    TypeEnum weakType = typeService.findWeakType(member, language, weakCategory);
+	    
 	    Integer optimalLevel = levelService.findOptimalLevel(member, language, weakCategory, weakType);
 
 	    List<Long> solvedQuestionNos = learningService.getAllSolvedQuestionNos(member);
-
-	   
-	    log.info("[RecommendService] Solved question numbers: {}", solvedQuestionNos);
 
 	    MultipleChoiceResponseDto recommendQuestion = multipleChoiceService.getUnsolvedMultipleChoiceQuestion(
 	            member, language,weakCategory,weakType,optimalLevel,solvedQuestionNos
 	    );
 
-	  
-	    log.info("[RecommendService] Recommended question number: {}", recommendQuestion.getQuestionNo());
-
 	    return recommendQuestion;
+	    
 	}
 
 

@@ -131,6 +131,7 @@ public class JwtUtil {
 	public Boolean validateToken(String accessToken, UserDetails userDetails) {
 		
 		final String username = extractUsername(accessToken);
+		
 		return username.equals(userDetails.getUsername());
 		
 	}
