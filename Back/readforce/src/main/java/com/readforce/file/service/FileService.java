@@ -189,9 +189,13 @@ public class FileService {
 		switch(fileCategory) {
 			
 			case PROFILE_IMAGE:
+				
 				fileInformationMap.put(NameEnum.UPLOAD_DIR, profileImageUploadDir);
+				
 				fileInformationMap.put(NameEnum.MAX_FILE_SIZE, profileImageMaxFileSize);
+				
 				fileInformationMap.put(NameEnum.FILE_TYPE_LIST, profileImageAllowedMimeTypeList);
+				
 				break;
 				
 			default:

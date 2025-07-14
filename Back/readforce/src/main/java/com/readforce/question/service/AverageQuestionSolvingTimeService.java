@@ -52,8 +52,11 @@ public class AverageQuestionSolvingTimeService {
 	public void createAverageQuestionSolvingTime(AdministratorAverageQuestionSolvingTimeRequestDto requestDto, Level level) {
 		
 		AgeGroup ageGroup = ageGroupService.getAgeGroupByAgeGroup(requestDto.getAgeGroup());
+		
 		Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+		
 		Type type = typeService.getTypeByType(requestDto.getType());
+		
 		Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
 		
 		AverageQuestionSolvingTime averageQuestionSolvingTime = AverageQuestionSolvingTime.builder()

@@ -17,7 +17,6 @@ import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.OrderByEnum;
 import com.readforce.common.enums.TypeEnum;
 import com.readforce.passage.dto.PassageResponseDto;
-import com.readforce.passage.entity.Passage;
 import com.readforce.passage.service.PassageService;
 
 import jakarta.validation.constraints.Max;
@@ -117,9 +116,6 @@ public class PassageController {
 		
 	}
 	
-	// 카테고리 + 레벨 조회
-
-	
 	@GetMapping("/get-passage-list-by-language-and-category-and-level")
 	public ResponseEntity<List<PassageResponseDto>> getPassageListByLanguageAndCategoryAndLevel(
 			@RequestParam("orderBy")
@@ -148,14 +144,15 @@ public class PassageController {
 		
 	}
 	
-	// 전체 지문 가져오기
 	@GetMapping("/get-all-passages")
 	public ResponseEntity<List<PassageResponseDto>> getAllPassages() {
-	    List<Passage> passageList = passageService.getAllPassages(); 
-	    List<PassageResponseDto> dtoList = passageList.stream()
+
+	    List<PassageResponseDto> passageList = passageService.getAllPassages().stream()
 	            .map(PassageResponseDto::new)
 	            .collect(Collectors.toList());
-	    return ResponseEntity.ok(dtoList);
+	    
+	    return ResponseEntity.status(HttpStatus.OK).body(passageList);
+	    
 	}
 	
 }

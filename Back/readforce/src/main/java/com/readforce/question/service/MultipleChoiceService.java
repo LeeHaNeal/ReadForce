@@ -73,24 +73,24 @@ public class MultipleChoiceService {
 	            type,
 	            level
 	    );
-
-	    // 모든 문제 가져오기
+	    
 	    List<MultipleChoice> allQuestions = passageNoList.stream()
 	            .flatMap(passageNo -> multipleChoiceRepository.findByPassage_PassageNo(passageNo).stream())
 	            .collect(Collectors.toList());
 
-	    // 푼 문제 제외
 	    List<MultipleChoice> unsolvedQuestions = allQuestions.stream()
 	            .filter(q -> !solvedQuestionNos.contains(q.getQuestionNo()))
 	            .collect(Collectors.toList());
 
-	    // 예외 처리
+
 	    if (unsolvedQuestions.isEmpty()) {
-	        throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
+
+	    	throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
+
 	    }
 
-	    // 랜덤 문제 추천
 	    Collections.shuffle(unsolvedQuestions);
+	    
 	    MultipleChoice selectedQuestion = unsolvedQuestions.get(0);
 
 	    Passage passage = selectedQuestion.getPassage();
@@ -109,6 +109,7 @@ public class MultipleChoiceService {
 	                    .map(ChoiceDto::new)
 	                    .collect(Collectors.toList()))
 	            .build();
+	    
 	}
 
 

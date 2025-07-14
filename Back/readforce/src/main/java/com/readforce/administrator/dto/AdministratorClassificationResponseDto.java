@@ -7,12 +7,10 @@ import com.readforce.passage.entity.Classification;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class AdministratorClassificationResponseDto {
 
 	private Long classificationNo;

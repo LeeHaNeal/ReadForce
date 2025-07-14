@@ -7,12 +7,10 @@ import com.readforce.member.entity.AgeGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class AdministratorAgeGroupResponseDto {
 
 	private Long ageGroupNo;

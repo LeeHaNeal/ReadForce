@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ public class AdministratorAverageQuestionSolvingTimeController {
 	private final AverageQuestionSolvingTimeService averageQuestionSolvingTimeService;
 	private final LevelService levelService;
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/get-all-list")
 	public ResponseEntity<List<AdministratorAverageQuetionSolvingTimeResponseDto>> getAllList(){
 		
@@ -47,6 +49,7 @@ public class AdministratorAverageQuestionSolvingTimeController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/create")
 	public ResponseEntity<Map<String, String>> create(
 			@Valid @RequestBody AdministratorAverageQuestionSolvingTimeRequestDto requestDto
@@ -61,6 +64,7 @@ public class AdministratorAverageQuestionSolvingTimeController {
 		
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/delete")
 	public ResponseEntity<Map<String, String>> delete(
 			@RequestParam("averageQuestionSolvingTimeNo")

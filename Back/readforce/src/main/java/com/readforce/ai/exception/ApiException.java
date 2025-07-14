@@ -1,4 +1,4 @@
-package com.readforce.ai;
+package com.readforce.ai.exception;
 
 public class ApiException extends RuntimeException {
 
