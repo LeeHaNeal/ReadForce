@@ -8,12 +8,13 @@ const AdaptiveQuizPage = () => {
   const [quiz, setQuiz] = useState(null);
   const [selected, setSelected] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const [startTime, setStartTime] = useState(Date.now());
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
         const res = await fetchWithAuth('/recommend/get-recommend?language=KOREAN');
-        console.log("asdfajewrakjdsfkjasbdkhbsdf");
+
         if (!res.ok) {
           console.error('백엔드 에러 상태 코드:', res.status);
           setNotFound(true);
@@ -22,15 +23,14 @@ const AdaptiveQuizPage = () => {
 
         const data = await res.json();
 
-        if (!data || !data.question) {
-          console.warn('백엔드에 문제 없음:', data);
+        if (!data || !data.question || !data.choiceList) {
+          console.warn('데이터 불완전:', data);
           setNotFound(true);
           return;
         }
-           
+
         setQuiz(data);
-   
-      console.log('문제 번호:', data.questionNo ?? '없음');
+        setStartTime(Date.now());
       } catch (err) {
         console.error('API 통신 오류:', err);
         setNotFound(true);
@@ -52,22 +52,42 @@ const AdaptiveQuizPage = () => {
 
   if (!quiz) return <div className="page-container">로딩 중...</div>;
 
-  // choiceList를 content 배열로 변환
-  const options = quiz.choiceList ? quiz.choiceList.map(choice => choice.content) : [];
+  const options = quiz.choiceList.map(choice => choice.content);
+  const selectedChoice = quiz.choiceList.find(choice => choice.content === selected);
 
-  const handleSubmit = () => {
-    if (!selected) return;
+  const handleSubmit = async () => {
+    if (!selectedChoice) return;
 
-    // 정답 선택지 찾기
-    const correctChoice = quiz.choiceList.find(choice => choice.isCorrect);
-    const correct = correctChoice && correctChoice.content === selected;
+    const solvingTime = Math.max(10, Math.floor((Date.now() - startTime) / 1000)); 
+    const payload = {
+      questionNo: quiz.questionNo,
+      selectedIndex: selectedChoice.choiceNo, 
+      questionSolvingTime: solvingTime,
+      isFavorit: false
+    };
+
+    try {
+      const res = await fetchWithAuth('/learning/save-multiple-choice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error('정답 기록 실패');
+      }
+    } catch (err) {
+      console.error('🚨 제출 실패:', err);
+    }
+
+    const correct = selectedChoice.isCorrect;
 
     navigate('/adaptive-learning/result', {
       state: {
         isCorrect: correct,
-        explanation: quiz.explanation || "해설 없음", // 백엔드에 explanation 추가 안 된 경우
-        next: '/adaptive-learning/start',
-      },
+        explanation: quiz.explanation || "해설 없음",
+        next: '/adaptive-learning/start'
+      }
     });
   };
 

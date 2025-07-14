@@ -7,6 +7,7 @@ const api = axios.create({
   },
 });
 
+// 토큰 설정
 api.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token');
@@ -32,6 +33,12 @@ const processQueue = (error, newAccessToken = null) => {
   failedQueue = [];
 };
 
+// 🔐 로그인 리디렉션 제외 대상 API 목록
+const skipRedirectUrls = [
+  '/ranking/get-ranking-list',
+  '/learning/get-most-incorrect-questions',
+];
+
 api.interceptors.response.use(
   response => response,
   async error => {
@@ -39,11 +46,19 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       const refreshToken = localStorage.getItem('refresh_token');
 
+      const shouldSkipRedirect = skipRedirectUrls.some(url =>
+        originalRequest.url.includes(url)
+      );
+
+      // Refresh token 없을 때
       if (!refreshToken || refreshToken === 'null' || refreshToken === 'undefined') {
-        localStorage.clear();
-        window.location.href = '/login';
+        if (!shouldSkipRedirect) {
+          localStorage.clear();
+          window.location.href = '/login';
+        }
         return Promise.reject(error);
       }
 
@@ -79,8 +94,12 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        localStorage.clear();
-        window.location.href = '/login';
+
+        if (!shouldSkipRedirect) {
+          localStorage.clear();
+          window.location.href = '/login';
+        }
+
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

@@ -127,7 +127,7 @@ const Main = () => {
           <div className="stat-box top5">
             <div className="top5-header-row">
               <h3>🏆 <span className="bold">주간 Top 5</span></h3>
-              <button className="ranking-more-btn" onClick={() => navigate('/ranking')}>＋</button>
+              <button className="ranking-more-btn" onClick={() => navigate('/ranking')}>전체보기</button>
             </div>
 
             <div className="tabs">
