@@ -74,14 +74,29 @@ const ProfileEditPage = () => {
   const validateBirthday = (value) => {
     setBirthdayMessage('');
     const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (birthdayRegex.test(value)) {
+  
+    if (!birthdayRegex.test(value)) {
+      setBirthdayMessage('생년월일 형식이 올바르지 않습니다. (예: YYYY-MM-DD)');
+      setIsBirthdayValid(false);
+      return;
+    }
+  
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+  
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    ) {
       setBirthdayMessage('생년월일 입력 완료');
       setIsBirthdayValid(true);
     } else {
-      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예:YYYY-MM-DD)');
+      setBirthdayMessage('존재하지 않는 날짜입니다.');
       setIsBirthdayValid(false);
     }
   };
+  
 
   const handleBirthdayChange = (value) => {
     const numeric = value.replace(/\D/g, '').slice(0, 8);
@@ -96,7 +111,6 @@ const ProfileEditPage = () => {
     validateBirthday(formatted);
   };
 
-  // ✅ 프로필 수정 제출
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (nickname && !isNicknameValid) {
