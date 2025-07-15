@@ -1,4 +1,3 @@
-// ✅ 공통 레이아웃 .page-container 반영됨
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './resetpassword.css';
@@ -14,14 +13,26 @@ export default function ResetPassword() {
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
 
-  // 생년월일 유효성 검사
   const validateBirthday = (value) => {
     const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (birthdayRegex.test(value)) {
+    if (!birthdayRegex.test(value)) {
+      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
+      setIsBirthdayValid(false);
+      return;
+    }
+
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    ) {
       setBirthdayMessage('생년월일 입력 완료');
       setIsBirthdayValid(true);
     } else {
-      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
+      setBirthdayMessage('존재하지 않는 날짜입니다. 다시 확인해주세요.');
       setIsBirthdayValid(false);
     }
   };
@@ -47,7 +58,7 @@ export default function ResetPassword() {
       return;
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
+    if (!isBirthdayValid) {
       alert('생년월일 형식을 확인해주세요 (예: 1997-11-04)');
       return;
     }
@@ -58,14 +69,14 @@ export default function ResetPassword() {
     }
 
     try {
-      const response = await fetch('/member/password-reset-by-link', {
+      const response = await fetch('/member/password-reset-from-link', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          temporal_token: token,
-          new_password: newPassword,
+          temporalToken: token,
+          newPassword: newPassword,
           birthday: birthday,
         }),
       });
@@ -84,8 +95,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div>
-      <div className="page-container">
+    <div className="page-container">
       <div className="reset-password-wrapper">
         <h2 className="reset-password-title">비밀번호 재설정</h2>
         <form className="reset-password-form" onSubmit={handleResetPassword}>
@@ -127,6 +137,7 @@ export default function ResetPassword() {
               required
             />
           </div>
+
           <div className="form-group">
             <label htmlFor="confirmPassword">비밀번호 확인</label>
             <input
@@ -138,12 +149,12 @@ export default function ResetPassword() {
               required
             />
           </div>
+
           <button type="submit" className="reset-btn">
             비밀번호 재설정
           </button>
         </form>
       </div>
-    </div>
     </div>
   );
 }

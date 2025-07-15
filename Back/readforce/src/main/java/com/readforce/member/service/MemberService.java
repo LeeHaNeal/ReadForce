@@ -361,9 +361,11 @@ public class MemberService {
 
 	@Transactional
 	public void passwordResetFromLink(MemberPasswordResetFromLinkDto memberPasswordResetFromLinkDto) {
-
+		
 		String email = redisTemplate.opsForValue().get(PrefixEnum.PASSWORD_RESET.getContent() + memberPasswordResetFromLinkDto.getTemporalToken());
 		
+		
+
 		if(email == null) {
 			
 			throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
