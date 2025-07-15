@@ -15,6 +15,7 @@ import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
+import com.readforce.common.service.RateLimitingService;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Classification;
@@ -48,6 +49,7 @@ public class ChallengeService {
 	private final CategoryService categoryService;
 	private final LanguageService languageService;
 	private final ClassificationService classificationService;
+	private final RateLimitingService rateLimitingService;
 	
 	@Transactional
 	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
@@ -88,6 +90,8 @@ public class ChallengeService {
 
 	@Transactional
 	public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
+		
+		rateLimitingService.checkDailyChallengeLimit(member.getEmail(), requestDto.getCategory(), requestDto.getLanguage());
 
 	    double totalScore = 0.0;
 	    final long MAX_TIME_SECONDS = 1800;
