@@ -22,6 +22,14 @@ public class QuestionSummaryResponseDto {
 	
 	private final LocalDateTime createdAt;
 	
+	private final String author;
+	
+	private final String language;
+	
+	private final String category;
+	
+	private String content;
+	
 	@JsonProperty("isCorrect")
 	private final boolean isCorrect;
 	
@@ -32,7 +40,10 @@ public class QuestionSummaryResponseDto {
 		this.title = learning.getQuestion().getPassage().getTitle();
 		this.createdAt = learning.getCreatedAt();
 		this.isCorrect = learning.getIsCorrect();
-		
+	    this.author = learning.getQuestion().getPassage().getAuthor();
+	    this.language = learning.getQuestion().getPassage().getLanguage().getLanguageName().name();
+	    this.category = learning.getQuestion().getPassage().getCategory().getCategoryName().name();
+	    this.content = learning.getQuestion().getPassage().getContent();
 	}
 	
 }
