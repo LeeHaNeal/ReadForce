@@ -1,13 +1,13 @@
 package com.readforce.recommend.service;
 
 import java.util.List;
-import com.readforce.common.exception.ResourceNotFoundException;
+
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.TypeEnum;
+import com.readforce.common.exception.ResourceNotFoundException;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.service.CategoryService;
 import com.readforce.passage.service.LevelService;
