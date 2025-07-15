@@ -232,32 +232,61 @@
   color: #777;
 }
 
-/* 많이 틀린 기사 */
+/* ===== 많이 틀린 지문 ===== */
 .wrong-articles .article {
   display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  background-color: #f7fafa;
+  border-left: 4px solid #439395;
+  cursor: pointer;
+  position: relative;
+  animation: slideUpFade 0.5s ease both;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  overflow: hidden;
 }
-.wrong-articles .flag {
-  width: 24px;
-  height: 16px;
-  font-size: 1.5rem;
-  margin-top: 4px;
-  text-align: center;
+
+.wrong-articles .rank-1 {
+  border-left-color: #f59e0b; /* gold */
 }
-.wrong-articles .title {
-  font-weight: bold;
-  font-size: 14px;
-  margin-bottom: 2px;
+.wrong-articles .rank-2 {
+  border-left-color: #9ca3af; /* silver */
 }
-.wrong-articles .author {
-  font-size: 12px;
-  color: #444;
+.wrong-articles .rank-3 {
+  border-left-color: #f97316; /* bronze */
 }
-.wrong-articles .author .sub {
-  color: #888;
-  font-size: 11px;
+
+.wrong-articles .article:hover {
+  background-color: #eef6f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.wrong-articles .subtitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+  word-break: break-word;
+}
+
+.wrong-articles .article:active::after {
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
@@ -287,7 +316,6 @@
 
   .wrong-articles .article   { gap: 0.5rem; margin-bottom: 0.75rem; }
   .wrong-articles .subtitle  { font-size: 13px; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .wrong-articles .author    { font-size: 11px; }
 
   .ranking-more-btn { font-size: 18px; }
   
