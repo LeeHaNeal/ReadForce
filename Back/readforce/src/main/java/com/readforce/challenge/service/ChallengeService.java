@@ -94,7 +94,7 @@ public class ChallengeService {
 		rateLimitingService.checkDailyChallengeLimit(member.getEmail(), requestDto.getCategory(), requestDto.getLanguage());
 
 	    double totalScore = 0.0;
-	    final long MAX_TIME_SECONDS = 1800;
+	    final long MAX_TIME_SECONDS = 1800;	
 
 	    for (Map<Long, Integer> resultMap : requestDto.getSelecetedIndexList()) {
 
@@ -217,5 +217,7 @@ public class ChallengeService {
 		}
 		
 	}
+	
+	
 
 }
