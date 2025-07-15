@@ -58,11 +58,24 @@ export default function Socialsignup() {
   // 생년월일 유효성 검사
   const validateBirthday = (value) => {
     const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (birthdayRegex.test(value)) {
+    if (!birthdayRegex.test(value)) {
+      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
+      setIsBirthdayValid(false);
+      return;
+    }
+
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    ) {
       setBirthdayMessage('생년월일 입력 완료');
       setIsBirthdayValid(true);
     } else {
-      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
+      setBirthdayMessage('존재하지 않는 날짜입니다. 다시 확인해주세요.');
       setIsBirthdayValid(false);
     }
   };

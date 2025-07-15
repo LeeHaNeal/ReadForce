@@ -1,4 +1,4 @@
-/* 공통 레이아웃 */
+/* 기본 설정 */
 .mypage-container {
   padding: 40px 20px;
   margin: 0 auto;
@@ -7,11 +7,11 @@
   color: #333;
 }
 
+/* 상단 레이아웃 */
 .top-section {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding: 20px;
   margin-bottom: 40px;
 }
 
@@ -21,15 +21,14 @@
   min-width: 300px;
   background-color: #f9f9f9;
   padding: 20px;
-  align-items: center;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* 프로필 */
 .left-top {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
@@ -44,8 +43,8 @@
 .nickname {
   font-size: 1.6rem;
   font-weight: 600;
-  text-align: center;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .badge {
@@ -54,9 +53,9 @@
   padding: 6px 14px;
   border-radius: 16px;
   font-size: 14px;
-  text-align: center;
 }
 
+/* 캘린더 */
 .calendar-section h4 {
   font-size: 18px;
   font-weight: bold;
@@ -76,7 +75,6 @@
   margin-bottom: 4px;
 }
 
-/* 공통 summary 클래스 */
 .summary-title {
   flex: 1;
   font-weight: 600;
@@ -90,7 +88,7 @@
   color: #4ABDAC;
 }
 
-/* 달력 */
+/* 캘린더 꾸미기 */
 .react-calendar {
   border: none;
   width: 100%;
@@ -102,7 +100,6 @@
 }
 
 .react-calendar__tile {
-  cursor: default !important;
   pointer-events: none;
 }
 
@@ -113,33 +110,29 @@
 
 .attended-day abbr {
   color: #4ABDAC !important;
-  font-weight: 700 !important;
+  font-weight: bold;
 }
 
 .react-calendar__navigation button {
-  color: black !important;
+  color: black;
   font-weight: 600;
-  background-color: white !important;
+  background-color: white;
 }
 
 .react-calendar__month-view__weekdays__weekday:nth-child(1) {
   color: red;
 }
 
-.react-calendar__tile abbr {
-  color: inherit;
-}
-
 .saturday abbr {
   color: black;
 }
 
-/* 하단 박스 섹션 */
+/* 하단 섹션 공통 */
 .bottom-section {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 20px;
-  flex-wrap: wrap;
   margin-top: 20px;
 }
 
@@ -153,7 +146,15 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* 학습 현황 내부 summary 카드 */
+/* 각각 박스 제목 */
+.learning-status-box h4,
+.learning-note-box h4 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* 🟦 학습 현황 박스 스타일 */
 .learning-status-box .summary-cards {
   display: flex;
   flex-direction: column;
@@ -168,23 +169,51 @@
   text-align: center;
 }
 
-/* 학습 노트 */
-.learning-note-box ul {
-  list-style: none;
-  padding: 0;
-  font-size: 15px;
-  line-height: 1.8;
-  color: #333;
+/* 🟧 학습 노트 박스 스타일 */
+.learning-note-box .summary-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-.learning-status-box h4,
-.learning-note-box h4 {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 16px;
+.learning-note-box .summary-card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s;
 }
 
-/* 반응형 */
+.learning-note-box .summary-card:hover {
+  transform: scale(1.02);
+}
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  width: 50%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* ✅ 반응형 */
 @media (max-width: 600px) {
   .mypage-container {
     padding: 24px 16px;
@@ -213,36 +242,7 @@
     text-align: left;
   }
 
-  .settings-button {
-    margin-top: 8px;
-  }
-
-  .learning-status-box .summary-cards {
-    gap: 10px;
-  }
-
-  .learning-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .note-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .note-card h5 {
-    margin: 0 0 8px;
-    font-size: 16px;
-  }
-
-  .note-item {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    margin-top: 4px;
+  .learning-note-box .summary-cards {
+    grid-template-columns: 1fr;
   }
 }

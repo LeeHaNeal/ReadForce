@@ -80,6 +80,7 @@ public final class MessageCode {
 	public static final String ORDER_BY_INVALID = "INV0019";
 	public static final String CLASSIFICATION_INVALID = "INV0020";
 	public static final String QUESTION_CLASSIFICATION_INVALID = "INV0021";
+	public static final String SCORE_INVALID = "INV0022";
 	
 	
 	
@@ -156,6 +157,7 @@ public final class MessageCode {
 	public static final String JSON_MAPPING_FAIL = "FAI0009";
 	public static final String GEMINI_API_REQUEST_FAIL = "FAI0010";
 	public static final String UPLOAD_PASSAGE_FAIL = "FAI0011";
+	public static final String SOCIAL_ACCOUNT_ALREADY_EXIST_CANNOT_LINK_NEW_ACCOUNT = "FAI0012";
 	
 	
 	

@@ -27,6 +27,7 @@ import com.readforce.member.entity.Member;
 import com.readforce.member.service.AttendanceService;
 import com.readforce.member.service.MemberService;
 import com.readforce.result.entity.Result;
+import com.readforce.result.service.ResultMetricEventService;
 import com.readforce.result.service.ResultService;
 
 import jakarta.servlet.ServletException;
@@ -44,6 +45,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 	private final AttendanceService attendanceService;
 	private final StringRedisTemplate redisTemplate;
 	private final ResultService resultService;
+	private final ResultMetricEventService resultMetricEventService;
 	
 	@Value("${custom.fronted.social-login-success.exist-member-url}")
 	private String socialLoginSuccessExistMemberUrl;
@@ -120,7 +122,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 				
 				Result newResult = resultService.create(member);
 				
-				memberService.createResultMetricsForMember(member, newResult);
+				resultMetricEventService.createResultMetricsForMember(newResult.getResultNo());
 				
 			}
 			

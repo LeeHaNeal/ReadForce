@@ -42,15 +42,8 @@ import com.readforce.member.dto.MemberSocialSignUpDto;
 import com.readforce.member.dto.MemberSummaryDto;
 import com.readforce.member.entity.Member;
 import com.readforce.member.repository.MemberRepository;
-import com.readforce.passage.entity.Category;
-import com.readforce.passage.entity.Language;
-import com.readforce.passage.entity.Level;
-import com.readforce.passage.entity.Type;
-import com.readforce.passage.service.CategoryService;
-import com.readforce.passage.service.LanguageService;
-import com.readforce.passage.service.LevelService;
-import com.readforce.passage.service.TypeService;
 import com.readforce.result.entity.Result;
+import com.readforce.result.service.ResultMetricEventService;
 import com.readforce.result.service.ResultMetricService;
 import com.readforce.result.service.ResultService;
 
@@ -70,10 +63,8 @@ public class MemberService {
 	private final FileDeleteFailLogService fileDeleteFailLogService;
 	private final EmailService emailService;
 	private final ResultMetricService resultMetricService;
-	private final LanguageService languageService;
-	private final CategoryService categoryService;
-	private final TypeService typeService;
-	private final LevelService levelService;
+	private final ResultMetricEventService resultMetricEventService;
+ 
 	
 	@Transactional(readOnly = true)
 	public MemberKeyInformationDto getMemberKeyInformationByEmailAndStatus(String email, StatusEnum status) {
@@ -94,6 +85,14 @@ public class MemberService {
 	@Transactional
 	public void linkSocialAccount(String email, String socialProvider, String socialId, String socialEmail) {
 
+		Member primaryMember = getActiveMemberByEmail(email);
+		
+		if(primaryMember.getSocialProvider() != null && !primaryMember.getSocialProvider().isEmpty()) {
+			
+			throw new AuthenticationException(MessageCode.SOCIAL_ACCOUNT_ALREADY_EXIST_CANNOT_LINK_NEW_ACCOUNT);
+			
+		}
+		
 		memberRepository
 			.findBySocialProviderAndSocialId(socialProvider, socialId)
 			.ifPresent(member -> {
@@ -238,41 +237,9 @@ public class MemberService {
 		
 		Result result = resultService.create(member);
 		
-		createResultMetricsForMember(member, result);
+		resultMetricEventService.createResultMetricsForMember(result.getResultNo());
 		
 		redisTemplate.delete(PrefixEnum.EMAIL_VERIFICATION.getContent() + memberSignUpDto.getEmail());
-		
-	}
-
-	public void createResultMetricsForMember(Member member, Result result) {
-		
-		List<Language> languageList = languageService.getAllLanguageList();
-		List<Category> categoryList = categoryService.getAllCategoryList();
-		List<Type> typeList = typeService.getAllTypeList();
-		List<Level> levelList = levelService.getAllLevelList();
-			
-		for(Language language : languageList) {
-			
-			for(Category category : categoryList) {
-				
-				resultMetricService.createResultMetric(result, language, category, null, null);
-				
-				for(Type type : typeList) {
-					
-					resultMetricService.createResultMetric(result, language, category, type, null);
-					
-					for(Level level : levelList) {
-						
-						resultMetricService.createResultMetric(result, language, category, type, level);
-						
-					}
-					
-				}				
-				
-			}
-			
-		}
-			
 		
 	}
 
@@ -361,9 +328,11 @@ public class MemberService {
 
 	@Transactional
 	public void passwordResetFromLink(MemberPasswordResetFromLinkDto memberPasswordResetFromLinkDto) {
-
+		
 		String email = redisTemplate.opsForValue().get(PrefixEnum.PASSWORD_RESET.getContent() + memberPasswordResetFromLinkDto.getTemporalToken());
 		
+		
+
 		if(email == null) {
 			
 			throw new AuthenticationException(MessageCode.AUTHENTICATION_FAIL);
@@ -436,7 +405,7 @@ public class MemberService {
 		
 		Result result = resultService.create(newMember);
 		
-		createResultMetricsForMember(newMember, result);
+		resultMetricEventService.createResultMetricsForMember(result.getResultNo());
 		
 		redisTemplate.delete(PrefixEnum.SOCIAL_SIGN_UP.getContent() + memberSocialSignUpDto.getTemporalToken());		
 		
@@ -550,12 +519,10 @@ public class MemberService {
 
 	@Transactional
 	public void createMissingResultMetricByEmail(String email) {
-
-		Member member = getActiveMemberByEmail(email);
 		
 		Result result = resultService.getActiveMemberResultByEmail(email);
 		
-		createResultMetricsForMember(member, result);
+		resultMetricEventService.createResultMetricsForMember(result.getResultNo());
 		
 	}
 

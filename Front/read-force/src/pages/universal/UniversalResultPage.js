@@ -29,7 +29,6 @@ const UniversalResultPage = () => {
     }
   };
 
-
   const correctCount = answers.reduce((acc, ans) => {
     const question = quizList.find(q => q.questionNo === ans.questionNo);
     const selected = question?.choiceList[ans.selectedIndex];
@@ -65,12 +64,13 @@ const UniversalResultPage = () => {
           {answers.map((ans, idx) => {
             const question = quizList.find(q => q.questionNo === ans.questionNo);
             const selected = question?.choiceList[ans.selectedIndex];
-            const isCorrect = selected?.isCorrect; // 여기도 수정됨
+            const correctChoice = question?.choiceList.find(choice => choice.isCorrect);
+            const isCorrect = selected?.isCorrect;
 
             return (
               <div key={idx} className="explanation-item">
                 <div className="explanation-header">
-                  <p><strong>문제 {idx + 1}:</strong> {question.question}</p>
+                  <p><strong>문제 {idx + 1}:</strong> {question?.question || '문제를 찾을 수 없습니다.'}</p>
                   <div className="solving-time-right">
                     <img src={clockImg} alt="clock" className="clock-icon" />
                     <span>{formatSeconds(ans.questionSolvingTime ?? 0)}</span>
@@ -86,7 +86,9 @@ const UniversalResultPage = () => {
                   {showExplanationIndex === idx ? '해설 닫기' : '해설 보기'}
                 </button>
                 {showExplanationIndex === idx && (
-                  <p className="explanation-text">{question.explanation || '해설이 없습니다.'}</p>
+                  <p className="explanation-text">
+                    {correctChoice?.explanation || '해설이 없습니다.'}
+                  </p>
                 )}
               </div>
             );

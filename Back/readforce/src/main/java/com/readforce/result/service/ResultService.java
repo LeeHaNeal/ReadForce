@@ -81,7 +81,7 @@ public class ResultService {
 	}
 
 	@Transactional
-	private Result getResultByResultNo(Long resultNo) {
+	public Result getResultByResultNo(Long resultNo) {
 
 		return resultRepository.findById(resultNo)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.RESULT_NOT_FOUND));
