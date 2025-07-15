@@ -2,6 +2,7 @@ package com.readforce.question.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.readforce.result.entity.Learning;
 
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class QuestionSummaryResponseDto {
 	
 	private final LocalDateTime createdAt;
 	
+	@JsonProperty("isCorrect")
 	private final boolean isCorrect;
 	
 	public QuestionSummaryResponseDto(Learning learning) {
