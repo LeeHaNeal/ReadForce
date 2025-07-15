@@ -202,6 +202,7 @@ const AdminUserInfo = () => {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
+                <th style={thStyle}>점수 번호</th>
                   <th style={thStyle}>점수</th>
                   <th style={thStyle}>카테고리</th>
                   <th style={thStyle}>언어</th>
@@ -212,6 +213,7 @@ const AdminUserInfo = () => {
               <tbody>
                 {scoreList.map((item) => (
                   <tr key={item.scoreNo}>
+                    <td style={tdStyle}>{item.scoreNo}</td>
                     <td style={tdStyle}>{item.score}</td>
                     <td style={tdStyle}>{item.category}</td>
                     <td style={tdStyle}>{item.language}</td>

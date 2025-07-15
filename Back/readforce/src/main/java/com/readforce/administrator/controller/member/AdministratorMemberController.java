@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -264,6 +265,15 @@ public class AdministratorMemberController {
 	public ResponseEntity<Map<String, String>> modifyScoreByEmail(
 			@Valid @RequestBody AdministratorScoreModifyRequestDto requestDto
 	){
+		
+		if(requestDto.getScore() < 0) {
+			
+			
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+					MessageCode.MESSAGE_CODE, MessageCode.SCORE_INVALID
+			));	
+			
+		}
 		
 		Member member = memberService.getActiveMemberByEmail(requestDto.getEmail());
 		
