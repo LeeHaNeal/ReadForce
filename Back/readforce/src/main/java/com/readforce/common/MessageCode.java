@@ -80,6 +80,7 @@ public final class MessageCode {
 	public static final String ORDER_BY_INVALID = "INV0019";
 	public static final String CLASSIFICATION_INVALID = "INV0020";
 	public static final String QUESTION_CLASSIFICATION_INVALID = "INV0021";
+	public static final String SCORE_INVALID = "INV0022";
 	
 	
 	
