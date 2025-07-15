@@ -94,6 +94,12 @@ public class Score {
 		
 	}
 	
+	public void updateScoreForChallenge(Double score) {
+		
+		this.score += score;
+		
+	}
+	
 	
 	
 }
