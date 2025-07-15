@@ -99,9 +99,13 @@ public class LevelService {
 				.orElse(0L);
 		
 		if(memberAverageSolvingTime <= overallAverageSolvingTime) {
+			
 			return challengeLevel;
+			
 		} else {
+			
 			return skilledLevel;
+			
 		}
 
 	}
