@@ -2,17 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import fetchWithAuth from '../../utils/fetchWithAuth';
 import './AdaptiveQuizPage.css';
+import clockImg from '../../assets/image/clock.png';
 
 const AdaptiveQuizPage = () => {
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [notFound, setNotFound] = useState(false);
-  const [startTime, setStartTime] = useState(Date.now());
 
-  // 추가된 state
-  const [isWaiting, setIsWaiting] = useState(true);
+  const [startTime, setStartTime] = useState(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isWaiting, setIsWaiting] = useState(true);
+
+  const formatTime = (seconds) => {
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -20,7 +26,6 @@ const AdaptiveQuizPage = () => {
         const res = await fetchWithAuth('/recommend/get-recommend?language=KOREAN');
 
         if (!res.ok) {
-          console.error('백엔드 에러 상태 코드:', res.status);
           setNotFound(true);
           return;
         }
@@ -28,14 +33,13 @@ const AdaptiveQuizPage = () => {
         const data = await res.json();
 
         if (!data || !data.question || !data.choiceList) {
-          console.warn('데이터 불완전:', data);
           setNotFound(true);
           return;
         }
 
         setQuiz(data);
         setStartTime(Date.now());
-        setSelectedIndex(null); // 새 문제에서 선택 초기화
+        setSelectedIndex(null);
       } catch (err) {
         console.error('API 통신 오류:', err);
         setNotFound(true);
@@ -45,12 +49,13 @@ const AdaptiveQuizPage = () => {
     fetchQuiz();
   }, []);
 
-  // 10초 대기 타이머
   useEffect(() => {
     if (!quiz?.questionNo) return;
 
     setIsWaiting(true);
     const newStart = Date.now();
+    setStartTime(newStart);
+    setElapsedSeconds(0);
 
     const timer = setInterval(() => {
       const secondsPassed = Math.floor((Date.now() - newStart) / 1000);
@@ -90,10 +95,18 @@ const AdaptiveQuizPage = () => {
 
       const isCorrect = quiz.choiceList[selectedIndex]?.isCorrect;
 
+     
+      const correctChoice = quiz.choiceList.find(choice => choice.isCorrect);
+      const correctChoiceIndex = correctChoice?.choiceIndex ?? -1;
+      const correctContent = correctChoice?.content ?? '';
+      const explanation = correctChoice?.explanation ?? '해설이 제공되지 않았습니다.';
+
       navigate('/adaptive-learning/result', {
         state: {
           isCorrect,
-          explanation: quiz.explanation || '해설 없음',
+          explanation,
+          correctChoiceIndex,
+          correctContent,
           next: '/adaptive-learning/start'
         }
       });
@@ -122,12 +135,19 @@ const AdaptiveQuizPage = () => {
       </div>
 
       <div className="quiz-box">
-        <h4 className="question-heading">💡 문제</h4>
+        <div className="quiz-header">
+          <h4 className="question-heading">💡 문제</h4>
+          <div className="quiz-timer">
+            <img src={clockImg} alt="clock" className="clock-icon" />
+            {formatTime(elapsedSeconds)}
+          </div>
+        </div>
+
         <p className="question-text">{quiz.question}</p>
 
         {isWaiting && (
           <div className="wait-message">
-            ⏳ {10 - elapsedSeconds}초 후에 선택할 수 있어요...
+            ⏳ {Math.max(0, 10 - elapsedSeconds)}초 후에 선택할 수 있어요...
           </div>
         )}
 

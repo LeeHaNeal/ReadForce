@@ -12,12 +12,19 @@ const AdaptiveResultPage = () => {
 
   const isCorrect = location.state?.isCorrect;
   const explanation = location.state?.explanation || '해설이 제공되지 않았습니다.';
-  const next = location.state?.next || '/adaptive-learning/start'; // 다음 문제로 되돌아가기
+  const correctChoiceIndex = location.state?.correctChoiceIndex ?? -1;
+  const correctContent = location.state?.correctContent || '';
+  const next = location.state?.next || '/adaptive-learning/start';
 
   const resultMessage = isCorrect ? '정답입니다!' : '오답입니다.';
   const resultSubText = isCorrect
     ? '👏 정확히 파악했어요! 멋져요.'
     : '😢 괜찮아요! 다음에는 더 잘할 수 있어요.';
+
+  const getChoiceLetter = (index) => {
+    if (typeof index !== 'number' || index < 0) return '?';
+    return String.fromCharCode(65 + index); 
+  };
 
   return (
     <div className="adaptive-result-wrapper">
@@ -38,7 +45,7 @@ const AdaptiveResultPage = () => {
             className="adaptive-result-button green"
             onClick={() => setShowExplanation(!showExplanation)}
           >
-            해설보기
+            {showExplanation ? '해설 닫기' : '해설 보기'}
           </button>
           <button
             className="adaptive-result-button yellow"
@@ -57,6 +64,7 @@ const AdaptiveResultPage = () => {
         {showExplanation && (
           <div className="adaptive-result-explanation">
             <h3>📝 해설</h3>
+            <p><strong>정답: {getChoiceLetter(correctChoiceIndex)}. {correctContent}</strong></p>
             <p>{explanation}</p>
           </div>
         )}

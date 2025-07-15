@@ -1,4 +1,3 @@
-// ✅ 공통 레이아웃 .page-container 반영됨
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import './resetpassword.css';
@@ -6,38 +5,10 @@ import './resetpassword.css';
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [birthday, setBirthday] = useState('');
-  const [birthdayMessage, setBirthdayMessage] = useState('');
-  const [isBirthdayValid, setIsBirthdayValid] = useState(null);
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
-
-  // 생년월일 유효성 검사
-  const validateBirthday = (value) => {
-    const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (birthdayRegex.test(value)) {
-      setBirthdayMessage('생년월일 입력 완료');
-      setIsBirthdayValid(true);
-    } else {
-      setBirthdayMessage('생년월일 8자리를 입력해주세요 (예: 19971104)');
-      setIsBirthdayValid(false);
-    }
-  };
-
-  const handleBirthdayChange = (value) => {
-    const numeric = value.replace(/\D/g, '').slice(0, 8);
-    let formatted = numeric;
-    if (numeric.length >= 5) {
-      formatted = `${numeric.slice(0, 4)}-${numeric.slice(4, 6)}`;
-      if (numeric.length >= 7) {
-        formatted += `-${numeric.slice(6, 8)}`;
-      }
-    }
-    setBirthday(formatted);
-    validateBirthday(formatted);
-  };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
@@ -47,26 +18,20 @@ export default function ResetPassword() {
       return;
     }
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
-      alert('생년월일 형식을 확인해주세요 (예: 1997-11-04)');
-      return;
-    }
-
     if (newPassword !== confirmPassword) {
       alert('비밀번호가 서로 다릅니다.');
       return;
     }
 
     try {
-      const response = await fetch('/member/password-reset-by-link', {
+      const response = await fetch('/member/password-reset-from-link', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          temporal_token: token,
-          new_password: newPassword,
-          birthday: birthday,
+          temporalToken: token,
+          newPassword: newPassword,
         }),
       });
 
@@ -84,38 +49,10 @@ export default function ResetPassword() {
   };
 
   return (
-    <div>
-      <div className="page-container">
+    <div className="page-container">
       <div className="reset-password-wrapper">
         <h2 className="reset-password-title">비밀번호 재설정</h2>
         <form className="reset-password-form" onSubmit={handleResetPassword}>
-          <div className="form-group">
-            <label>생년월일</label>
-            <div className="input-with-message">
-              <input
-                type="text"
-                placeholder="예: 19971104"
-                value={birthday}
-                onChange={(e) => handleBirthdayChange(e.target.value)}
-                required
-              />
-              <span
-                className="validation-message"
-                style={{
-                  color:
-                    isBirthdayValid === null
-                      ? 'inherit'
-                      : isBirthdayValid
-                      ? 'green'
-                      : 'red',
-                  fontSize: '0.85rem',
-                }}
-              >
-                {birthdayMessage}
-              </span>
-            </div>
-          </div>
-
           <div className="form-group">
             <label htmlFor="newPassword">새 비밀번호</label>
             <input
@@ -127,6 +64,7 @@ export default function ResetPassword() {
               required
             />
           </div>
+
           <div className="form-group">
             <label htmlFor="confirmPassword">비밀번호 확인</label>
             <input
@@ -138,12 +76,12 @@ export default function ResetPassword() {
               required
             />
           </div>
+
           <button type="submit" className="reset-btn">
             비밀번호 재설정
           </button>
         </form>
       </div>
-    </div>
     </div>
   );
 }
