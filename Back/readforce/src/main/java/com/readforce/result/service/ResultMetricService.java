@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class ResultMetricService {
 	
 	private final ResultMetricRepository resultMetricRepository;
-
+	
 	@Transactional(readOnly = true)
 	public void createResultMetric(Result result, Language language, Category category, Type type, Level level) {
 

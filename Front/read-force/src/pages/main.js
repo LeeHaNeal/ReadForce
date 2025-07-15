@@ -159,12 +159,12 @@ const Main = () => {
           </div>
 
           <div className="stat-box wrong-articles">
-            <h3>가장 많이 틀린 지문</h3>
+            <h3>📉 가장 많이 틀린 지문</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
             ) : (
               wrongArticles.map((passage, index) => (
-                <div className="article" key={index} onClick={() => handleQuizClick(passage)}>
+                <div className={`article rank-${index + 1}`} key={index} onClick={() => handleQuizClick(passage)}>
                   <div>
                     <div className="subtitle" title={passage.title}>
                       <strong>{index + 1}위</strong>{" "}
