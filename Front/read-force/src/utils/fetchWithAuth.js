@@ -101,4 +101,31 @@ export const fetchWithAuth = async (url, options = {}) => {
   return res;
 };
 
+export const toggleFavoritePassage = async (passageNo, isFavorite) => {
+  try {
+    const res = await fetchWithAuth('/passage/change-favorite-state', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ passageNo, isFavorite }),
+    });
+
+    if (!res.ok) throw new Error('서버 응답 실패');
+
+    const data = await res.json();
+    console.log('✅ 즐겨찾기 변경 완료:', data);
+    return true;
+  } catch (err) {
+    console.error('❌ 즐겨찾기 변경 실패:', err);
+    return false;
+  }
+};
+
+export const fetchFavoritePassageList = async () => {
+  const res = await fetchWithAuth('/passage/get-favorite-passage-list');
+  if (!res.ok) throw new Error('즐겨찾기 목록 실패');
+  return res.json();              // [passageNo, passageNo ...]
+};
+
 export default fetchWithAuth;

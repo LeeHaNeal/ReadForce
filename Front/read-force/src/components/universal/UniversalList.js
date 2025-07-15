@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import UniversalFilterBar from './UniversalFilterBar';
 import UniversalCard from './UniversalCard';
 import './css/UniversalList.css';
+import { toggleFavoritePassage, fetchFavoritePassageList } from '../../utils/fetchWithAuth';
 
 const UniversalList = ({
   items: initialItems = [],
@@ -12,23 +13,53 @@ const UniversalList = ({
   onSolve,
 }) => {
 
-  const [items, setItems] = useState(
-  initialItems.map((it, idx) => ({ ...it, _uid: it.id ?? idx, isFavorite: !!it.isFavorite }))
-  );
+  const [items, setItems] = useState([]);
 
   /* 2️⃣ props 변경 시 state 동기화 */
   useEffect(() => {
-    setItems(initialItems.map((it, idx) => ({ ...it, _uid: it.id ?? idx, isFavorite: !!it.isFavorite })));
-  }, [initialItems]);
+    const mergeFavorites = async () => {
+   try {
+     const favList = await fetchFavoritePassageList();
+     const favSet  = new Set(favList.map(f => f.passageNo));  // passageNo만 추출
+     const merged = initialItems.map((it, idx) => ({
+        ...it,
+       _uid: it.id ?? it.passageNo ?? idx,
+        isFavorite: favSet.has(it.passageNo),
+     }));
+     setItems(merged);
+   } catch (err) {
+      console.error('즐겨찾기 목록 불러오기 실패:', err);
+      // 실패하면 즐겨찾기 표시 없이
+      setItems(
+       initialItems.map((it, idx) => ({
+         ...it,
+         _uid: it.id ?? it.passageNo ?? idx,
+          isFavorite: false,
+        }))
+      );
+    }
+  };
+  mergeFavorites();
+}, [initialItems]);
 
-  const toggleFavorite = (uid) => {
+  const toggleFavorite = (uid, passageNo, currentIsFav) => {
+    // 1) 화면 먼저 토글
     setItems(prev =>
-      prev.map(item =>
-        item._uid === uid
-          ? { ...item, isFavorite: !item.isFavorite }   // ← 이 줄만 확실히
-          : item
+      prev.map(it =>
+        it._uid === uid ? { ...it, isFavorite: !it.isFavorite } : it
       )
     );
+
+    // 2) DB 저장
+    toggleFavoritePassage(passageNo, !currentIsFav).catch(() => {
+      // 실패 시 롤백
+      setItems(prev =>
+        prev.map(it =>
+          it._uid === uid ? { ...it, isFavorite: currentIsFav } : it
+        )
+      );
+      alert('서버 저장 실패!');
+    });
   };
 
   /* 4️⃣ 필터링 */
@@ -84,7 +115,8 @@ const UniversalList = ({
                 data={{ ...item, _uid: fallbackId }}   // _uid 추가
                 typeOptions={typeOptions}
                 onSolve={onSolve}
-                onToggleFavorite={() => toggleFavorite(item._uid)}
+                onToggleFavorite={() =>
+                  toggleFavorite(item._uid, item.passageNo, item.isFavorite)}
               />
             );
           })
