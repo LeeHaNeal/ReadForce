@@ -1,6 +1,7 @@
 package com.readforce.passage.service;
 
 import java.time.LocalDate;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,13 +21,16 @@ import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.OrderByEnum;
 import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
+import com.readforce.member.entity.Member;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Classification;
+import com.readforce.passage.entity.FavoritePassage;
 import com.readforce.passage.entity.Language;
 import com.readforce.passage.entity.Level;
 import com.readforce.passage.entity.Passage;
 import com.readforce.passage.entity.Type;
+import com.readforce.passage.repository.FavoritePassageRepository;
 import com.readforce.passage.repository.PassageRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +45,7 @@ public class PassageService {
 	private final LevelService levelService;
 	private final ClassificationService classificationService;
 	private final TypeService typeService;
+	private final FavoritePassageRepository favoritePassageRepository;
 	
 	@Transactional(readOnly = true)
 	public List<PassageResponseDto> getPassageListByLanguageAndCategory(OrderByEnum orderBy, LanguageEnum language, ClassificationEnum classification, CategoryEnum category) {
@@ -323,6 +328,37 @@ public class PassageService {
 		Passage passage = getPassageByPassageNo(passageNo);
 		
 		passageRepository.delete(passage);
+		
+	}
+
+	@Transactional
+	public void changeFavoriteState(Member member, Passage passage, Boolean isFavorit) {
+		
+
+		if(isFavorit) {
+			
+			favoritePassageRepository.save(FavoritePassage.builder()
+					.member(member)
+					.passage(passage)
+					.build());
+			
+		} else {
+
+			favoritePassageRepository.deleteByMemberAndPassage(member, passage);
+			
+		}
+		
+	}
+
+	@Transactional(readOnly = true)
+	public List<PassageResponseDto> getFavoritePassageList(Member member) {
+
+		List<FavoritePassage> favoritePassageList = favoritePassageRepository.findByMember(member);
+		
+		return favoritePassageList.stream()
+				.map(favorit -> favorit.getPassage())
+				.map(PassageResponseDto::new)
+				.collect(Collectors.toList());
 		
 	}
 

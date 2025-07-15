@@ -51,6 +51,7 @@ public final class MessageCode {
 	public static final String SCORE_NOT_NULL = "NOT0042";
 	public static final String SCORE_NO_NOT_NULL = "NOT0043";
 	public static final String RESULT_NO_NOT_NULL = "NOT0044";
+	public static final String IS_FAVORITE_NOT_NULL = "NOT0045";
 	
 	
 	
@@ -140,6 +141,7 @@ public final class MessageCode {
 	public static final String MODIFY_RESULT_SUCCESS = "SUC0051";
 	public static final String CREATE_MISSING_RESULT_METRIC_SUCCESS = "SUC0052";
 	public static final String MODIFY_RESULT_METRIC_SUCCESS = "SUC0052";
+	public static final String CHANGE_FAVORIT_PASSAGE_SUCCESS = "SUC0053";
 	
 	
 	
