@@ -28,7 +28,6 @@ const UniversalQuestionPage = () => {
     return `${m}:${s}`;
   };
 
-  // 문제 진입 시 타이머 및 대기 상태 초기화
   useEffect(() => {
     const newStart = Date.now();
     setStartTime(newStart);
@@ -51,7 +50,6 @@ const UniversalQuestionPage = () => {
     };
   }, [currentIndex]);
 
-  // passage 및 문제 리스트 로드
   useEffect(() => {
     const loadedPassage = location.state?.passage || {
       passageNo: Number(id),
@@ -172,7 +170,7 @@ const UniversalQuestionPage = () => {
                 disabled={isWaiting}
                 onClick={() => setSelected(idx)}
               >
-                {String.fromCharCode(65 + idx)}. {choice.content}
+                {String.fromCharCode(65 + idx)}. {choice.content.replace(/^[A-Z]\.\s*/, '')}
               </button>
             ))}
           </div>
