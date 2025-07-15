@@ -8,7 +8,7 @@
   flex-direction: column;
   justify-content: space-between;
   height: auto !important;
-  position: relative; /* 배지 absolute 위치를 위해 필요 */
+  position: relative; 
   margin-top: 20px;
 }
 
@@ -104,19 +104,21 @@
   margin-left: 10px;
 }
 
-/* ───────── 모바일 전용 (≤480px) ───────── */
+.UniversalCard-star {
+  position: absolute;
+  cursor: pointer;
+}
+
 @media (max-width: 480px) {
 
-  /* 카드 기본 */
   .UniversalCard-card {
     padding: 18px;
     margin-bottom: 0px;
     height: auto;
   }
 
-  /* (1) 제목만 포함된 헤더 */
   .UniversalCard-header {
-    order: 1;               /* 제일 위 */
+    order: 1;               
     margin-bottom: 6px;
   }
   .UniversalCard-title {
@@ -124,13 +126,12 @@
     line-height: 1.4;
     margin: 0;
     word-break: break-word;
-    max-height: calc(1.4em * 3); /* 두 줄까지만 */
+    max-height: calc(1.4em * 3);
     overflow: hidden;
-    max-width: 100%;   /* 데스크톱에서 걸린 120px 여유 폭 해제 */
+    max-width: 100%;   
     width: 73%;
   }
 
-  /* (2) 카테고리·버튼·배지 한 줄 */
   .UniversalCard-footer {
     order: 2;
     display: flex;
@@ -139,24 +140,23 @@
     gap: 8px;
   }
 
-  .UniversalCard-category {        /* # 정치 */
+  .UniversalCard-category {       
     font-size: 15px;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
-  .UniversalCard-button {          /* 문제 풀기 */
+  .UniversalCard-button {          
     padding: 6px 14px;
     font-size: 14px;
     flex-shrink: 0;
   }
 
-  .UniversalCard-badge {           /* 10단계 */
+  .UniversalCard-badge {           
     padding: 6px 12px;
     font-size: 13px;
     flex-shrink: 0;
   }
 
-  /* (3) 본문 요약 숨김 */
   .UniversalCard-content { display: none; }
 }
