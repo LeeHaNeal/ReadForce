@@ -16,7 +16,6 @@ export default function Socialsignup() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  // 닉네임 중복 검사
   const checkNicknameDuplicate = async (nickname) => {
     try {
       const res = await fetch(`/member/nickname-check?nickname=${nickname}`);
@@ -55,7 +54,6 @@ export default function Socialsignup() {
     }
   };
 
-  // 생년월일 유효성 검사
   const validateBirthday = (value) => {
     const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!birthdayRegex.test(value)) {
@@ -93,7 +91,6 @@ export default function Socialsignup() {
     validateBirthday(formatted);
   };
 
-  // 토큰 검증
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('TEMPORAL_TOKEN');

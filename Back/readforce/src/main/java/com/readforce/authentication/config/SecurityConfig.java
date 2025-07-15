@@ -54,6 +54,7 @@ public class SecurityConfig {
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
 			.authorizeHttpRequests(
 					auth -> auth.requestMatchers(
+							"/",
 							"/authentication/sign-in",
 							"/authentication/reissue-refresh-token",
 							"/authentication/get-tokens",
