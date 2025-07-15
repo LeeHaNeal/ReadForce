@@ -10,15 +10,19 @@ const MyPage = () => {
   const [nickname, setNickname] = useState("");
   const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [attendanceDates, setAttendanceDates] = useState([]);
-  const [summary, setSummary] = useState({ total: 0, monthlyRate: 0, streak: 0 });
+  const [summary, setSummary] = useState({
+    total: 0,
+    monthlyRate: 0,
+    streak: 0,
+  });
   const [correctRate, setCorrectRate] = useState(0);
   const [todaySolvedCount, setTodaySolvedCount] = useState(0);
   const [totalLearning, setTotalLearning] = useState([]);
+  const [totalIncorrect, setTotalIncorrect] = useState([]);
   const [todayLearning, setTodayLearning] = useState([]);
   const [todayIncorrect, setTodayIncorrect] = useState([]);
   const [favoritLearning, setFavoritLearning] = useState([]);
   const [selectedNoteType, setSelectedNoteType] = useState(null);
-
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
 
@@ -50,13 +54,15 @@ const MyPage = () => {
       .then((res) => {
         const dates = (res.data || []).map((d) => new Date(d));
         setAttendanceDates(dates);
-
         const today = new Date();
         const thisMonthDates = dates.filter(
-          (d) => d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth()
+          (d) =>
+            d.getFullYear() === today.getFullYear() &&
+            d.getMonth() === today.getMonth()
         );
-        const monthlyRate = Math.round((thisMonthDates.length / today.getDate()) * 100);
-
+        const monthlyRate = Math.round(
+          (thisMonthDates.length / today.getDate()) * 100
+        );
         const getStreak = (dates) => {
           const sorted = [...dates]
             .map((d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()))
@@ -69,7 +75,11 @@ const MyPage = () => {
               current.setDate(current.getDate() - 1);
             } else if (
               date.toDateString() ===
-              new Date(current.getFullYear(), current.getMonth(), current.getDate() - 1).toDateString()
+              new Date(
+                current.getFullYear(),
+                current.getMonth(),
+                current.getDate() - 1
+              ).toDateString()
             ) {
               streak++;
               current.setDate(current.getDate() - 1);
@@ -77,8 +87,11 @@ const MyPage = () => {
           }
           return streak;
         };
-
-        setSummary({ total: dates.length, monthlyRate, streak: getStreak(dates) });
+        setSummary({
+          total: dates.length,
+          monthlyRate,
+          streak: getStreak(dates),
+        });
       })
       .catch((e) => console.error("출석 로딩 실패:", e));
   }, []);
@@ -108,21 +121,33 @@ const MyPage = () => {
       try {
         const results = await Promise.allSettled([
           axiosInstance.get("/learning/get-total-learning"),
+          axiosInstance.get("/learning/get-total-incorrect-learning"),
           axiosInstance.get("/learning/get-today-learning"),
           axiosInstance.get("/learning/get-today-incorrect-learning"),
           axiosInstance.get("/learning/get-favorit-learning"),
         ]);
 
-        const [total, today, todayWrong, fav] = results;
+        const [total, incorrect, today, todayWrong, fav] = results;
         setTotalLearning(total.status === "fulfilled" ? total.value.data : []);
+        setTotalIncorrect(
+          incorrect.status === "fulfilled" ? incorrect.value.data : []
+        );
         setTodayLearning(today.status === "fulfilled" ? today.value.data : []);
-        setTodayIncorrect(todayWrong.status === "fulfilled" ? todayWrong.value.data : []);
+        setTodayIncorrect(
+          todayWrong.status === "fulfilled" ? todayWrong.value.data : []
+        );
         setFavoritLearning(fav.status === "fulfilled" ? fav.value.data : []);
 
-        if (total.status === "rejected") console.warn("총 학습 로딩 실패:", total.reason);
-        if (today.status === "rejected") console.warn("오늘 학습 로딩 실패:", today.reason);
-        if (todayWrong.status === "rejected") console.warn("오늘 틀린 학습 로딩 실패:", todayWrong.reason);
-        if (fav.status === "rejected") console.warn("즐겨찾기 학습 로딩 실패:", fav.reason);
+        if (total.status === "rejected")
+          console.warn("총 학습 로딩 실패:", total.reason);
+        if (incorrect.status === "rejected")
+          console.warn("전체 틀린 문제 로딩 실패:", incorrect.reason);
+        if (today.status === "rejected")
+          console.warn("오늘 학습 로딩 실패:", today.reason);
+        if (todayWrong.status === "rejected")
+          console.warn("오늘 틀린 학습 로딩 실패:", todayWrong.reason);
+        if (fav.status === "rejected")
+          console.warn("즐겨찾기 학습 로딩 실패:", fav.reason);
       } catch (e) {
         console.error("예상치 못한 오류 발생:", e);
       }
@@ -133,23 +158,23 @@ const MyPage = () => {
 
   const noteTypeMap = {
     total: { label: "전체 푼 문제", list: totalLearning },
+    totalIncorrect: { label: "전체 틀린 문제", list: totalIncorrect },
     today: { label: "오늘의 푼 문제", list: todayLearning },
     incorrect: { label: "오늘의 틀린 문제", list: todayIncorrect },
-    favorite: { label: "즐겨찾기 문제", list: favoritLearning },
+    favorite: { label: "즐겨찾기 지문", list: favoritLearning },
   };
 
   const handleQuizClick = (item) => {
     if (!item?.passageNo || !item?.title) return;
-
     navigate(`/questionpage/${item.passageNo}`, {
       state: {
         passage: {
           passageNo: item.passageNo,
-          title: item.title ?? '',
-          content: item.content ?? '',
-          author: item.author ?? '',
-          language: item.language ?? 'KOREAN',
-          category: item.category ?? 'NEWS',
+          title: item.title ?? "",
+          content: item.content ?? "",
+          author: item.author ?? "",
+          language: item.language ?? "KOREAN",
+          category: item.category ?? "NEWS",
         },
       },
     });
@@ -226,7 +251,7 @@ const MyPage = () => {
                 onClick={() => handleOpenModal(key)}
               >
                 <div className="summary-title">{label}</div>
-                <div className="summary-value">{list.length}문제</div>
+                <div className="summary-value">{list.length}{key === "favorite" ? "개" : "문제"}</div>
               </div>
             ))}
           </div>
@@ -249,23 +274,39 @@ const MyPage = () => {
                     cursor: "pointer",
                   }}
                 >
-                  <div><strong>{item.title}</strong></div>
+                  <div>
+                    <strong>{item.title}</strong>
+                  </div>
                   <div style={{ fontSize: "0.9rem", color: "#666" }}>
                     {new Date(item.createdAt).toLocaleString()}
                   </div>
-                  <div style={{
-                    marginTop: "4px",
-                    fontWeight: "bold",
-                    color: item.isCorrect ? "#22c55e" : "#ef4444",
-                  }}>
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      fontWeight: "bold",
+                      color: item.isCorrect ? "#22c55e" : "#ef4444",
+                    }}
+                  >
                     {item.isCorrect ? "정답" : "오답"}
                   </div>
                 </li>
               ))}
             </ul>
-            <button onClick={handleCloseModal} style={{ marginTop: "16px" }}>
-              닫기
-            </button>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={handleCloseModal}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#f3f4f6",
+                  border: "1px solid #ccc",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}
