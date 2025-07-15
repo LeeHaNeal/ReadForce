@@ -13,6 +13,8 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class QuestionSummaryResponseDto {
+	
+	private final Long passageNo;
 
 	private final Long questionNo;
 	
@@ -25,6 +27,7 @@ public class QuestionSummaryResponseDto {
 	
 	public QuestionSummaryResponseDto(Learning learning) {
 		
+		this.passageNo = learning.getQuestion().getPassage().getPassageNo();
 		this.questionNo = learning.getQuestion().getQuestionNo();
 		this.title = learning.getQuestion().getPassage().getTitle();
 		this.createdAt = learning.getCreatedAt();
