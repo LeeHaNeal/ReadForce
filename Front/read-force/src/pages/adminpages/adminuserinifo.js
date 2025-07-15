@@ -13,7 +13,7 @@ const AdminUserInfo = () => {
   const [newScore, setNewScore] = useState(0);
   const [modifiedScore, setModifiedScore] = useState(0);
   const [modifyTargetScoreNo, setModifyTargetScoreNo] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("english_news");
+  const [selectedCategory, setSelectedCategory] = useState("NEWS");
   const [selectedLanguage, setSelectedLanguage] = useState("KOREAN");
 
   const [showAddScoreModal, setShowAddScoreModal] = useState(false);
@@ -282,11 +282,12 @@ const AdminUserInfo = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               style={inputStyle}
             >
-              <option value="english_news">영어 뉴스</option>
-              <option value="japanese_news">일본어 뉴스</option>
-              <option value="korean_news">국어 뉴스</option>
-              <option value="fairytale">동화</option>
-              <option value="novel">소설</option>
+              <option value="NEWS">뉴스</option>
+                  <option value="NOVEL">소설</option>
+                  <option value="FAIRY_TALE">동화</option>
+                  <option value="VOCABULARY">사전</option>
+                  <option value="FACTUAL">사실</option>
+                  <option value="INFERENTIAL">추론</option>
             </select>
             <br />
             <label>언어: </label>
@@ -340,11 +341,12 @@ const AdminUserInfo = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               style={inputStyle}
             >
-              <option value="english_news">영어 뉴스</option>
-              <option value="japanese_news">일본어 뉴스</option>
-              <option value="korean_news">국어 뉴스</option>
-              <option value="fairytale">동화</option>
-              <option value="novel">소설</option>
+              <option value="NEWS">뉴스</option>
+                  <option value="NOVEL">소설</option>
+                  <option value="FAIRY_TALE">동화</option>
+                  <option value="VOCABULARY">사전</option>
+                  <option value="FACTUAL">사실</option>
+                  <option value="INFERENTIAL">추론</option>
             </select>
             <br />
             <label>언어: </label>
