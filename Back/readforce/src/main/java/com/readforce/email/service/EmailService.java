@@ -110,7 +110,7 @@ public class EmailService {
 		String text = 
 				DEFAULT_MESSAGE + "\n" +
 				"비밀번호를 재설정 하시려면 아래의 링크를 눌러주세요.\n" +
-				passwordResetUrl + "?" + NameEnum.TEMPORAL_TOKEN.name() + temporalToken;
+				passwordResetUrl + "?" + "token=" + temporalToken;
 		
 		redisTemplate.opsForValue().set(
 				PrefixEnum.PASSWORD_RESET.getContent() + temporalToken,
