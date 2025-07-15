@@ -3,11 +3,11 @@ import './MyPage.css';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axiosInstance from '../../api/axiosInstance';
-import { useNavigate } from 'react-router-dom';
+import defaultProfileImage from '../../assets/image/default-profile.png';
 
 const MyPage = () => {
   const [nickname, setNickname] = useState('');
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState(defaultProfileImage);
   const [attendanceDates, setAttendanceDates] = useState([]);
   const [summary, setSummary] = useState({ total: 0, monthlyRate: 0, streak: 0 });
   const [correctRate, setCorrectRate] = useState(0);
@@ -19,7 +19,6 @@ const MyPage = () => {
   const [favoritLearning, setFavoritLearning] = useState([]);
 
   const isLoggedIn = !!localStorage.getItem('token');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfileImage = async () => {
@@ -28,9 +27,11 @@ const MyPage = () => {
           responseType: 'blob',
         });
         const blob = res.data;
-        setProfileImageUrl(URL.createObjectURL(blob));
+        const imageUrl = URL.createObjectURL(blob);
+        setProfileImageUrl(imageUrl);
       } catch (e) {
-        console.error('프로필 이미지 불러오기 실패:', e);
+        console.warn('프로필 이미지 없음 → 기본 이미지 사용');
+        setProfileImageUrl(defaultProfileImage);
       }
     };
     if (isLoggedIn) fetchProfileImage();
@@ -135,21 +136,12 @@ const MyPage = () => {
     fetchLearningData();
   }, []);
 
-  const getBadgeLabel = (rate) => {
-    if (rate >= 100) return '초고수';
-    if (rate >= 75) return '고급';
-    if (rate >= 50) return '중급';
-    if (rate >= 25) return '초심자';
-    return '입문자';
-  };
-
   return (
     <div className="mypage-container">
       <div className="top-section">
         <div className="left-top">
           <img src={profileImageUrl} alt="프로필" className="profile-img" />
           <h3 className="nickname">{nickname} 님</h3>
-          <span className="badge">{getBadgeLabel(correctRate)}</span>
         </div>
 
         <div className="calendar-section">
