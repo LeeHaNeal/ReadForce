@@ -28,8 +28,10 @@ import com.readforce.result.entity.Result;
 import com.readforce.result.entity.ResultMetric;
 import com.readforce.result.repository.LearningRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LearningService {
@@ -43,16 +45,22 @@ public class LearningService {
 	@Transactional
 	public void saveMuiltipleChoice(String email, LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto) {
 
-		QuestionCheckResultDto questionCheckResultDto = multipleChoiceService.checkResult(learningMultipleChoiceRequestDto.getQuestionNo(), learningMultipleChoiceRequestDto.getSelectedIndex());
-		
-		Member member = memberService.getActiveMemberByEmail(email);
-		
-		recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(), learningMultipleChoiceRequestDto.getQuestionSolvingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
-		
-		updateResultAndMetric(member);
-		
+	    log.info("[LearningService] saveMuiltipleChoice called for user: {}, questionNo: {}, selectedIndex: {}",
+	            email, learningMultipleChoiceRequestDto.getQuestionNo(), learningMultipleChoiceRequestDto.getSelectedIndex());
+
+	    QuestionCheckResultDto questionCheckResultDto = multipleChoiceService.checkResult(
+	            learningMultipleChoiceRequestDto.getQuestionNo(),
+	            learningMultipleChoiceRequestDto.getSelectedIndex()
+	    );
+
+	    Member member = memberService.getActiveMemberByEmail(email);
+
+	    recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(),
+	            learningMultipleChoiceRequestDto.getQuestionSolvingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
+
+	    updateResultAndMetric(member);
 	}
-	
+
 	@Transactional
 	private void updateResultAndMetric(Member member) {
 		
@@ -275,7 +283,14 @@ public class LearningService {
 		
 	}
 	
-	
+	@Transactional(readOnly = true)
+	public List<Long> getAllSolvedQuestionNos(Member member) {
+	    return learningRepository.findAllByMember(member).stream()
+	            .map(learning -> learning.getQuestion().getQuestionNo())
+	            .distinct()
+	            .collect(Collectors.toList());
+	}
+
 	
 
 }

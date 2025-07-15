@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.readforce.ai.ApiException;
+import com.readforce.ai.exception.ApiException;
 import com.readforce.authentication.exception.AuthenticationException;
 import com.readforce.authentication.exception.JwtException;
 import com.readforce.common.MessageCode;
@@ -96,9 +96,6 @@ public class GlobalExceptionHandler {
 		
 	}
 	
-	
-	
-
 	@ExceptionHandler(FileException.class)
 	public ResponseEntity<Map<String, String>> handlerFileException(FileException exception){
 		

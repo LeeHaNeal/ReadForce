@@ -36,13 +36,13 @@ public class Choice {
 	@Column(nullable = false)
 	private Integer choiceIndex;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 	
 	@Column(nullable = false)
 	private Boolean isCorrect;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String explanation;
 	
 	@ManyToOne(fetch = FetchType.LAZY)

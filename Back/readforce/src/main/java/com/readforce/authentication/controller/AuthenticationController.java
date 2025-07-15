@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/authentication")
 @RequiredArgsConstructor
+@Validated
 public class AuthenticationController {
 
 	@Value("${custom.fronted.kakao-logout-url}")
@@ -122,13 +124,10 @@ public class AuthenticationController {
 	
 	@PostMapping("/reissue-refresh-token")
 	public ResponseEntity<Map<String, String>> reissueRefreshToken(
-	        
     		@RequestParam("refreshToken")
     		@NotBlank(message = MessageCode.REFRESH_TOKEN_NOT_BLANK)
     		String refreshToken
 	){
-
-		System.out.println(refreshToken);
 		
 		String username = jwtUtil.extractUsername(refreshToken);
 		String storedRefreshToken = authenticationService.getRefreshToken(username);
@@ -169,8 +168,6 @@ public class AuthenticationController {
 			String temporalToken
 	){
 		
-		System.out.println("d111111111111111111111111 : " + temporalToken);
-
 		String temporalTokenJson = redisTemplate.opsForValue().get(PrefixEnum.TEMPORAL.getContent() + temporalToken);
 		
 		if(temporalTokenJson == null) {

@@ -13,23 +13,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.readforce.ai.ApiException;
 import com.readforce.ai.dto.AiGeneratePassageRequestDto;
 import com.readforce.ai.dto.GeminiGeneratePassageResponseDto;
 import com.readforce.ai.dto.GeminiGenerateQuestionResponseDto;
 import com.readforce.ai.dto.GeminiGenerateTestPassageAndQuestionResponseDto;
 import com.readforce.ai.dto.GeminiGenerateTestPassageResponseDto;
+import com.readforce.ai.exception.ApiException;
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.NameEnum;
-import com.readforce.common.enums.TypeEnum;
 import com.readforce.common.exception.JsonException;
 import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.passage.entity.Category;
@@ -50,911 +50,723 @@ import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.question.service.QuestionService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiService {
-   
-   private final LevelService levelService;
-   private final CategoryService categoryService;
-   private final LanguageService languageService;
-   private final RestTemplate restTemplate;
-   private final PassageService passageService;
-   private final ObjectMapper objectMapper;
-   private final ClassificationService classificationService;
-   private final QuestionService questionService;
-   private final MultipleChoiceService multipleChoiceService;
-   private final TypeService typeService;
-   
-   @Value("${gemini.api.key}")
-   private String geminiApiKey;
-   
-   @Value("${gemini.api.url}")
-   private String geminiApiUrl;
-   
-   @Transactional
-   public void generateTestVocabulary(LanguageEnum languageEnum) {
-      
-      Language language = languageService.getLangeageByLanguage(languageEnum);
-      
-      List<Level> levelList = levelService.getAllLevelList();
-      
-      Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
 
-         
-      for(Level level : levelList) {
-         
-         String prompt = gernerateTestVocabularyPrompt(language, level);
-          
-         Map<String, Object> requestResult = requestGenerate(prompt);
-         
-         String content = extractContentFromResponse(requestResult);
-          
-         List<GeminiGenerateTestPassageResponseDto> parsedResultList = parsingResponse(content);
-         
-         for(GeminiGenerateTestPassageResponseDto parsedResult : parsedResultList) {
+    private final LevelService levelService;
+    private final CategoryService categoryService;
+    private final LanguageService languageService;
+    private final RestTemplate restTemplate;
+    private final PassageService passageService;
+    private final ObjectMapper objectMapper;
+    private final ClassificationService classificationService;
+    private final QuestionService questionService;
+    private final MultipleChoiceService multipleChoiceService;
+    private final TypeService typeService;
+    private final PromptService promptService;
+
+    @Value("${gemini.api.key}")
+    private String geminiApiKey;
+
+    @Value("${gemini.api.url}")
+    private String geminiApiUrl;
+
+    private String requestGenerate(String prompt) {
+        String url = geminiApiUrl + "?key=" + geminiApiKey;
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        
+        List<Map<String, String>> safetySettings = List.of(
+            Map.of("category", "HARM_CATEGORY_HARASSMENT", "threshold", "BLOCK_NONE"),
+            Map.of("category", "HARM_CATEGORY_HATE_SPEECH", "threshold", "BLOCK_NONE"),
+            Map.of("category", "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold", "BLOCK_NONE"),
+            Map.of("category", "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold", "BLOCK_NONE")
+        );
+
+        Map<String, Object> requestBody = Map.of(
+            "contents", List.of(Map.of("parts", List.of(Map.of("text", prompt)))),
+            "safetySettings", safetySettings
+        );
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+
+        try {
+        	
+            Map<String, Object> response = restTemplate.postForObject(url, requestEntity, Map.class);
             
-            String author = NameEnum.GEMINI.name();
-             
-            LocalDate publicationDate = LocalDate.now();
-             
-            Category categoryEntity = categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY);
-
-            passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), author, publicationDate, categoryEntity, level, language, classification, null);
+            return extractContentFromResponse(response);
             
-         }
-         
-         try {
+        } catch (HttpClientErrorException e) {
+        	
+            log.error("Gemini API 호출 실패: Status Code = {}, Response Body = {}", e.getStatusCode(), e.getResponseBodyAsString());
             
-            Thread.sleep(1000);
+            log.error("Request Body: {}", requestBody);
             
-         } catch(InterruptedException exception){
+            throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
             
-            Thread.currentThread().interrupt();
+        } catch (Exception exception) {
+        	
+            log.error("Gemini API 호출 중 알 수 없는 오류 발생", exception);
             
-         }
-
-      }
-         
-      
-      
-   }
-   
-   
-   private List<GeminiGenerateTestPassageResponseDto> parsingResponse(String requestResult) {
-
-      try {
-         
-         JsonNode rootNode = objectMapper.readTree(requestResult);
-         
-         if(rootNode.isArray()) {
+            throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
             
-            return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageResponseDto>>() {});
+        }
+    }
+
+    private String extractContentFromResponse(Map<String, Object> response) {
+    	
+        try {
+        	
+            JsonNode rootNode = objectMapper.valueToTree(response);
             
-         } else {
+            JsonNode textNode = rootNode.path("candidates").get(0).path("content").path("parts").get(0).path("text");
             
-            GeminiGenerateTestPassageResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class);
-            
-            return Collections.singletonList(singleDto);
-            
-         }
-         
-      } catch(Exception exception) {
-         
-         throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-         
-      }
-
-   }
-
-   private Map<String, Object> requestGenerate(String prompt) {
-
-      HttpHeaders httpHeaders = new HttpHeaders();
-      
-      httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-      
-      Map<String, Object> part = Map.of("text", prompt);
-      Map<String, Object> content = Map.of("parts", List.of(part));
-      Map<String, Object> body = Map.of("contents", List.of(content));
-      
-      HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, httpHeaders);
-      
-      String url = geminiApiUrl + "?key=" + geminiApiKey;
-      
-      try {
-         
-         return restTemplate.postForObject(url, requestEntity, Map.class);
-               
-      } catch(Exception exception){
-         
-         throw new ApiException(MessageCode.GEMINI_API_REQUEST_FAIL);
-         
-      }
-
-   }
-
-
-   private String gernerateTestVocabularyPrompt(Language language, Level level) {
-
-      String prompt = "";
-      
-      switch(language.getLanguageName()) {
-      
-         case KOREAN:
-            prompt = String.format(
-                  """
-                         당신은 한국어 어휘의 전문가입니다.
-                         '난이도 %d (%s)' 수준의 단어 데이터를 생성해야 합니다.
-   
-                         ## 중요 규칙
-                         - 반드시 **하나의 JSON 객체** 형식으로만 응답해야 합니다.
-                         - 절대로 JSON 배열(리스트) 형식인 `[ ]` 로 감싸서 반환하면 안 됩니다.
-   
-                         ## 올바른 응답 형식 (JSON 객체):
-                         {
-                           "title": "단어",
-                           "content": "단어의 뜻",
-                           "level": "난이도 1 (초등 저학년)"
-                         }
-   
-                         ## 잘못된 응답 형식 (JSON 배열):
-                         [
-                           {
-                             "title": "단어",
-                             "content": "단어의 뜻",
-                             "level": "난이도 1 (초등 저학년)"
-                           }
-                         ]
-   
-                         이제 규칙에 맞춰 '난이도 %d (%s)' 수준의 단어를 생성해 주세요.
-                      """, level.getLevelNumber(), level.getVocabularyLevel(), level.getLevelNumber(), level.getVocabularyLevel());
-            break;
-         
-         default:
-            
-      }
-      
-      return prompt;
-
-   }
-
-   @Transactional
-   public void generateTestQuestion(LanguageEnum languageEnum) {
-      
-      Language language = languageService.getLangeageByLanguage(languageEnum);
-      Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
-      
-      List<CategoryEnum> testCategoryList = new ArrayList<CategoryEnum>();
-      testCategoryList.add(CategoryEnum.VOCABULARY);
-      testCategoryList.add(CategoryEnum.FACTUAL);
-      testCategoryList.add(CategoryEnum.INFERENTIAL);
-      
-      for(CategoryEnum testCategory : testCategoryList) {
-         
-         if(testCategory == CategoryEnum.VOCABULARY) {
-            
-            List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
-
-            if(unusedPassageList.isEmpty()) {
-               
-               continue;
-               
+            if (textNode.isMissingNode()) {
+            	
+                log.warn("응답에서 'text' 필드를 찾을 수 없습니다. 응답: {}", response);
+                
+                return "{}";
+                
             }
             
-            PassageResponseDto randomPassagDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
+            return cleanJsonString(textNode.asText());
             
-            Passage passage = passageService.getPassageByPassageNo(randomPassagDto.getPassageNo());
+        } catch (Exception exception) {
+        	
+            log.error("Gemini API 응답 파싱 중 오류 발생", exception);
             
-            String prompt = gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
-
-            Map<String, Object> requestResult = requestGenerate(prompt);
+            return "{}";
             
-            String content = extractContentFromResponse(requestResult);
+        }
+        
+    }
+    
+    private String cleanJsonString(String rawText) {
+        if (rawText == null || rawText.trim().isEmpty()) {
+            log.warn("cleanJsonString: null 또는 빈 문자열 입력");
+            return "{}";
+        }
+        
+        try {
+            // 기본 정리
+            String cleanedText = rawText.replaceAll("```json", "").replaceAll("```", "").trim();
             
-            List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
+            // 제어 문자 이스케이프 처리 추가
+            cleanedText = escapeControlCharacters(cleanedText);
             
-            for(GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
-               
-               saveMultipleChoiceQuestion(passage, parsedResult);
-               
-            }
-
-         } else {
+            // 로깅 추가
+            log.debug("cleanJsonString: 정리 전 텍스트: {}", rawText);
+            log.debug("cleanJsonString: 정리 후 텍스트: {}", cleanedText);
             
-            for(Level level : levelService.getAllLevelList()) {
-               
-               String prompt = (testCategory == CategoryEnum.FACTUAL)
-                     ? generateTestFactualPassageAndQuestionPrompt(language, level)
-                     : generateTestInferentialPassageAndQuestionPrompt(language, level);
-               
-               Map<String, Object> requestResult = requestGenerate(prompt);
-               
-               String content = extractContentFromResponse(requestResult);
-               
-               List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
-               
-               for(GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
-                  
-                  Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
-                  
-                  Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification, null);
-                        
-                  saveMultipleChoiceQuestion(newPassage, parsedResult);
-                  
-               }
-               
-               try {
-                  
-                  Thread.sleep(1000);
-                  
-               } catch(InterruptedException exception){
-                  
-                  Thread.currentThread().interrupt();
-                  
-               }
-
-            }
-
-         }
-
-      }
-      
-   }
-   
-   private List<GeminiGenerateTestPassageAndQuestionResponseDto> parsePassageAndQuestionResponse(String requestResult) {
-
-      try {
-         
-         JsonNode rootNode = objectMapper.readTree(requestResult);
-         
-         if(rootNode.isArray()) {
+            int firstBracket = cleanedText.indexOf('{');
+            int firstSquareBracket = cleanedText.indexOf('[');
             
-            return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageAndQuestionResponseDto>>() {});
-            
-         } else {
-            
-            GeminiGenerateTestPassageAndQuestionResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class);
-            
-            return Collections.singletonList(singleDto);
-            
-         }
-      } catch(Exception exception) {
-         
-         return Collections.emptyList();
-         
-      }
-      
-   }
-
-
-   private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateTestPassageAndQuestionResponseDto parsedResult) {
-            
-      List<Choice> choiceList = new ArrayList<>();
-      Map<String, String> explanationMap = parsedResult.getExplanation();
-      
-      for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
-         
-         boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
-         
-         String explanationText = isCorrect
-               ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.")
-               : explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
-         
-         Choice choice = Choice.builder()
-               .choiceIndex(i)
-               .content(parsedResult.getChoiceList().get(i))
-               .isCorrect(i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()))
-               .explanation(explanationText)
-               .build();
-         
-         choiceList.add(choice);
-         
-      }
-                  
-      MultipleChoice multipleChoice = MultipleChoice.builder()
-            .passage(passage)
-            .question(parsedResult.getQuestion())
-            .choiceList(choiceList)
-            .build();
-      
-      multipleChoiceService.saveMultipleChoice(multipleChoice);
-      
-   }
-   
-   private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateQuestionResponseDto parsedResult) {
-      
-      List<Choice> choiceList = new ArrayList<>();
-      Map<String, String> explanationMap = parsedResult.getExplanation();
-      
-      for(int i = 0 ; i < parsedResult.getChoiceList().size() ; i++) {
-         
-         boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
-         
-         String explanationText = isCorrect
-               ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.")
-               : explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
-         
-         Choice choice = Choice.builder()
-               .choiceIndex(i)
-               .content(parsedResult.getChoiceList().get(i))
-               .isCorrect(i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()))
-               .explanation(explanationText)
-               .build();
-         
-         choiceList.add(choice);
-         
-      }
-                  
-      MultipleChoice multipleChoice = MultipleChoice.builder()
-            .passage(passage)
-            .question(parsedResult.getQuestion())
-            .choiceList(choiceList)
-            .build();
-      
-      multipleChoiceService.saveMultipleChoice(multipleChoice);
-      
-   }
-
-   private String gernerateTestVocabularyQuestionPrompt(Language language, Level level, String title, String content) {
-      
-      String prompt = "";
-      
-      switch(language.getLanguageName()) {
-      
-         case KOREAN:
-            prompt = String.format("""
-                  당신은 한국어 어휘 문제 출제 전문가입니다.
-                  '난이도 %d (%s)' 수준의 단어인 '%s'의 의미를 묻는 객관식 문제를 생성해 주세요.
-                  아래 예시 문장을 문제에 반드시 포함하고, 정답 1개와 매력적인 오답 3개를 포함한 총 4개의 선택지를 만들어 주세요.
-                  정답의 위치는 무작위로 설정해 주세요.
-         
-                  - 단어: %s
-                  - 예시 문장: %s
-         
-                  반드시 아래의 JSON 형식으로만 응답해 주세요:
-                  {
-                        "question": "생성된 질문",
-                        "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
-                        "correctAnswerIndex": 정답_선택지의_인덱스 (0-3),
-                        "explanation": {
-                             "correct": "정답 해설...",
-                           "incorrect": "오답 해설..."
-                          }
-                  }
-            """, level.getLevelNumber(), level.getVocabularyLevel(), title, title, content);
-            
-         default:
-      
-      }
-      
-      return prompt;
-      
-   }
-   
-   private String generateTestFactualPassageAndQuestionPrompt(Language language, Level level) {
-      
-      String prompt = "";
-      
-      switch(language.getLanguageName()) {
-      
-         case KOREAN:
-            prompt = String.format("""
-                  당신은 한국어 '사실적 이해' 문제 출제 전문가입니다.
-                      '난이도 %d (%s)' 수준의 짧은 글을 생성하고, 글의 내용과 일치하는 내용을 찾는 객관식 문제를 JSON 형식으로 생성해 주세요.
-                      정답 1개와 매력적인 오답 3개를 포함하고, 정답의 위치는 무작위로 설정해 주세요.
-      
-                      요청 형식:
-                      {
-                           "title": "여기에 지문 제목을 생성해주세요.",
-                           "content": "여기에 지문 내용을 생성해주세요.",
-                           "question": "생성된 질문",
-                           "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
-                        "correctAnswerIndex": 정답_선택지의_인덱스 (0-3),
-                          "explanation": {
-                             "correct": "정답 해설...",
-                             "incorrect": "오답 해설..."
-                            }
-                      }
-            """, level.getLevelNumber(), level.getVocabularyLevel());
-            break;
-
-         default:
-            
-      }
-      
-      return prompt;
-      
-   }
-   
-   private String generateTestInferentialPassageAndQuestionPrompt(Language language, Level level) {
-      
-      String prompt = "";
-      
-      switch(language.getLanguageName()) {
-      
-         case KOREAN:
-            prompt = String.format(
-                     """
-                         당신은 한국어 '추론적 이해' 문제 출제 전문가입니다.
-                         '난이도 %d (%s)' 수준의 짧은 글을 생성하고, 글의 내용을 바탕으로 추론할 수 있는 내용을 찾는 객관식 문제를 JSON 형식으로 생성해 주세요.
-                         정답 1개와 매력적인 오답 3개를 포함하고, 정답의 위치는 무작위로 설정해 주세요.
-
-                         요청 형식:
-                         {
-                              "title": "여기에 지문 제목을 생성해주세요.",
-                              "content": "여기에 지문 내용을 생성해주세요.",
-                              "question": "생성된 질문",
-                              "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
-                           "correctAnswerIndex": 정답_선택지의_인덱스 (0-3),
-                             "explanation": {
-                                "correct": "정답 해설...",
-                                "incorrect": "오답 해설..."
-                               }
-                         }
-             """, level.getLevelNumber(), level.getVocabularyLevel());
-            break;
-            
-         default:
-      
-      }
-      
-      return prompt;
-      
-   }
-
-   @Transactional
-   public void generatePassage(AiGeneratePassageRequestDto requestDto) {
-
-       Level level = levelService.getLevelByLevel(requestDto.getLevel());
-       Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
-       Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
-       Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
-       Type type = typeService.getTypeByType(requestDto.getType());
-
-       int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
-
-       for (int i = 0; i < count; i++) {
-
-           String prompt = generatePassagePrompt(requestDto);
-           Map<String, Object> requestResult = requestGenerate(prompt);
-           String content = extractContentFromResponse(requestResult);
-           GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
-
-           passageService.savePassage(
-                   parsedResult.getTitle(),
-                   parsedResult.getContent(),
-                   NameEnum.GEMINI.name(),
-                   LocalDate.now(),
-                   category,
-                   level,
-                   language,
-                   classification,
-                   type
-           );
-
-           try {
-               Thread.sleep(3000);  // 3초 간격
-           } catch (InterruptedException e) {
-               Thread.currentThread().interrupt();
-           }
-       }
-   }
-
-
-
-
-   private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {
-      
-      try {
-         
-         JsonNode rootNode = objectMapper.readTree(requestResult);
-         
-         if(rootNode.isArray()) {
-            
-            List<GeminiGeneratePassageResponseDto> list = objectMapper.readValue(requestResult, new TypeReference<List<GeminiGeneratePassageResponseDto>>() {});
-            
-            if(!list.isEmpty()) {
-               
-               return list.get(0);
-               
+            if (firstBracket == -1 && firstSquareBracket == -1) {
+                log.warn("cleanJsonString: JSON 시작 문자({, [)를 찾을 수 없음");
+                return "{}";
             }
             
-            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
+            int startIndex = (firstBracket != -1 && firstSquareBracket != -1) 
+                ? Math.min(firstBracket, firstSquareBracket) 
+                : Math.max(firstBracket, firstSquareBracket);
             
-         } else {
+            char startChar = cleanedText.charAt(startIndex);
+            char endChar = (startChar == '{') ? '}' : ']';
             
-            return objectMapper.readValue(requestResult, GeminiGeneratePassageResponseDto.class);
+            int lastIndex = cleanedText.lastIndexOf(endChar);
             
-         }
-         
-      } catch(Exception exception) {
-         
-         throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-         
-      }
-      
-   }
-
-
-   private String generatePassagePrompt(AiGeneratePassageRequestDto aiGeneratePassageRequestDto) {
-
-	    String languageString = getLanguageString(aiGeneratePassageRequestDto.getLanguage());
-	    String categoryString = getCategoryString(
-	            aiGeneratePassageRequestDto.getLanguage(),
-	            aiGeneratePassageRequestDto.getCategory()
-	    );
-	    String typeString = getTypeString(
-	            aiGeneratePassageRequestDto.getLanguage(),
-	            aiGeneratePassageRequestDto.getCategory(),
-	            aiGeneratePassageRequestDto.getType()
-	    );
-
-	    Level level = levelService.getLevelByLevel(aiGeneratePassageRequestDto.getLevel());
-
-	    String prompt = "";
-
-	    switch (aiGeneratePassageRequestDto.getCategory()) {
-
-	        case NEWS:
-	            switch (aiGeneratePassageRequestDto.getLanguage()) {
-
-	                case KOREAN:
-	                    prompt = String.format("""
-	                            당신은 %s 분야를 다루는 전문 기자입니다. 이번 기사 주제는 '%s'입니다.
-	                            지금부터 다음 조건에 맞춰 뉴스 기사를 작성해 주세요.
-
-	                            1. **언어:** %s
-	                            2. **카테고리:** %s
-	                            3. **유형:** %s
-	                            4. **난이도:** 전체 10의 난이도 중 %d
-	                               - **어휘:** %s 수준
-	                               - **문장 구조:** %s
-	                               - **내용:** '%s' 주제에 맞는 실제 사례나 최근 이슈를 포함해 주세요.
-	                               - **분량:** 제목 포함 %d개 문단으로 구성해 주세요.
-
-	                            5. **출력 형식:** 아래 JSON 형식으로만 응답해 주세요. 다른 설명은 포함하지 마세요.
-
-	                            {
-	                              "title": "기사 제목",
-	                              "content": "기사 본문 내용. 문단 구분을 위해 '\\n\\n'를 사용하세요."
-	                            }
-	                            """,
-	                            typeString, // 기자 분야
-	                            typeString, // 주제 명시
-	                            languageString,
-	                            categoryString,
-	                            typeString,
-	                            level.getLevelNumber(),
-	                            level.getVocabularyLevel(),
-	                            level.getSentenceStructure(),
-	                            typeString, // 내용에 주제 명시
-	                            level.getParagraphCount()
-	                    );
-	                    break;
-
-	                default:
-	                    prompt = "지원하지 않는 언어입니다.";
-	                    break;
-	            }
-	            break;
-
-	        // [추가 예정] 소설이나 동화는 이곳에 별도 프롬프트 작성
-	        case NOVEL:
-	            prompt = "소설 카테고리는 AI가 직접 생성하지 않습니다.";
-	            break;
-
-	        case FAIRY_TALE:
-	            prompt = "동화 카테고리는 AI가 직접 생성하지 않습니다.";
-	            break;
-
-	        default:
-	            prompt = "지원하지 않는 카테고리입니다.";
-	            break;
-	    }
-
-	    return prompt;
-	}
-
-
-
-   private String getCategoryString(LanguageEnum language, CategoryEnum category) {
-
-      switch(language) {
-      
-         case KOREAN:
-            
-            switch(category) {
-            
-            case NEWS:
-               return "뉴스";
-               
-            case NOVEL:
-               return "소설";
-               
-            case FAIRY_TALE:
-               return "동화";
-               
-            default:
-            
+            if (lastIndex > startIndex) {
+                String result = cleanedText.substring(startIndex, lastIndex + 1);
+                log.debug("cleanJsonString: 최종 결과: {}", result);
+                return result;
+            } else {
+                log.warn("cleanJsonString: 올바른 JSON 끝 문자를 찾을 수 없음");
+                return "{}";
             }
             
-         case ENGLISH:
-      
-         case JAPANESE:
-      
-         default:
+        } catch (Exception e) {
+            log.error("cleanJsonString: 문자열 정리 중 오류 발생", e);
+            return "{}";
+        }
+    }
+    
+    private String escapeControlCharacters(String text) {
+        if (text == null) return null;
+        
+        StringBuilder sb = new StringBuilder();
+        boolean insideString = false;
+        boolean escapeNext = false;
+        
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
             
-      }
-      return null;
-   }
-
-
-   private String getLanguageString(LanguageEnum language) {
-
-      switch(language) {
-      
-         case KOREAN:
-            return "한국어";
-      
-         case ENGLISH:
-            return "Englisgh";
-            
-         case JAPANESE:
-            return "日本語";
-            
-         default:
-            
-      }
-      
-      return null;
-   }
-
-
-   private String getTypeString(LanguageEnum language, CategoryEnum category, TypeEnum type) {
-
-      switch(language) {
-      
-         case KOREAN:
-            
-            switch(category) {
-            
-               case NEWS:
-                  
-                  switch(type) {
-                  
-                        case POLITICS: 
-                           return "정부 정책, 법안, 선거";
-                        case ECONOMY: 
-                           return "경제 지표, 기업, 시장";
-                        case SOCIETY:
-                           return "교육, 환경, 사건";
-                        case LIFE_AND_CULTURE: 
-                           return "문화·라이프스타일, 건강";
-                        case IT_AND_SCIENCE: 
-                           return "AI, 우주, 기술 혁신";
-                        case WORLD: 
-                           return "국제 사건, 글로벌 이슈";
-                        case SPORTS: 
-                           return "경기 결과, 선수";
-                        case ENTERTAINMENT: 
-                           return "영화, 스타 활동";
-                        default:
-                  }
-                  
-               break;
-               
-               default:
-            
+            if (escapeNext) {
+                sb.append(c);
+                escapeNext = false;
+                continue;
             }
             
-            break;
+            if (c == '\\') {
+                sb.append(c);
+                escapeNext = true;
+                continue;
+            }
             
-         case ENGLISH:
+            if (c == '"' && !escapeNext) {
+                insideString = !insideString;
+                sb.append(c);
+                continue;
+            }
             
-         case JAPANESE:
-      
-         default:
-      
-      }
-
-      return null;
-
-   }
-
-
-   public void generateQuestion() {
-      
-      List<Passage> noQuestionPassageList = passageService.getNoQuestionPassage();
-      
-      for(Passage passage : noQuestionPassageList) {
-         
-         String prompt = generateQuestionPrompt(passage);
-         
-         Map<String, Object> requestResult = requestGenerate(prompt);
-         
-         String content = extractContentFromResponse(requestResult);
-         
-         List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
-                        
-         for(GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
-            
-            saveMultipleChoiceQuestion(passage, parsedResult);
-            
-         }         
-
-      }
-
-   }
-
-
-   private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
-      
-      try {
-         
-         JsonNode rootNode = objectMapper.readTree(requestResult);
-         
-         if(rootNode.isArray()) {
-            
-            return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
-            
-         } else {
-            
-            GeminiGenerateQuestionResponseDto singleDto = objectMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class);
-            
-            return Collections.singletonList(singleDto);
-                  
-         }
-                  
-      } catch(Exception exception) {
-         
-         throw new JsonException(MessageCode.JSON_PROCESSING_FAIL);
-         
-      }
-      
-   }
-
-
-   private String generateQuestionPrompt(Passage passage) {
-      
-      String prompt = "";
-      
-      switch(passage.getLanguage().getLanguageName()) {
-      
-         case KOREAN:
-            prompt = String.format("""
-               당신은 문해력 평가 전문가입니다. 주어진 텍스트와 그 텍스트의 난이도에 맞춰, 학생의 이해도를 정확히 측정할 수 있는 문제와 상세한 해설을 생성해 주세요.
-               
-               1.  **주어진 텍스트:**
-                   {%s}
-               
-               2.  **텍스트의 난이도:** 전체 10의 난이도 중 {%d}
-               
-               3.  **생성 조건:**
-                   * **질문 유형:** {%s}에 해당하는 질문 유형으로 문제를 생성해야 합니다.
-                   * **문제 수:** {%d}
-                   * **선택지 구성:** 문제의 난이도에 맞게 오답 선택지의 매력도를 조절해 주세요. (예: 난이도가 높을수록 오답이 더 정교하고 미묘해야 함)
-                   * **해설 생성:** 정답의 근거와 오답이 틀린 이유를 명확하게 설명하는 해설을 포함해 주세요.
-               
-               4.  **출력 형식:** 아래의 JSON 배열 형식에 맞춰서, 다른 설명 없이 JSON 데이터만 출력해 주세요.
-               
-               [
-                 {
-                   "question": "문제 내용",
-                   "choiceList": ["선택지 1", "선택지 2", "선택지 3", "선택지 4"],
-                   "correctAnswerIndex": 0,
-                   "explanation": {
-                     "correct": "정답 해설...",
-                     "incorrect": "오답 해설..."
-                   }
-                 }
-               ]
-            """, 
-            passage.getContent(), 
-            passage.getLevel().getLevelNumber(), 
-            passage.getLevel().getQuestionType(),
-            3);
-            break;
-         
-         default:
-            
-      
-      }
-      
-      return prompt;
-
-   }
-
-
-   private String extractContentFromResponse(Map<String, Object> response) {
-      
-      if(response != null && response.containsKey("candidates")) {
-         
-         List<Map<String, Object>> candidates = (List<Map<String, Object>>)response.get("candidates");
-         
-         if(candidates != null && !candidates.isEmpty()) {
-            
-            Map<String, Object> firstCandidate = candidates.get(0);
-            
-            if(firstCandidate.containsKey("content")) {
-               
-               Map<String, Object> content = (Map<String, Object>)firstCandidate.get("content");
-               
-               if(content.containsKey("parts")) {
-                  
-                  List<Map<String, Object>> parts = (List<Map<String, Object>>)content.get("parts");
-                  
-                  if(parts != null && !parts.isEmpty()) {
-                     
-                     Map<String, Object> firstPart = parts.get(0);
-                     
-                     if(firstPart.containsKey("text")) {
-                        
-                        String text = (String)firstPart.get("text");
-                        
-                        int firstBracket = text.indexOf('{');
-                        int firstSquareBracket = text.indexOf('[');
-                        
-                        if(firstBracket == -1 && firstSquareBracket == -1) {
-                           
-                           return "{}";
-                           
-                        }
-                        
-                        int startIndex = -1;
-                        
-                        if(firstBracket != -1 && firstSquareBracket != -1) {
-                           
-                           startIndex = Math.min(firstBracket, firstSquareBracket);
-                           
-                        } else if(firstBracket != -1) {
-                           
-                           startIndex = firstBracket;
-                           
+            if (insideString) {
+                // 문자열 내부에서 제어 문자 이스케이프 처리
+                switch (c) {
+                    case '\n':
+                        sb.append("\\n");
+                        break;
+                    case '\r':
+                        sb.append("\\r");
+                        break;
+                    case '\t':
+                        sb.append("\\t");
+                        break;
+                    case '\b':
+                        sb.append("\\b");
+                        break;
+                    case '\f':
+                        sb.append("\\f");
+                        break;
+                    case '\0':
+                        sb.append("\\u0000");
+                        break;
+                    default:
+                        // 기타 제어 문자 처리
+                        if (Character.isISOControl(c)) {
+                            sb.append(String.format("\\u%04x", (int) c));
                         } else {
-                           
-                           startIndex = firstSquareBracket;
-                           
+                            sb.append(c);
                         }
-                        
-                        int lastBracket = text.lastIndexOf('}');
-                        int lastSquareBracket = text.lastIndexOf(']');
-                        
-                        int endIndex = Math.max(lastBracket, lastSquareBracket);
-                        
-                        if(endIndex == -1) {
-                           
-                           return "{}";
-                           
-                        }
-                        
-                        return text.substring(startIndex, endIndex + 1);
-                        
-                     }
-                     
-                  }
-                  
-               }
-         
+                        break;
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        
+        return sb.toString();
+    }
+
+    @Transactional
+    public void generateTestVocabulary(LanguageEnum languageEnum) {
+        
+    	Language language = languageService.getLangeageByLanguage(languageEnum);
+        
+    	List<Level> levelList = levelService.getAllLevelList();
+        
+    	Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
+
+        for (Level level : levelList) {
+            
+        	String prompt = promptService.gernerateTestVocabularyPrompt(language, level);
+           
+            try {
+               
+            	String responseText = requestGenerate(prompt);
+
+            	String content = cleanJsonString(responseText);
+                
+            	List<GeminiGenerateTestPassageResponseDto> parsedResultList = parseTestPassageResponse(content);
+
+                for (GeminiGenerateTestPassageResponseDto parsedResult : parsedResultList) {
+                    
+                	passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryService.getCategoryByCategory(CategoryEnum.VOCABULARY), level, language, classification, null);
+                
+                }
+                
+                Thread.sleep(2000);
+                
+            } catch (InterruptedException exception) {
+            	
+                Thread.currentThread().interrupt();
+                
+                log.error("Thread sleep interrupted", exception);
+                
+            } catch (ApiException exception) {
+            	
+                log.error("Failed to call Gemini API for level {}: {}", level.getLevelNumber(), exception.getMessage());
+                
             }
             
-         }
+        }
+        
+    }
+    
+    private List<GeminiGenerateTestPassageResponseDto> parseTestPassageResponse(String requestResult) {
+    	
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+        	
+            return Collections.emptyList();
+            
+        }
+        
+        try {
+        	
+            JsonNode rootNode = objectMapper.readTree(requestResult);
+            
+            if (rootNode.isArray()) {
+            	
+                return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageResponseDto>>() {});
+           
+            } else {
+            	
+                return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateTestPassageResponseDto.class));
+           
+            }
+            
+        } catch (Exception exception) {
+        	
+            throw new JsonException(MessageCode.JSON_PROCESSING_FAIL + " 내용: " + requestResult);
+            
+        }
+        
+    }
 
-      }
-      
-      return "{}";
-      
-   }
+    @Transactional
+    public void generatePassage(AiGeneratePassageRequestDto requestDto) {
+        
+        Level level = levelService.getLevelByLevel(requestDto.getLevel());
+        Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+        Classification classification = classificationService.getClassificationByClassfication(requestDto.getClassification());
+        Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+        Type type = typeService.getTypeByType(requestDto.getType());
+        
+        int count = (requestDto.getCount() != null) ? requestDto.getCount() : 1;
 
-	@Transactional
-	public void generateChallengeQuestions() {
+        for (int i = 0; i < count; i++) {
+            
+            try {
+                String prompt = promptService.generatePassagePrompt(requestDto);
+                
+                String responseText = requestGenerate(prompt);
+                
+                if (responseText == null || responseText.trim().isEmpty()) {
+                    log.warn("generatePassage: Gemini API에서 빈 응답 수신 - 시도 {}/{}", i + 1, count);
+                    continue;
+                }
+                
+                String content = cleanJsonString(responseText);
+                
+                GeminiGeneratePassageResponseDto parsedResult = parsePassageResponse(content);
+
+                if (parsedResult != null) {
+                    // 추가 검증
+                    if (parsedResult.getTitle() == null || parsedResult.getTitle().trim().isEmpty()) {
+                        log.warn("generatePassage: 제목이 없는 응답 무시 - 시도 {}/{}", i + 1, count);
+                        continue;
+                    }
+                    
+                    if (parsedResult.getContent() == null || parsedResult.getContent().trim().isEmpty()) {
+                        log.warn("generatePassage: 내용이 없는 응답 무시 - 시도 {}/{}", i + 1, count);
+                        continue;
+                    }
+                    
+                    passageService.savePassage(
+                        parsedResult.getTitle(), 
+                        parsedResult.getContent(), 
+                        NameEnum.GEMINI.name(), 
+                        LocalDate.now(), 
+                        category, 
+                        level, 
+                        language, 
+                        classification, 
+                        type
+                    );
+                    
+                    log.info("generatePassage: 지문 생성 성공 - 시도 {}/{}", i + 1, count);
+                } else {
+                    log.warn("generatePassage: 파싱 결과가 null - 시도 {}/{}", i + 1, count);
+                }
+                
+            } catch (JsonException e) {
+                log.error("generatePassage: JSON 처리 오류 - 시도 {}/{}", i + 1, count, e);
+                // JSON 오류는 계속 진행
+                
+            } catch (Exception e) {
+                log.error("generatePassage: 예상하지 못한 오류 - 시도 {}/{}", i + 1, count, e);
+                // 다른 오류도 계속 진행하되, 심각한 오류는 중단할 수 있음
+            }
+            
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("generatePassage: Thread sleep 중단됨");
+                break;
+            }
+        }
+    }
+    
+    private GeminiGeneratePassageResponseDto parsePassageResponse(String requestResult) {
+        // 1. 입력 검증 강화
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            log.warn("parsePassageResponse: 빈 응답 또는 null 응답 수신");
+            return null;
+        }
+        
+        try {
+            // 2. JSON 파싱 전 로깅
+            log.debug("parsePassageResponse: JSON 파싱 시작");
+            
+            // 3. ObjectMapper 설정으로 제어 문자 허용
+            ObjectMapper lenientMapper = objectMapper.copy();
+            lenientMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+            
+            JsonNode rootNode = lenientMapper.readTree(requestResult);
+            
+            // 4. 배열 처리
+            if (rootNode.isArray()) {
+                if (rootNode.size() == 0) {
+                    log.warn("parsePassageResponse: 빈 배열 수신");
+                    return null;
+                }
+                
+                JsonNode firstElement = rootNode.get(0);
+                if (firstElement.isNull()) {
+                    log.warn("parsePassageResponse: 배열의 첫 번째 요소가 null");
+                    return null;
+                }
+                
+                return lenientMapper.treeToValue(firstElement, GeminiGeneratePassageResponseDto.class);
+                
+            } else if (rootNode.isObject()) {
+                // 빈 객체 체크
+                if (rootNode.size() == 0) {
+                    log.warn("parsePassageResponse: 빈 객체 수신");
+                    return null;
+                }
+                
+                return lenientMapper.treeToValue(rootNode, GeminiGeneratePassageResponseDto.class);
+            } else {
+                log.warn("parsePassageResponse: 예상하지 못한 JSON 타입 - nodeType: {}", rootNode.getNodeType());
+                return null;
+            }
+            
+        } catch (com.fasterxml.jackson.core.JsonParseException e) {
+            log.error("parsePassageResponse: JSON 파싱 오류 - 잘못된 JSON 형식", e);
+            log.error("parsePassageResponse: 문제가 된 JSON 내용 (처음 1000자): {}", 
+                      requestResult.length() > 1000 ? requestResult.substring(0, 1000) + "..." : requestResult);
+            
+            // 추가 정리 시도
+            try {
+                String repairedJson = repairJsonString(requestResult);
+                log.info("parsePassageResponse: JSON 복구 시도");
+                return objectMapper.readValue(repairedJson, GeminiGeneratePassageResponseDto.class);
+            } catch (Exception repairException) {
+                log.error("parsePassageResponse: JSON 복구 실패", repairException);
+                return null;
+            }
+            
+        } catch (Exception e) {
+            log.error("parsePassageResponse: 예상하지 못한 오류 발생", e);
+            log.error("parsePassageResponse: 문제가 된 JSON 내용 (처음 1000자): {}", 
+                      requestResult.length() > 1000 ? requestResult.substring(0, 1000) + "..." : requestResult);
+            return null;
+        }
+    }
+    
+    private String repairJsonString(String jsonString) {
+        // 기본 정리
+        String cleaned = jsonString.replaceAll("```json", "").replaceAll("```", "").trim();
+        
+        // 제어 문자를 공백으로 치환 (문자열 내부가 아닌 경우)
+        cleaned = cleaned.replaceAll("[\u0000-\u001F\u007F]", " ");
+        
+        // 연속된 공백을 하나로 합치기
+        cleaned = cleaned.replaceAll("\\s+", " ");
+        
+        // 이스케이프되지 않은 개행 문자 처리
+        cleaned = cleaned.replaceAll("(?<!\\\\)\\n", "\\\\n");
+        cleaned = cleaned.replaceAll("(?<!\\\\)\\r", "\\\\r");
+        cleaned = cleaned.replaceAll("(?<!\\\\)\\t", "\\\\t");
+        
+        return cleaned;
+    }
+
+    @Transactional
+    public void generateQuestion() {
+        
+    	List<Passage> noQuestionPassageList = passageService.getNoQuestionPassage();
+        
+        for (Passage passage : noQuestionPassageList) {
+           
+        	String prompt = promptService.generateQuestionPrompt(passage);
+            
+            String responseText = requestGenerate(prompt);
+            
+            String content = cleanJsonString(responseText);
+            
+            List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
+           
+            for (GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
+                
+            	saveMultipleChoiceQuestion(passage, parsedResult);
+                
+            }
+            
+            try {
+               
+            	Thread.sleep(2000);
+            	
+            } catch (InterruptedException e) {
+                
+            	Thread.currentThread().interrupt();
+                
+                log.error("Thread sleep interrupted", e);
+            
+            }
+            
+        }
+        
+    }
+
+    private List<GeminiGenerateQuestionResponseDto> parseQuestionResponse(String requestResult) {
+        if (requestResult == null || requestResult.trim().isEmpty() || "{}".equals(requestResult.trim())) {
+            return Collections.emptyList();
+        }
+        
+        try {
+            ObjectMapper lenientMapper = objectMapper.copy();
+            lenientMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+            
+            JsonNode rootNode = lenientMapper.readTree(requestResult);
+            
+            if (rootNode.isArray()) {
+                return lenientMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+            } else {
+                return Collections.singletonList(lenientMapper.readValue(requestResult, GeminiGenerateQuestionResponseDto.class));
+            }
+       
+        } catch (Exception exception) {
+            log.error("parseQuestionResponse: JSON 파싱 오류", exception);
+            log.error("parseQuestionResponse: 문제가 된 JSON 내용: {}", requestResult);
+            
+            // 복구 시도
+            try {
+                String repairedJson = repairJsonString(requestResult);
+                JsonNode rootNode = objectMapper.readTree(repairedJson);
+                
+                if (rootNode.isArray()) {
+                    return objectMapper.readValue(repairedJson, new TypeReference<List<GeminiGenerateQuestionResponseDto>>() {});
+                } else {
+                    return Collections.singletonList(objectMapper.readValue(repairedJson, GeminiGenerateQuestionResponseDto.class));
+                }
+            } catch (Exception repairException) {
+                log.error("parseQuestionResponse: JSON 복구 실패", repairException);
+                return Collections.emptyList();
+            }
+        }
+    }
+
+    @Transactional
+    public void generateTestQuestion(LanguageEnum languageEnum) {
+        
+    	Language language = languageService.getLangeageByLanguage(languageEnum);
+        
+        Classification classification = classificationService.getClassificationByClassfication(ClassificationEnum.TEST);
+        
+        List<CategoryEnum> testCategoryList = List.of(CategoryEnum.VOCABULARY, CategoryEnum.FACTUAL, CategoryEnum.INFERENTIAL);
+
+        for (CategoryEnum testCategory : testCategoryList) {
+            
+        	if (testCategory == CategoryEnum.VOCABULARY) {
+                
+            	List<PassageResponseDto> unusedPassageList = questionService.getUnusedVocabularyPassageList(languageEnum, ClassificationEnum.TEST);
+                
+                if (unusedPassageList.isEmpty()) continue;
+                
+                PassageResponseDto randomPassageDto = unusedPassageList.get(new Random().nextInt(unusedPassageList.size()));
+                
+                Passage passage = passageService.getPassageByPassageNo(randomPassageDto.getPassageNo());
+                
+                String prompt = promptService.gernerateTestVocabularyQuestionPrompt(language, passage.getLevel(), passage.getTitle(), passage.getContent());
+                
+                String responseText = requestGenerate(prompt);
+                
+                String content = cleanJsonString(responseText);
+               
+                List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
+                
+                for (GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
+                    
+                	saveMultipleChoiceQuestion(passage, parsedResult);
+               
+                }
+           
+            } else {
+                
+            	for (Level level : levelService.getAllLevelList()) {
+                    
+                	String prompt = (testCategory == CategoryEnum.FACTUAL)
+                            ? promptService.generateTestFactualPassageAndQuestionPrompt(language, level)
+                            : promptService.generateTestInferentialPassageAndQuestionPrompt(language, level);
+                    
+                    String responseText = requestGenerate(prompt);
+                    
+                    String content = cleanJsonString(responseText);
+                    
+                    List<GeminiGenerateTestPassageAndQuestionResponseDto> parsedResultList = parsePassageAndQuestionResponse(content);
+                    
+                    for (GeminiGenerateTestPassageAndQuestionResponseDto parsedResult : parsedResultList) {
+                        
+                    	Category categoryEntity = categoryService.getCategoryByCategory(testCategory);
+                        
+                        Passage newPassage = passageService.savePassage(parsedResult.getTitle(), parsedResult.getContent(), NameEnum.GEMINI.name(), LocalDate.now(), categoryEntity, level, language, classification, null);
+                        
+                        saveMultipleChoiceQuestion(newPassage, parsedResult);
+                    
+                    }
+                    
+                    try {
+                      
+                    	Thread.sleep(2000);
+                    	
+                    } catch (InterruptedException e) {
+                       
+                    	Thread.currentThread().interrupt();
+                    	
+                    }
+                    
+                }
+                
+            }
+        
+        }
+        
+    }
+
+    private List<GeminiGenerateTestPassageAndQuestionResponseDto> parsePassageAndQuestionResponse(String requestResult) {
 		
+    	try {
+			
+			JsonNode rootNode = objectMapper.readTree(requestResult);
+			
+			if(rootNode.isArray()) {
+				
+				return objectMapper.readValue(requestResult, new TypeReference<List<GeminiGenerateTestPassageAndQuestionResponseDto>>() {});
+			
+			} else {
+				
+				return Collections.singletonList(objectMapper.readValue(requestResult, GeminiGenerateTestPassageAndQuestionResponseDto.class));
+			
+			}
+			
+		} catch(Exception exception) {
+			
+			return Collections.emptyList();
+		
+		}
+		
+	}
+    
+    private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateTestPassageAndQuestionResponseDto parsedResult) {
+		
+    	List<Choice> choiceList = new ArrayList<>();
+		
+		Map<String, String> explanationMap = parsedResult.getExplanation();
+
+		for(int i = 0; i < parsedResult.getChoiceList().size(); i++) {
+			
+			boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
+			
+			String explanationText = isCorrect ? explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.") : explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.");
+			
+			Choice choice = Choice.builder()
+					.choiceIndex(i)
+					.content(parsedResult.getChoiceList().get(i))
+					.isCorrect(isCorrect)
+					.explanation(explanationText)
+					.build();
+			
+			choiceList.add(choice);
+		}
+
+		MultipleChoice multipleChoice = MultipleChoice.builder()
+				.passage(passage)
+				.question(parsedResult.getQuestion())
+				.choiceList(choiceList)
+				.build();
+		
+		multipleChoiceService.saveMultipleChoice(multipleChoice);
+	
+    }
+
+    private void saveMultipleChoiceQuestion(Passage passage, GeminiGenerateQuestionResponseDto parsedResult) {
+		
+    	List<Choice> choiceList = new ArrayList<>();
+		
+		Map<String, Object> explanationMap = parsedResult.getExplanation();
+
+		for(int i = 0; i < parsedResult.getChoiceList().size(); i++) {
+			
+			boolean isCorrect = (i == Integer.parseInt(parsedResult.getCorrectAnswerIndex()));
+			
+            String explanationText;
+            
+            if (isCorrect) {
+                
+            	explanationText = explanationMap.getOrDefault("correct", "정답에 대한 설명이 없습니다.").toString();
+           
+            } else {
+            	
+                explanationText = explanationMap.getOrDefault("incorrect", "오답에 대한 설명이 없습니다.").toString();
+                
+            }
+
+			Choice choice = Choice.builder()
+					.choiceIndex(i)
+					.content(parsedResult.getChoiceList().get(i))
+					.isCorrect(isCorrect)
+					.explanation(explanationText)
+					.build();
+			
+			choiceList.add(choice);
+			
+		}
+
+		MultipleChoice multipleChoice = MultipleChoice.builder()
+				.passage(passage)
+				.question(parsedResult.getQuestion())
+				.choiceList(choiceList)
+				.build();
+		
+		multipleChoiceService.saveMultipleChoice(multipleChoice);
 		
 	}
 
+    @Transactional
+	public void generateQuestionByPassageNo(Long passageNo) {
 
+    	Passage passage = passageService.getPassageByPassageNo(passageNo);
+    	
+    	String prompt = promptService.generateQuestionPrompt(passage);
+    	
+    	String responseText = requestGenerate(prompt);
+    	
+    	String content = cleanJsonString(responseText);
+    	
+    	List<GeminiGenerateQuestionResponseDto> parsedResultList = parseQuestionResponse(content);
 
-
-
-   
-   
+    	for(GeminiGenerateQuestionResponseDto parsedResult : parsedResultList) {
+    		
+    		saveMultipleChoiceQuestion(passage, parsedResult);
+    		
+    	}
+    	
+	}
+    
 }

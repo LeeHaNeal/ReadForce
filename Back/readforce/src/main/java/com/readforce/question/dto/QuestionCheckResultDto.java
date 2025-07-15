@@ -12,6 +12,7 @@ import lombok.Getter;
 public class QuestionCheckResultDto {
 	
 	private final Boolean isCorrect;
+	
 	private final MultipleChoice multipleChoice;
 
 }

@@ -1,10 +1,17 @@
 package com.readforce.question.dto;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import com.readforce.question.entity.Choice;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
+@AllArgsConstructor
 public class ChoiceDto {
 	
 	private final Integer choiceIndex;

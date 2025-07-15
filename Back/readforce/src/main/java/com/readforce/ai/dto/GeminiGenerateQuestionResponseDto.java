@@ -20,6 +20,6 @@ public class GeminiGenerateQuestionResponseDto {
 	
 	private String correctAnswerIndex;
 	
-	private Map<String, String> explanation;
+	private Map<String, Object> explanation;
 	
 }

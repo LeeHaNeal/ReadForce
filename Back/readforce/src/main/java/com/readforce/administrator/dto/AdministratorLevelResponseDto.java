@@ -7,12 +7,10 @@ import com.readforce.passage.entity.Level;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class AdministratorLevelResponseDto {
 
 	private Long levelNo;
@@ -20,6 +18,8 @@ public class AdministratorLevelResponseDto {
 	private Integer level;
 	
 	private Integer paragraphCount;
+	
+	private String vocabularyLevel;
 	
 	private String sentenceStructure;
 	
@@ -34,6 +34,7 @@ public class AdministratorLevelResponseDto {
 		this.levelNo = level.getLevelNo();
 		this.level = level.getLevelNumber();
 		this.paragraphCount = level.getParagraphCount();
+		this.vocabularyLevel = level.getVocabularyLevel();
 		this.sentenceStructure = level.getSentenceStructure();
 		this.questionType = level.getQuestionType();
 		this.createdAt = level.getCreatedAt();

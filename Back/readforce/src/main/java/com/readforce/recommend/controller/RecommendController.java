@@ -34,15 +34,16 @@ public class RecommendController {
             @RequestParam(name = "language") 
             @NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
             LanguageEnum language,
-
             @AuthenticationPrincipal UserDetails userDetails
     ) {
+    	
         String email = userDetails.getUsername();
 
         Member member = memberService.getActiveMemberByEmail(email);
 
         MultipleChoiceResponseDto recommendQuestion = recommendService.getRecommendQuestion(member, language);
-
+        
         return ResponseEntity.status(HttpStatus.OK).body(recommendQuestion);
+        
     }
 }

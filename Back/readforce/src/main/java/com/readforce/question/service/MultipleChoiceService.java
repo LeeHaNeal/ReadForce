@@ -64,50 +64,55 @@ public class MultipleChoiceService {
 	}
 
 	@Transactional(readOnly = true)
-	public MultipleChoiceResponseDto getUnsolvedMultipleChoiceQuestion(Member member, LanguageEnum language, CategoryEnum category, TypeEnum type, Integer level, List<Long> solvedPassageNoList) {
-		
-		List<Long> passageNoList = passageService
-				.getPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(language, ClassificationEnum.NORMAL, category, type, level);
+	public MultipleChoiceResponseDto getUnsolvedMultipleChoiceQuestion(Member member, LanguageEnum language, CategoryEnum category, TypeEnum type, Integer level, List<Long> solvedQuestionNos) {
 
-		List<Long> unsolvedPassageList = passageNoList.stream()
-				.filter(passageNo -> !solvedPassageNoList.contains(passageNo))
-				.collect(Collectors.toList());
-		
-		if(unsolvedPassageList.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
-			
-		}
-		
-		Collections.shuffle(unsolvedPassageList);
-		
-		Passage recommendPassage = passageService.getPassageByPassageNo(unsolvedPassageList.get(0));
-		
-		List<MultipleChoice> recommendMultipleChoice = multipleChoiceRepository.findByPassage_PassageNo(unsolvedPassageList.get(0)); 
-		
-		if(recommendMultipleChoice.isEmpty()) {
-			
-			throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
-			
-		}
-		
-		return MultipleChoiceResponseDto.builder()
-				.passageNo(recommendPassage.getPassageNo())
-				.title(recommendPassage.getTitle())
-				.content(recommendPassage.getContent())
-				.author(recommendPassage.getAuthor())
-				.publicationDate(recommendPassage.getPublicationDate())
-				.category(recommendPassage.getCategory().getCategoryName().name())
-				.level(recommendPassage.getLevel().getLevelNumber())
-				.questionNo(recommendMultipleChoice.get(0).getQuestionNo())
-				.question(recommendMultipleChoice.get(0).getQuestion())
-				.choiceList(recommendMultipleChoice.get(0).getChoiceList().stream()
-						.map(ChoiceDto::new)
-						.collect(Collectors.toList())
-				)
-				.build();
-		
+	    List<Long> passageNoList = passageService.getPassageNoListByLanguageAndClassificationAndCategoryAndTypeAndLevel(
+	            language,
+	            ClassificationEnum.NORMAL,
+	            category,
+	            type,
+	            level
+	    );
+	    
+	    List<MultipleChoice> allQuestions = passageNoList.stream()
+	            .flatMap(passageNo -> multipleChoiceRepository.findByPassage_PassageNo(passageNo).stream())
+	            .collect(Collectors.toList());
+
+	    List<MultipleChoice> unsolvedQuestions = allQuestions.stream()
+	            .filter(q -> !solvedQuestionNos.contains(q.getQuestionNo()))
+	            .collect(Collectors.toList());
+
+
+	    if (unsolvedQuestions.isEmpty()) {
+
+	    	throw new ResourceNotFoundException(MessageCode.QUESTION_NOT_FOUND);
+
+	    }
+
+	    Collections.shuffle(unsolvedQuestions);
+	    
+	    MultipleChoice selectedQuestion = unsolvedQuestions.get(0);
+
+	    Passage passage = selectedQuestion.getPassage();
+
+	    return MultipleChoiceResponseDto.builder()
+	            .passageNo(passage.getPassageNo())
+	            .title(passage.getTitle())
+	            .content(passage.getContent())
+	            .author(passage.getAuthor())
+	            .publicationDate(passage.getPublicationDate())
+	            .category(passage.getCategory().getCategoryName().name())
+	            .level(passage.getLevel().getLevelNumber())
+	            .questionNo(selectedQuestion.getQuestionNo())
+	            .question(selectedQuestion.getQuestion())
+	            .choiceList(selectedQuestion.getChoiceList().stream()
+	                    .map(ChoiceDto::new)
+	                    .collect(Collectors.toList()))
+	            .build();
+	    
 	}
+
+
 
 	@Transactional
 	public void saveMultipleChoice(MultipleChoice multipleChoice) {

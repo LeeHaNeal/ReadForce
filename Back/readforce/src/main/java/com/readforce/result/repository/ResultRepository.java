@@ -21,5 +21,6 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
 	);
 
 	Optional<Result> findByMember_Email(String email);
-
+	
+	
 }

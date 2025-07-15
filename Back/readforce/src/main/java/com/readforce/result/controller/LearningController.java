@@ -37,6 +37,8 @@ public class LearningController {
 			@Valid @RequestBody LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
+		System.out.println("asdasdasdasdasdasdasdasdasdassd123123123123123    "
+				+ learningMultipleChoiceRequestDto.getSelectedIndex());
 		
 		String email = userDetails.getUsername();
 		
@@ -124,12 +126,6 @@ public class LearningController {
 	){
 		
 		List<QuestionMostIncorrectResponseDto> incorrectQuestionList = learningService.getMostIncorrectQuestions(language, number);
-		
-		for(QuestionMostIncorrectResponseDto q : incorrectQuestionList) {
-			
-			System.out.println("sadfasdf : " + q.getTitle());
-			
-		}
 		
 		return ResponseEntity.status(HttpStatus.OK).body(incorrectQuestionList);
 		

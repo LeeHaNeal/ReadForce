@@ -110,74 +110,81 @@ public class LevelService {
 
 		Result result = resultService.getActiveMemberResultByEmail(email);
 		
-		List<ResultMetric> metricList = resultMetricService.getAllByResultAndLanguage_Language(result, language);
-		
-		Map<Integer, Double> levelCorrectRateMap = metricList.stream()
-			    .filter(metric -> Optional.ofNullable(metric.getCategory())
-			                               .map(category -> category.getCategoryName().name())
-			                               .map(name -> name.equals(weakCategory.name()))
-			                               .orElse(false))
-			    .filter(metric -> Optional.ofNullable(metric.getType())
-			                               .map(type -> type.getTypeName().name())
-			                               .map(name -> name.equals(weakType.name()))
-			                               .orElse(false))
-			    .filter(metric -> metric.getLevel() != null && metric.getCorrectAnswerRate() != null)
-			    .collect(Collectors.toMap(
-			            metric -> metric.getLevel().getLevelNumber(),
-			            ResultMetric::getCorrectAnswerRate,
-			            (rate1, rate2) -> rate1
-			    ));
+	    List<ResultMetric> metricList = resultMetricService.getAllByResultAndLanguage_Language(result, language);
 
-		
-		Integer skilledLevel = null;
-		for(double threshold = 0.80; threshold >= 0.0; threshold -= 0.05) {
-			
-			final double currentThreshold = threshold;
-			
-			Optional<Integer> skilledLevelOptional = levelCorrectRateMap.entrySet().stream()
-					.filter(entry -> entry.getValue() >= currentThreshold)
-					.map(Map.Entry::getKey)
-					.max(Comparator.naturalOrder());
-			
-			if(skilledLevelOptional.isPresent()) {
-				
-				skilledLevel = skilledLevelOptional.get();
-				break;
-				
-			}
-			
-		}
-		
-		if(skilledLevel == null) {
-			
-			throw new ResourceNotFoundException(MessageCode.SKILLED_LEVEL_NOT_FOUND);
-			
-		}
-		
-		Integer challengeLevel = null;
-		for(double threshold = 0.50; threshold >= 0.0; threshold -= 0.05) {
-			
-			final Integer finalSkilledLevel = skilledLevel;
-			final double currentThreshold = threshold;
-			
-			Optional<Integer> challengeLevelOptional = levelCorrectRateMap.entrySet().stream()
-					.filter(entry -> entry.getKey() > finalSkilledLevel && entry.getValue() <= currentThreshold)
-					.map(Map.Entry::getKey)
-					.min(Comparator.naturalOrder());
-			
-			if(challengeLevelOptional.isPresent()) {
-				
-				challengeLevel = challengeLevelOptional.get();
-				break;
-				
-			}
-			
-		}
+	    Map<Integer, Double> levelCorrectRateMap = metricList.stream()
+	        .filter(metric -> metric.getCategory() != null && metric.getCategory().getCategoryName() == weakCategory)
+	        .filter(metric -> metric.getType() != null && metric.getType().getTypeName() == weakType)
+	        .filter(metric -> metric.getLevel() != null && metric.getCorrectAnswerRate() != null)
+	        .collect(Collectors.toMap(
+	            metric -> metric.getLevel().getLevelNumber(),
+	            ResultMetric::getCorrectAnswerRate,
+	            (rate1, rate2) -> rate1
+	        ));
 
-		return new Integer[] {skilledLevel, challengeLevel};
+	    Integer skilledLevel = null;
+	    
+	    for (double threshold = 0.80; threshold >= 0.0; threshold -= 0.05) {
+	    	
+	        final double currentThreshold = threshold;
 
+	        Optional<Integer> skilledLevelOptional = levelCorrectRateMap.entrySet().stream()
+	            .filter(entry -> entry.getValue() >= currentThreshold)
+	            .map(Map.Entry::getKey)
+	            .max(Comparator.naturalOrder());
+
+	        if (skilledLevelOptional.isPresent()) {
+	        	
+	            skilledLevel = skilledLevelOptional.get();
+	            
+	            break;
+	        }
+	        
+	    }
+
+	    if (skilledLevel == null) {
+	    	
+	        skilledLevel = levelCorrectRateMap.keySet().stream()
+	            .min(Integer::compareTo)
+	            .orElse(1);
+	        
+	    }
+
+	    Integer challengeLevel = null;
+	    
+	    for (double threshold = 0.50; threshold >= 0.0; threshold -= 0.05) {
+	       
+	    	final Integer finalSkilledLevel = skilledLevel;
+	    	
+	        final double currentThreshold = threshold;
+
+	        Optional<Integer> challengeLevelOptional = levelCorrectRateMap.entrySet().stream()
+	            .filter(entry -> entry.getKey() > finalSkilledLevel && entry.getValue() <= currentThreshold)
+	            .map(Map.Entry::getKey)
+	            .min(Comparator.naturalOrder());
+
+	        if (challengeLevelOptional.isPresent()) {
+	        	
+	            challengeLevel = challengeLevelOptional.get();
+	           
+	            break;
+	            
+	        }
+	    }
+
+	    if (challengeLevel == null) {
+
+	        challengeLevel = skilledLevel + 1;
+	        
+	    }
+
+	    return new Integer[]{skilledLevel, challengeLevel};
+	    
 	}
 
+
+	
+	
 	@Transactional
 	public void saveLevel(Level level) {
 

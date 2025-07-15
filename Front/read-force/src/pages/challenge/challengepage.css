@@ -1,46 +1,84 @@
+/* ───────── 기본 = 모바일(≤375px) ───────── */
 .challenge-wrapper {
-  height: calc(90vh - 100px);
   width: 100%;
+  min-height: calc(70vh - 100px);
+  padding: 0 16px;              /* 좌우 여백 */
+  margin: 0 auto 4rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 2.5rem;
+  gap: 2rem;
   text-align: center;
-  margin-bottom: 4rem; 
+  transform: translateY(20px); 
 }
 
-/* ⬇️ 새로 추가 */
+/* 안내 문구 */
 .challenge-info-text {
-  font-size: 2rem;     /* 글 크기UP */
+  font-size: 1.25rem;           /* 20px 정도 */
+  line-height: 1.45;
   font-weight: 600;
-  line-height: 1.5;
-  margin: 0;       
-  color: #5A5A5A;
-  margin-top: 2rem;
+  color: #5a5a5a;
+  margin: 0;
+  margin-top: 10px;
 }
 
-.highlight {
-  color: #439395;
-  font-weight: 700;
-}
+/* 강조 색 */
+.highlight { color: #439395; font-weight: 700; }
 
-/* 트로피 크기를 시안 수준으로 ↓ */
+/* 트로피 애니메이션 */
 .trophy-animation {
-  width: min(70vw, 480px); /* 작은 화면 70vw, 최대 480px */
+  width: 70vw;                 /* 화면의 70% */
+  max-width: 320px;            /* 너무 커지지 않게 */
   height: auto;
 }
 
+/* 도전 버튼 */
 .challenge-btn {
-  padding: 0.85rem 5rem;
-  font-size: 1.1rem;
+  padding: 0.75rem 3rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
   background: #439395;
-  border: none;
   border-radius: 8px;
+  border: none;
   cursor: pointer;
   transition: opacity 0.2s;
 }
+.challenge-btn:hover { opacity: .85; }
 
-.challenge-btn:hover { opacity: 0.85; }
+
+
+/* ───────── 태블릿 이상(≥768px) ───────── */
+@media (min-width: 768px) {
+  .challenge-wrapper { gap: 2.5rem; }
+
+  .challenge-info-text { font-size: 1.625rem; }  /* 26px */
+
+  .trophy-animation {
+    width: 60vw;
+    max-width: 420px;
+  }
+
+  .challenge-btn {
+    padding: 0.85rem 4rem;
+    font-size: 1.1rem;
+  }
+}
+
+
+/* ───────── 데스크탑 이상(≥1024px) ───────── */
+@media (min-width: 1024px) {
+  .challenge-wrapper { gap: 3rem; }
+
+  .challenge-info-text { font-size: 2rem; }      /* 32px */
+
+  .trophy-animation {
+    width: 480px;             /* 고정 최대 */
+  }
+
+  .challenge-btn {
+    padding: 1rem 5rem;
+    font-size: 1.15rem;
+  }
+}

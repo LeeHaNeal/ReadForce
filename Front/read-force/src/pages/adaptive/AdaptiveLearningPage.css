@@ -1,71 +1,98 @@
+/* ───────── 기본 = 모바일(≤375 px) ───────── */
 .adaptive-learning-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 90px 20px;
+  padding: 94px 16px;
   min-height: 60vh;
 }
 
 .adaptive-content-wrapper {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 40px;
-  max-width: 1000px;
   width: 100%;
-  position: relative;
+  max-width: 1000px;      /* 데스크톱 한계 */
+  display: flex;
+  flex-direction: column; /* 모바일은 세로 */
+  align-items: center;
+  gap: 2rem;
 }
 
-.robot-section {
-  position: relative;
-  top: 150px;     
-  left: -40px;   
+main.adaptive-narrow {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
+/* 로봇 애니메이션 */
 .robot-animation {
-  width: 220px;
-  flex-shrink: 0;
+  width: 180px;           /* 화면 70% 정도 */
+  max-width: 60vw;
+  height: auto;
 }
 
+/* 소개 문구 */
 .adaptive-intro {
-  text-align: left;
-  position: relative;
-  top: 10px; 
-  margin-left: 40px;
+  text-align: center;
 }
 
 .adaptive-intro p {
-  font-size: 1.8rem;
-  color: #868686;
+  font-size: 1.25rem;     /* ≈20 px */
   line-height: 1.5;
-  margin: 1px 0;
-  font-weight: bold;
+  color: #868686;
+  margin: 2px 0;
+  font-weight: 700;
 }
 
 .nickname {
   color: #439395;
-  font-weight: bold;
-  font-size: 1.8rem;
+  font-weight: 700;
 }
 
-.start-button {
-  margin-top: 82px;
-  margin-left: 90px;
+/* 시작 버튼 */
+.start-button  { margin-top: 2.5rem; }
+.start-button a{
+  display:inline-block;
+  padding:.8rem 2.2rem;
+  font-size:1rem;
+  font-weight:700;
+  background:#888;
+  color:#fff;
+  border-radius:8px;
+  text-decoration:none;
+  transition:background .25s;
+}
+.start-button a:hover { background:#666; }
+
+
+
+/* ───────── 태블릿 이상 ≥ 768 px ───────── */
+@media (min-width:768px){
+  .adaptive-content-wrapper{
+    flex-direction: row;          /* 좌우 배치 */
+    align-items: flex-start;
+    gap: 3rem;
+  }
+
+  .robot-animation{ width:220px; max-width:none; }
+
+  .adaptive-intro{
+    text-align: left;
+    margin-left: 0;
+  }
+
+  .adaptive-intro p { font-size:1.5rem; }        /* ≈24 px */
+  .nickname        { font-size:1.5rem; }
+
+  .start-button{ margin-top:3.5rem; }
+  .start-button a{ font-size:1.05rem; padding:.9rem 2.8rem; }
 }
 
-.start-button a {
-  display: inline-block;
-  padding: 12px 34px;
-  background-color: #888;
-  color: white;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-  font-weight: bold;
-}
 
-.start-button a:hover {
-  background-color: #666;
+
+/* ───────── 데스크톱 이상 ≥ 1024 px ───────── */
+@media (min-width:1024px){
+  .robot-animation{ width:260px; }
+
+  .adaptive-intro p { font-size:1.8rem; }        /* ≈29 px */
+  .nickname        { font-size:1.8rem; }
+
+  .start-button a{ font-size:1.15rem; padding:1rem 3.2rem; }
 }
