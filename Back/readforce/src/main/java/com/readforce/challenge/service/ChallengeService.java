@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import com.readforce.common.enums.CategoryEnum;
 import com.readforce.common.enums.ClassificationEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.exception.ResourceNotFoundException;
+import com.readforce.common.service.RateLimitingService;
 import com.readforce.member.entity.Member;
 import com.readforce.passage.entity.Category;
 import com.readforce.passage.entity.Classification;
@@ -30,6 +32,7 @@ import com.readforce.question.dto.QuestionCheckResultDto;
 import com.readforce.question.dto.QuestionLevelAndCategoryAndLanguageDto;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.question.service.QuestionService;
+import com.readforce.result.entity.Score;
 import com.readforce.result.service.ScoreService;
 
 import lombok.RequiredArgsConstructor;
@@ -46,6 +49,7 @@ public class ChallengeService {
 	private final CategoryService categoryService;
 	private final LanguageService languageService;
 	private final ClassificationService classificationService;
+	private final RateLimitingService rateLimitingService;
 	
 	@Transactional
 	public List<MultipleChoiceResponseDto> getChallengeQuestionList(LanguageEnum language, CategoryEnum category) {
@@ -86,6 +90,8 @@ public class ChallengeService {
 
 	@Transactional
 	public Double submitChallengeResult(Member member, ChallengeSubmitResultRequestDto requestDto) {
+		
+		rateLimitingService.checkDailyChallengeLimit(member.getEmail(), requestDto.getCategory(), requestDto.getLanguage());
 
 	    double totalScore = 0.0;
 	    final long MAX_TIME_SECONDS = 1800;
@@ -113,6 +119,7 @@ public class ChallengeService {
 	    }
 
 	    long solvingTime = requestDto.getTotalQuestionSolvingTime();
+	    
 	    if (solvingTime < MAX_TIME_SECONDS) {
 
 	        double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
@@ -124,16 +131,27 @@ public class ChallengeService {
 	    totalScore = Math.round(totalScore * 10.0) / 10.0;
 
 	    Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+	    
 	    Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+	    
+	    Optional<Score> memberScore = scoreService.findByMemberAndCategoryAndLanguageWithOptional(member, category, language);
 
-	    scoreService.createScore(
-	            member,
-	            totalScore,
-	            category,
-	            language
-	    );
+	    if(memberScore.isEmpty()) {
+			
+	    	scoreService.createScore(
+		            member,
+		            totalScore,
+		            category,
+		            language
+		    );
+			
+		}
+	    
+	    scoreService.updateScoreForChallenge(memberScore.get(), totalScore);
+	    
 
 	    return totalScore;
+	    
 	}
 
 

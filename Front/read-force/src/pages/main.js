@@ -57,7 +57,7 @@ const Main = () => {
       try {
         const [rankingRes, wrongRes] = await Promise.all([
           api.get(`/ranking/get-ranking-list?category=${selectedCategory}&language=KOREAN`),
-          api.get(`/learning/get-most-incorrect-questions?language=KOREAN&number=3`),
+          api.get(`/learning/get-most-incorrect-passages?language=KOREAN&number=3`), // ✅ 수정된 API
         ]);
         setTop5Data(rankingRes.data.slice(0, 5));
         setWrongArticles(wrongRes.data);
@@ -77,17 +77,17 @@ const Main = () => {
       : navigate(currentSlide.buttonLink);
   };
 
-  const handleQuizClick = (quiz) => {
-    if (!quiz || !quiz.questionNo) return;
-    navigate(`/questionpage/${quiz.questionNo}`, {
+  const handleQuizClick = (passage) => {
+    if (!passage || !passage.passageNo) return;
+    navigate(`/questionpage/${passage.passageNo}`, {
       state: {
         passage: {
-          passageNo: quiz.questionNo,
-          title: quiz.title ?? '',
-          summary: quiz.summary ?? '',
-          content: quiz.content ?? '',
-          language: "KOREAN",
-          category: "NEWS",
+          passageNo: passage.passageNo,
+          title: passage.title ?? '',
+          content: passage.content ?? '',
+          author: passage.author ?? '',
+          language: passage.language ?? 'KOREAN',
+          category: passage.category ?? 'NEWS',
         },
       },
     });
@@ -159,18 +159,16 @@ const Main = () => {
           </div>
 
           <div className="stat-box wrong-articles">
-            <h3>가장 많이 틀린 문제</h3>
+            <h3>가장 많이 틀린 지문</h3>
             {Array.isArray(wrongArticles) && wrongArticles.length === 0 ? (
               <p>데이터가 없습니다.</p>
             ) : (
-              wrongArticles.map((quiz, index) => (
-                <div className="article" key={index} onClick={() => handleQuizClick(quiz)}>
+              wrongArticles.map((passage, index) => (
+                <div className="article" key={index} onClick={() => handleQuizClick(passage)}>
                   <div>
-                    <div className="subtitle" title={quiz.title}>
-                      {quiz.title?.length > 25 ? `${quiz.title.slice(0, 25)}...` : quiz.title}
-                    </div>
-                    <div className="author">
-                      정답률 {quiz.correctAnswerRate != null ? `${(quiz.correctAnswerRate).toFixed(1)}%` : 'N/A'}
+                    <div className="subtitle" title={passage.title}>
+                      <strong>{index + 1}위</strong>{" "}
+                      {passage.title?.length > 25 ? `${passage.title.slice(0, 25)}...` : passage.title}
                     </div>
                   </div>
                 </div>
