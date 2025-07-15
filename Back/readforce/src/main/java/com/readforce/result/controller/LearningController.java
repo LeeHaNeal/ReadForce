@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.readforce.common.MessageCode;
 import com.readforce.common.enums.LanguageEnum;
-import com.readforce.question.dto.QuestionMostIncorrectResponseDto;
+import com.readforce.passage.dto.PassageResponseDto;
 import com.readforce.question.dto.QuestionSummaryResponseDto;
 import com.readforce.result.dto.LearningMultipleChoiceRequestDto;
 import com.readforce.result.service.LearningService;
@@ -37,8 +37,6 @@ public class LearningController {
 			@Valid @RequestBody LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto,
 			@AuthenticationPrincipal UserDetails userDetails
 	){
-		System.out.println("asdasdasdasdasdasdasdasdasdassd123123123123123    "
-				+ learningMultipleChoiceRequestDto.getSelectedIndex());
 		
 		String email = userDetails.getUsername();
 		
@@ -115,8 +113,8 @@ public class LearningController {
 		
 	}
 	
-	@GetMapping("/get-most-incorrect-questions")
-	public ResponseEntity<List<QuestionMostIncorrectResponseDto>> getMostIncorrectQuestions(
+	@GetMapping("/get-most-incorrect-passages")
+	public ResponseEntity<List<PassageResponseDto>> getMostIncorrectPassages(
 			@RequestParam("language")
 			@NotNull(message = MessageCode.LANGUAGE_NOT_NULL)
 			LanguageEnum language,
@@ -125,9 +123,9 @@ public class LearningController {
 			Integer number
 	){
 		
-		List<QuestionMostIncorrectResponseDto> incorrectQuestionList = learningService.getMostIncorrectQuestions(language, number);
+		List<PassageResponseDto> incorrectPassgeList = learningService.getMostIncorrectPassages(language, number);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(incorrectQuestionList);
+		return ResponseEntity.status(HttpStatus.OK).body(incorrectPassgeList);
 		
 	}
 	
