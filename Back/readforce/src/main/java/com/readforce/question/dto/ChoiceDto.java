@@ -1,8 +1,5 @@
 package com.readforce.question.dto;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import com.readforce.question.entity.Choice;
 
 import lombok.AllArgsConstructor;
