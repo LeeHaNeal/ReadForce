@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import com.readforce.question.dto.QuestionCheckResultDto;
 import com.readforce.question.dto.QuestionLevelAndCategoryAndLanguageDto;
 import com.readforce.question.service.MultipleChoiceService;
 import com.readforce.question.service.QuestionService;
+import com.readforce.result.entity.Score;
 import com.readforce.result.service.ScoreService;
 
 import lombok.RequiredArgsConstructor;
@@ -113,6 +115,7 @@ public class ChallengeService {
 	    }
 
 	    long solvingTime = requestDto.getTotalQuestionSolvingTime();
+	    
 	    if (solvingTime < MAX_TIME_SECONDS) {
 
 	        double timeBonus = (1 - (double) solvingTime / MAX_TIME_SECONDS) * 50;
@@ -124,16 +127,27 @@ public class ChallengeService {
 	    totalScore = Math.round(totalScore * 10.0) / 10.0;
 
 	    Category category = categoryService.getCategoryByCategory(requestDto.getCategory());
+	    
 	    Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
+	    
+	    Optional<Score> memberScore = scoreService.findByMemberAndCategoryAndLanguageWithOptional(member, category, language);
 
-	    scoreService.createScore(
-	            member,
-	            totalScore,
-	            category,
-	            language
-	    );
+	    if(memberScore.isEmpty()) {
+			
+	    	scoreService.createScore(
+		            member,
+		            totalScore,
+		            category,
+		            language
+		    );
+			
+		}
+	    
+	    scoreService.updateScoreForChallenge(memberScore.get(), totalScore);
+	    
 
 	    return totalScore;
+	    
 	}
 
 

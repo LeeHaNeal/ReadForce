@@ -1,6 +1,7 @@
 package com.readforce.result.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -103,6 +104,22 @@ public class ScoreService {
 
 		return scoreRepository.findById(scoreNo)
 				.orElseThrow(() -> new ResourceNotFoundException(MessageCode.SCORE_NOT_FOUND));
+		
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Score> findByMemberAndCategoryAndLanguageWithOptional(Member member, Category category, Language language) {
+
+		return scoreRepository.findByMemberAndCategoryAndLanguage(member, category, language);
+
+	}
+
+	@Transactional
+	public void updateScoreForChallenge(Score score, double totalScore) {
+		
+		score.updateScoreForChallenge(totalScore);
+		
+		scoreRepository.save(score);
 		
 	}
 

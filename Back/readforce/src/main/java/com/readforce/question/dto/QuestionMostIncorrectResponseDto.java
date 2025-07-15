@@ -10,6 +10,8 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class QuestionMostIncorrectResponseDto {
+	
+	private final Long passageNo;
 
 	private final Long questionNo;
 	
