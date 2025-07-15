@@ -111,8 +111,7 @@ const Main = () => {
               <img src={currentSlide.image} alt="슬라이드 이미지" />
             </div>
           </div>
-          <button className="slide-arrow left" onClick={() => setSlideIndex((prev) => (prev - 1 + slides.length) % slides.length)}>⮜</button>
-          <button className="slide-arrow right" onClick={() => setSlideIndex((prev) => (prev + 1) % slides.length)}>⮞</button>
+          <div className="slide-dots">{slides.map((_, i) => (<div key={i} className={`slide-dot ${slideIndex === i ? "active" : ""}`}onClick={() => setSlideIndex(i)}/>))}</div>
           <div className="slide-ui">
             <button onClick={() => setIsPaused((prev) => !prev)}>
               {isPaused ? "▶" : "⏸"}
