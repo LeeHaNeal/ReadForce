@@ -152,7 +152,7 @@ const AdminUserInfo = () => {
                 ? new Date(user.withdrawAt).toLocaleDateString()
                 : "-"}
             </p>
-            {user.profileImagePath && (
+            {/* {user.profileImagePath && (
               <div>
                 <strong>프로필 이미지:</strong>
                 <br />
@@ -162,7 +162,7 @@ const AdminUserInfo = () => {
                   style={{ width: "100px", borderRadius: "50%" }}
                 />
               </div>
-            )}
+            )} */}
           </div>
         ) : (
           <p>회원 정보를 불러오는 중입니다...</p>
