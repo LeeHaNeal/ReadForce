@@ -213,36 +213,50 @@
   overflow-y: auto;
 }
 
-/* ✅ 반응형 */
-@media (max-width: 600px) {
+/* ───────── 375 px 이하 – 모바일 전용 ───────── */
+@media (max-width: 375px) {
+
+  /* 1) 전체 여백 ↓ */
   .mypage-container {
     padding: 24px 16px;
   }
 
+  /* 2) 상·하단 박스 세로 스택 */
   .top-section,
   .bottom-section {
     flex-direction: column;
     gap: 24px;
   }
 
+  /* 3) 각 박스 폭 100 % */
   .left-top,
-  .calendar-section {
+  .calendar-section,
+  .learning-status-box,
+  .learning-note-box {
     width: 100%;
     padding: 16px;
   }
 
-  .summary-row {
-    flex-direction: column;
-    gap: 8px;
+  /* 4) 출석 현황 요약(제목/값) 1줄 가로 + 중앙 정렬 */
+  .summary-row {                     /* ← 핵심 변경 */
+    flex-direction: row;
+    justify-content: space-between;
   }
-
   .summary-title,
   .summary-value {
-    flex: none;
-    text-align: left;
+    flex: 1;
+    text-align: center;
   }
 
+  /* 5) 학습 노트 카드 1열 */
   .learning-note-box .summary-cards {
     grid-template-columns: 1fr;
   }
+
+  .modal-content {
+    width: 90vw !important;
+    max-width: 350px !important;
+    padding: 16px !important;
+  }
+  
 }
