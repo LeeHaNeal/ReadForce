@@ -34,7 +34,7 @@ const UniversalQuestionPage = () => {
     setStartTime(newStart);
     setElapsedSeconds(0);
     setIsWaiting(true);
-    setSelected(null); // 선택 초기화
+    setSelected(null); 
 
     const timer = setInterval(() => {
       const secondsPassed = Math.floor((Date.now() - newStart) / 1000);

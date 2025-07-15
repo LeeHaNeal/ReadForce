@@ -156,6 +156,7 @@ public final class MessageCode {
 	public static final String JSON_MAPPING_FAIL = "FAI0009";
 	public static final String GEMINI_API_REQUEST_FAIL = "FAI0010";
 	public static final String UPLOAD_PASSAGE_FAIL = "FAI0011";
+	public static final String SOCIAL_ACCOUNT_ALREADY_EXIST_CANNOT_LINK_NEW_ACCOUNT = "FAI0012";
 	
 	
 	

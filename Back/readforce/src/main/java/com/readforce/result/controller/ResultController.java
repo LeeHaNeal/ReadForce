@@ -33,8 +33,10 @@ public class ResultController {
 		
 		Double overallCorrectAnswerRate = resultService.getOverallCorrectAnswerRate(email);
 		
+		Double formattedRate = Math.round(overallCorrectAnswerRate * 100) / 100.0;
+		
 		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
-				NameEnum.OVERALL_CORRECT_ANSWER_RATE.name(), overallCorrectAnswerRate
+				NameEnum.OVERALL_CORRECT_ANSWER_RATE.name(), formattedRate
 		));
 
 	}
