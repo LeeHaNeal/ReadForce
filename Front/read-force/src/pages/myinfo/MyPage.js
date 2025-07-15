@@ -21,7 +21,7 @@ const MyPage = () => {
   const [totalIncorrect, setTotalIncorrect] = useState([]);
   const [todayLearning, setTodayLearning] = useState([]);
   const [todayIncorrect, setTodayIncorrect] = useState([]);
-  const [favoritLearning, setFavoritLearning] = useState([]);
+  const [favoritePassages, setFavoritePassages] = useState([]);
   const [selectedNoteType, setSelectedNoteType] = useState(null);
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("token");
@@ -124,7 +124,7 @@ const MyPage = () => {
           axiosInstance.get("/learning/get-total-incorrect-learning"),
           axiosInstance.get("/learning/get-today-learning"),
           axiosInstance.get("/learning/get-today-incorrect-learning"),
-          axiosInstance.get("/learning/get-favorit-learning"),
+          axiosInstance.get("/passage/get-favorite-passage-list"),
         ]);
 
         const [total, incorrect, today, todayWrong, fav] = results;
@@ -136,7 +136,9 @@ const MyPage = () => {
         setTodayIncorrect(
           todayWrong.status === "fulfilled" ? todayWrong.value.data : []
         );
-        setFavoritLearning(fav.status === "fulfilled" ? fav.value.data : []);
+        setFavoritePassages(
+          fav.status === "fulfilled" ? fav.value.data : []
+        );
 
         if (total.status === "rejected")
           console.warn("총 학습 로딩 실패:", total.reason);
@@ -147,7 +149,7 @@ const MyPage = () => {
         if (todayWrong.status === "rejected")
           console.warn("오늘 틀린 학습 로딩 실패:", todayWrong.reason);
         if (fav.status === "rejected")
-          console.warn("즐겨찾기 학습 로딩 실패:", fav.reason);
+          console.warn("즐겨찾기 지문 로딩 실패:", fav.reason);
       } catch (e) {
         console.error("예상치 못한 오류 발생:", e);
       }
@@ -161,7 +163,7 @@ const MyPage = () => {
     totalIncorrect: { label: "전체 틀린 문제", list: totalIncorrect },
     today: { label: "오늘의 푼 문제", list: todayLearning },
     incorrect: { label: "오늘의 틀린 문제", list: todayIncorrect },
-    favorite: { label: "즐겨찾기 지문", list: favoritLearning },
+    favorite: { label: "즐겨찾기 지문", list: favoritePassages },
   };
 
   const handleQuizClick = (item) => {
@@ -251,7 +253,10 @@ const MyPage = () => {
                 onClick={() => handleOpenModal(key)}
               >
                 <div className="summary-title">{label}</div>
-                <div className="summary-value">{list.length}{key === "favorite" ? "개" : "문제"}</div>
+                <div className="summary-value">
+                  {list.length}
+                  {key === "favorite" ? "개" : "문제"}
+                </div>
               </div>
             ))}
           </div>
@@ -265,7 +270,7 @@ const MyPage = () => {
             <ul style={{ maxHeight: "50%", overflowY: "auto", padding: 0 }}>
               {noteTypeMap[selectedNoteType].list.map((item) => (
                 <li
-                  key={item.questionNo}
+                  key={item.passageNo || item.questionNo}
                   onClick={() => handleQuizClick(item)}
                   style={{
                     marginBottom: "12px",
@@ -280,15 +285,17 @@ const MyPage = () => {
                   <div style={{ fontSize: "0.9rem", color: "#666" }}>
                     {new Date(item.createdAt).toLocaleString()}
                   </div>
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      fontWeight: "bold",
-                      color: item.isCorrect ? "#22c55e" : "#ef4444",
-                    }}
-                  >
-                    {item.isCorrect ? "정답" : "오답"}
-                  </div>
+                  {"isCorrect" in item && (
+                    <div
+                      style={{
+                        marginTop: "4px",
+                        fontWeight: "bold",
+                        color: item.isCorrect ? "#22c55e" : "#ef4444",
+                      }}
+                    >
+                      {item.isCorrect ? "정답" : "오답"}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
