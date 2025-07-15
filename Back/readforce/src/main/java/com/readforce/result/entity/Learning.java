@@ -63,5 +63,11 @@ public class Learning {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_no", nullable = false)
 	private Member member;
+	
+	public void changeFavoritState(Boolean isFavorit) {
+		
+		this.isFavorit = isFavorit;
+		
+	}
 
 }

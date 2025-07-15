@@ -202,7 +202,7 @@ const AdminUserInfo = () => {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
-                <th style={thStyle}>점수 번호</th>
+                  <th style={thStyle}>점수 번호</th>
                   <th style={thStyle}>점수</th>
                   <th style={thStyle}>카테고리</th>
                   <th style={thStyle}>언어</th>
@@ -285,11 +285,11 @@ const AdminUserInfo = () => {
               style={inputStyle}
             >
               <option value="NEWS">뉴스</option>
-                  <option value="NOVEL">소설</option>
-                  <option value="FAIRY_TALE">동화</option>
-                  <option value="VOCABULARY">사전</option>
-                  <option value="FACTUAL">사실</option>
-                  <option value="INFERENTIAL">추론</option>
+              <option value="NOVEL">소설</option>
+              <option value="FAIRY_TALE">동화</option>
+              <option value="VOCABULARY">사전</option>
+              <option value="FACTUAL">사실</option>
+              <option value="INFERENTIAL">추론</option>
             </select>
             <br />
             <label>언어: </label>
@@ -303,14 +303,8 @@ const AdminUserInfo = () => {
               <option value="JAPANESE">일본어</option>
             </select>
             <div style={{ marginTop: "16px" }}>
-              <button onClick={handleAddScore}>
-                추가
-              </button>
-              <button
-                onClick={() => setShowAddScoreModal(false)}
-              >
-                취소
-              </button>
+              <button onClick={handleAddScore}>추가</button>
+              <button onClick={() => setShowAddScoreModal(false)}>취소</button>
             </div>
           </div>
         </div>
@@ -344,11 +338,11 @@ const AdminUserInfo = () => {
               style={inputStyle}
             >
               <option value="NEWS">뉴스</option>
-                  <option value="NOVEL">소설</option>
-                  <option value="FAIRY_TALE">동화</option>
-                  <option value="VOCABULARY">사전</option>
-                  <option value="FACTUAL">사실</option>
-                  <option value="INFERENTIAL">추론</option>
+              <option value="NOVEL">소설</option>
+              <option value="FAIRY_TALE">동화</option>
+              <option value="VOCABULARY">사전</option>
+              <option value="FACTUAL">사실</option>
+              <option value="INFERENTIAL">추론</option>
             </select>
             <br />
             <label>언어: </label>
@@ -362,12 +356,8 @@ const AdminUserInfo = () => {
               <option value="JAPANESE">일본어</option>
             </select>
             <div style={{ marginTop: "16px" }}>
-              <button onClick={handleModifyScore}>
-                수정
-              </button>
-              <button
-                onClick={() => setShowModifyScoreModal(false)}
-              >
+              <button onClick={handleModifyScore}>수정</button>
+              <button onClick={() => setShowModifyScoreModal(false)}>
                 취소
               </button>
             </div>
