@@ -45,7 +45,11 @@
   text-align: right;
   font-weight: bold;
 }
-
+.stat-box.top5 {
+  flex: 0 0 45%;
+  max-width: 500px;
+  margin-left:0;
+}
 /* ===== TOP5 탭 ===== */
 .top5 .tabs {
   display: flex;
@@ -224,11 +228,11 @@
 .stat-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
   gap: 2rem;
 }
 .stat-box {
-  flex: 1;
+  flex: 0 1 45%;  
   min-width: 300px;
   background: #fff;
   border-radius: 10px;
@@ -298,7 +302,11 @@
   height: 200px;
   opacity: 0;
 }
-
+.stat-box.wrong-articles {
+  flex: 0 0 45%;
+  max-width: 550px;
+  margin-right: 0;
+}
 @keyframes slideUpFade {
   from {
     opacity: 0;
