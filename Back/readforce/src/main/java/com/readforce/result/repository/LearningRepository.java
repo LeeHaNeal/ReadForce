@@ -2,6 +2,7 @@ package com.readforce.result.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +44,9 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 			AND l.isCorrect = false
 			ORDER BY l.createdAt DESC			
 	""")
-	List<Learning> findIncorrectLearningByMember_Email(String email);
+	List<Learning> findIncorrectLearningByMember_Email(
+			@Param("email") String email
+	);
 
 	
 	@Query("""
@@ -133,5 +136,7 @@ public interface LearningRepository extends JpaRepository<Learning, Long> {
 	List<Learning> findAllWithDetailsByMember(
 			@Param("member") Member member
 	);
+
+	Optional<Learning> findByQuestion_QuestionNo(Long questionNo);
 	
 }

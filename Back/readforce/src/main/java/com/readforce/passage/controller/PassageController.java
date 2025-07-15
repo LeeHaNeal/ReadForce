@@ -1,11 +1,16 @@
 package com.readforce.passage.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,9 +21,14 @@ import com.readforce.common.enums.ClassificationEnum;
 import com.readforce.common.enums.LanguageEnum;
 import com.readforce.common.enums.OrderByEnum;
 import com.readforce.common.enums.TypeEnum;
+import com.readforce.member.entity.Member;
+import com.readforce.member.service.MemberService;
+import com.readforce.passage.dto.PassageChangeFavoritStateRequestDto;
 import com.readforce.passage.dto.PassageResponseDto;
+import com.readforce.passage.entity.Passage;
 import com.readforce.passage.service.PassageService;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -30,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 public class PassageController {
 
 	private final PassageService passageService;
+	private final MemberService memberService;
 	
 	@GetMapping("/get-passage-list-by-language-and-category")
 	public ResponseEntity<List<PassageResponseDto>> getPassageListByLanguageAndCategory(
@@ -153,6 +164,37 @@ public class PassageController {
 	    
 	    return ResponseEntity.status(HttpStatus.OK).body(passageList);
 	    
+	}
+	
+	@PatchMapping("/change-favorite-state")
+	public ResponseEntity<Map<String, String>> changeFavoriteState(
+			@Valid @RequestBody PassageChangeFavoritStateRequestDto requestDto,
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		Member member = memberService.getActiveMemberByEmail(userDetails.getUsername());
+		
+		Passage passage = passageService.getPassageByPassageNo(requestDto.getPassageNo());
+		
+		passageService.changeFavoriteState(member, passage, requestDto.getIsFavorite());
+		
+		return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+				MessageCode.MESSAGE_CODE, MessageCode.CHANGE_FAVORIT_PASSAGE_SUCCESS
+		));
+		
+	}
+	
+	@GetMapping("/get-favorite-passage-list")
+	public ResponseEntity<List<PassageResponseDto>> getFavoritePassageList(
+			@AuthenticationPrincipal UserDetails userDetails
+	){
+		
+		Member member = memberService.getActiveMemberByEmail(userDetails.getUsername());
+		
+		List<PassageResponseDto> favoritePassageList = passageService.getFavoritePassageList(member);		
+		
+		return ResponseEntity.status(HttpStatus.OK).body(favoritePassageList);
+		
 	}
 	
 }

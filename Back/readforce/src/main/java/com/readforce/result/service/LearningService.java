@@ -43,9 +43,6 @@ public class LearningService {
 	@Transactional
 	public void saveMuiltipleChoice(String email, LearningMultipleChoiceRequestDto learningMultipleChoiceRequestDto) {
 
-	    log.info("[LearningService] saveMuiltipleChoice called for user: {}, questionNo: {}, selectedIndex: {}",
-	            email, learningMultipleChoiceRequestDto.getQuestionNo(), learningMultipleChoiceRequestDto.getSelectedIndex());
-
 	    QuestionCheckResultDto questionCheckResultDto = multipleChoiceService.checkResult(
 	            learningMultipleChoiceRequestDto.getQuestionNo(),
 	            learningMultipleChoiceRequestDto.getSelectedIndex()
@@ -53,8 +50,12 @@ public class LearningService {
 
 	    Member member = memberService.getActiveMemberByEmail(email);
 
-	    recordLearning(member, questionCheckResultDto.getMultipleChoice(), questionCheckResultDto.getIsCorrect(),
-	            learningMultipleChoiceRequestDto.getQuestionSolvingTime(), learningMultipleChoiceRequestDto.getIsFavorit());
+	    recordLearning(
+	    		member, 
+	    		questionCheckResultDto.getMultipleChoice(), 
+	    		questionCheckResultDto.getIsCorrect(),
+	            learningMultipleChoiceRequestDto.getQuestionSolvingTime()
+	    );
 
 	    updateResultAndMetric(member);
 	}
@@ -111,14 +112,13 @@ public class LearningService {
 	}
 
 	@Transactional
-	public void recordLearning(Member member, Question question, Boolean isCorrect, Long solvingTime, Boolean isFavorit) {
+	public void recordLearning(Member member, Question question, Boolean isCorrect, Long solvingTime) {
 		
 		Learning learning = Learning.builder()
 				.isCorrect(isCorrect)
 				.questionSolvingTime(solvingTime)
 				.question(question)
 				.member(member)
-				.isFavorit(isFavorit)
 				.build();
 		
 		learningRepository.save(learning);
@@ -268,7 +268,5 @@ public class LearningService {
 	            .distinct()
 	            .collect(Collectors.toList());
 	}
-
-	
 
 }

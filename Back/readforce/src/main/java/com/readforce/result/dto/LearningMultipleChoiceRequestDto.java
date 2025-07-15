@@ -20,7 +20,5 @@ public class LearningMultipleChoiceRequestDto {
 	
 	@NotNull(message = MessageCode.QUESTION_NO_NOT_NULL)
 	private Long questionNo;
-	
-	private Boolean isFavorit;
 
 }
