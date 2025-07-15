@@ -5,7 +5,7 @@
   max-width: 600px;
   margin: 3rem auto;
   padding: 2rem;
-  background-color: #f7f7f7;
+  background-color: #ffffff;
   border-radius: 12px;
   position: relative;
 }
@@ -29,6 +29,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  position: relative;
+  width: 100%;
+  max-width: 300px; 
+  margin: 0 auto;
 }
 
 .input-with-message input {
@@ -37,6 +41,7 @@
   border-radius: 6px;
   font-size: 1rem;
   width: 100%;
+  max-width: 400px;
 }
 
 .validation-message {
