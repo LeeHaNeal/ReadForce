@@ -15,7 +15,7 @@ const ChallengeResultPage = () => {
     <div className="ChallengeResultPage-container">
             <Lottie animationData={trophyAnimation} loop autoplay className="trophy-animation" />
       <h2 className="ChallengeResultPage-title">오늘의 도전 완료!</h2>
-      <p>총 점수:</p><p className="ChallengeResultPage-score"> <b>{finalScore}</b></p>
+      <p className="ChallengeResultPage-score-line">총 점수: <span className="ChallengeResultPage-score">{finalScore}</span></p>
       <button
         className="ChallengeResultPage-button"
         onClick={() => navigate('/challenge')}
