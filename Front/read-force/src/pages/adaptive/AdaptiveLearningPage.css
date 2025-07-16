@@ -85,14 +85,25 @@ main.adaptive-narrow {
   .start-button a{ font-size:1.05rem; padding:.9rem 2.8rem; }
 }
 
+.mobile-only-br {
+  display: none;
+}
 
-
-/* ───────── 데스크톱 이상 ≥ 1024 px ───────── */
-@media (min-width:1024px){
-  .robot-animation{ width:260px; }
-
-  .adaptive-intro p { font-size:1.8rem; }        /* ≈29 px */
-  .nickname        { font-size:1.8rem; }
-
-  .start-button a{ font-size:1.15rem; padding:1rem 3.2rem; }
+@media (max-width:375px){            /* ⏬ 새로 추가: 초소형 스마트폰 전용 */
+  .adaptive-intro p {
+    font-size: 1.5rem;              /* 약 18px 정도 */
+  }
+  .adaptive-intro {
+    margin-top: 15px;     
+  }
+  .nickname {
+    font-size: 1.8rem;
+  }
+  .start-button a {
+    font-size: 0.95rem;
+    padding: 0.75rem 2rem;
+  }
+  .mobile-only-br {
+    display: inline;
+  }
 }
