@@ -134,10 +134,10 @@ public class ChallengeService {
 	    
 	    Language language = languageService.getLangeageByLanguage(requestDto.getLanguage());
 	    
-	    Optional<Score> memberScore = scoreService.findByMemberAndCategoryAndLanguageWithOptional(member, category, language);
+	    Optional<Score> memberScoreOptional = scoreService.findByMemberAndCategoryAndLanguageWithOptional(member, category, language);
 
-	    if(memberScore.isEmpty()) {
-			
+	    if(memberScoreOptional.isEmpty()) {
+			// 기존 점수가 없으면 새로 생성합니다.
 	    	scoreService.createScore(
 		            member,
 		            totalScore,
@@ -145,11 +145,12 @@ public class ChallengeService {
 		            language
 		    );
 			
+		} else {
+			// 기존 점수가 있으면 업데이트합니다.
+			Score memberScore = memberScoreOptional.get();
+			scoreService.updateScoreForChallenge(memberScore, totalScore);
 		}
 	    
-	    scoreService.updateScoreForChallenge(memberScore.get(), totalScore);
-	    
-
 	    return totalScore;
 	    
 	}
