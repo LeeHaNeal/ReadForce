@@ -1,51 +1,60 @@
+/* 로그인 박스 스타일 */
 .login-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  padding: 3rem 2rem;
   background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 10px;
+  margin: 0 auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
+/* 로그인 타이틀 */
 .login-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   text-align: center;
 }
 
+/* 폼 구조 */
 .login-form {
-  width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.5rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
+/* 입력 필드 레이블 */
 .form-group label {
-  margin-bottom: 0.4rem;
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 15px;
+  font-weight: 600;
+  color: #444;
 }
 
+/* 입력 필드 */
 .form-group input {
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 12px;
+  font-size: 15px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background-color: transparent;
+  outline: none;
 }
 
+/* 링크 */
 .login-links {
   display: flex;
   justify-content: flex-end;
   font-size: 13px;
-  color: #555;
+  color: #666;
   gap: 1rem;
+  margin-top: -1rem;
+}
+
+.login-links span {
   cursor: pointer;
 }
 
@@ -53,43 +62,35 @@
   text-decoration: underline;
 }
 
+/* 소셜 로그인 아이콘 */
 .social-login {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin: 1rem 0;
+  gap: 1.2rem;
+  margin-top: 1rem;
 }
 
 .social-btn {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border: none;
-  background-color: #eee;
-  border-radius: 50%;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  transition: filter 0.2s ease;
 }
 
 .social-btn img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
+  width: 33px !important;
+  height: 33px !important;
 }
 
-.social-btn:hover {
-  filter: brightness(90%);
-}
-
-.social-btn:focus {
-  outline: 2px solid #aaa;
-}
-
+/* 로그인 버튼 */
 .login-btn {
-  margin-top: 1rem;
+  margin-top: 1.8rem;
   background-color: #319690;
   color: white;
   font-size: 16px;
@@ -97,13 +98,14 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: bold;
 }
 
 .login-btn:hover {
   background-color: #267973;
 }
 
+/* 에러 메시지 */
 .error-message {
   color: red;
   font-size: 14px;
@@ -111,24 +113,51 @@
   margin-top: -0.5rem;
 }
 
-@media screen and (max-width: 480px) {
-  .login-form {
-    padding: 1rem;
-    max-width: 100%;
+@media screen and (max-width: 374px) {
+  .login-wrapper {
+    padding: 1.5rem 1.2rem;  /* 위아래 패딩 줄임 */
+    margin: 16px auto;       /* 위아래 마진 살짝 줄임 */
+    margin-top: 40px;
+  }
+
+  .login-title {
+    font-size: 22px;         /* 제목 크기 축소 */
+    margin-bottom: 2rem;
+  }
+
+  .form-group input {
+    font-size: 14px;
+    padding: 10px;
   }
 
   .social-login {
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 0.8rem;
   }
 
   .social-btn {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
 
   .social-btn img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .login-btn {
+    font-size: 15px;
+    padding: 10px;
+    margin-top: 1.2rem;
+  }
+
+  .login-links {
+    font-size: 12px;
+    margin-top: -0.5rem;
+  }
+
+  .error-message {
+    font-size: 13px;
+    margin-top: -0.3rem;
   }
 }

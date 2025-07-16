@@ -47,10 +47,10 @@
 }
 .stat-box.top5 {
   flex: 0 0 45%;
-  max-width: 500px;
-  margin-left:0;
+  max-width: 600px;
+  margin-right: 20px;
 }
-/* ===== TOP5 탭 ===== */
+
 .top5 .tabs {
   display: flex;
   justify-content: center;
