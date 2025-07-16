@@ -82,7 +82,11 @@ const ChallengeQuizPage = () => {
     try {
       const res = await api.post('/challenge/submit-challenge-result', payload);
       alert(`오늘의 도전 완료! 점수: ${res.data.SCORE}`);
-      navigate('/challenge');
+      navigate('/challenge/result',{
+        state: {
+          finalScore: res.data.SCORE || res.data.score, // 둘 중 하나에 값이 있다면
+        },
+      });
     } catch (error) {
       console.log('🔥 error.response.data:', error.response?.data);
 
