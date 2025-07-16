@@ -57,7 +57,7 @@ const Main = () => {
       try {
         const [rankingRes, wrongRes] = await Promise.all([
           api.get(`/ranking/get-ranking-list?category=${selectedCategory}&language=KOREAN`),
-          api.get(`/learning/get-most-incorrect-passages?language=KOREAN&number=3`), // ✅ 수정된 API
+          api.get(`/learning/get-most-incorrect-passages?language=KOREAN&number=5`), // ✅ 수정된 API
         ]);
         setTop5Data(rankingRes.data.slice(0, 5));
         setWrongArticles(wrongRes.data);
