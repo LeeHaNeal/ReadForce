@@ -115,7 +115,11 @@ public class PassageService {
 		long count = passageRepository.countByLanguage_LanguageNameAndCategory_CategoryNameAndLevel_LevelNumberAndClassification_ClassificationName(language, category, level, ClassificationEnum.TEST);
 		
 		if(count == 0) {
-			
+			// 예외를 발생시키는 대신, 호출한 쪽에서 처리할 수 있도록 null을 반환하거나 혹은 Optional을 사용할 수 있습니다.
+            // 하지만 현재 구조에서는 예외를 발생시키는 것이 명확할 수 있습니다.
+            // 만약 여기서 빈 리스트를 반환하고 싶다면, 메서드의 반환 타입이 List<Passage>가 되어야 합니다.
+            // 현재는 단일 Passage를 반환하므로, 예외 처리가 더 적절해 보입니다. 
+            // AiService의 오류 처리 강화로 이 부분은 해결 가능합니다.
 			throw new ResourceNotFoundException(MessageCode.PASSAGE_NOT_FOUND);
 			
 		}
