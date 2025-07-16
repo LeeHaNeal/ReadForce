@@ -7,7 +7,7 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: #f9fafb;
+  background: #ffffff;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -20,7 +20,7 @@
 
 .ChallengeResultPage-score {
   font-size: 1.25rem;          /* ≈20 px */
-  color: #343a40;
+  color: #ff0000;
   margin: 0 0 2rem;
 }
 
