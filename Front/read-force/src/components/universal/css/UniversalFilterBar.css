@@ -16,7 +16,7 @@
 }
 
 .UniversalFilterBar-left {
-  flex: 0.6;
+  flex: 0.7;
 }
 
 .UniversalFilterBar-sort-button {
@@ -58,7 +58,7 @@
 }
 
 .UniversalFilterBar-right {
-  flex: 0.4;
+  flex: 0.3;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -66,9 +66,9 @@
 
 @media (max-width: 600px) {
   main {
-    padding-top: 0px;      /* 기존 32px → 12px (원하는 값으로 조정) */
-    padding-left: 16px;     /* 기존 값 유지 */
-    padding-right: 16px;    /* 기존 값 유지 */
+    padding-top: 0px; 
+    padding-left: 16px;    
+    padding-right: 16px;   
   }
 
   .UniversalFilterBar-layout {
