@@ -54,32 +54,33 @@ const AdminPassage = () => {
     }, []);
 
     // 테스트 지문 생성
-    const handleGenerateTestPassage = async () => {
-        setLoadingTestPassage(true);
-        try {
-            const res = await axiosInstance.post("/ai/generate-test-passage?language=KOREAN");
-            alert("성공 : " + res.data.message);
-        } catch (err) {
-            console.error(err);
-            alert("실패 : 지문 생성 중 오류가 발생했습니다.");
-        } finally {
-            setLoadingTestPassage(false);
-        }
-    };
-
-    // 테스트 문제 생성
-    const handleGenerateTestQuestion = async () => {
-        setLoadingTestQuestion(true);
-        try {
-            const res = await axiosInstance.post("/ai/generate-test-question?language=KOREAN");
-            alert("성공 : " + res.data.message);
-        } catch (err) {
-            console.error(err);
-            alert("실패 : 문제 생성 중 오류가 발생했습니다.");
-        } finally {
-            setLoadingTestQuestion(false);
-        }
-    };
+        const handleGenerateTestPassage = async () => {
+            setLoadingTestPassage(true);
+            try {
+                const res = await axiosInstance.post("/ai/generate-test-passage?language=KOREAN");
+                const message = res.data.message || "테스트 지문 생성 완료!";
+                alert("성공 : " + message);
+            } catch (err) {
+                console.error(err);
+                alert("실패 : 지문 생성 중 오류가 발생했습니다.");
+            } finally {
+                setLoadingTestPassage(false);
+            }
+        };
+        // 테스트 문제 생성 
+        const handleGenerateTestQuestion = async () => {
+            setLoadingTestQuestion(true);
+            try {
+                const res = await axiosInstance.post("/ai/generate-test-question?language=KOREAN");
+                const message = res.data.message || "테스트 문제 생성 완료!";
+                alert("성공 : " + message);
+            } catch (err) {
+                console.error(err);
+                alert("실패 : 문제 생성 중 오류가 발생했습니다.");
+            } finally {
+                setLoadingTestQuestion(false);
+            }
+        };
 
     // 일반 지문 생성
     const handleGeneratePassageWithParams = async () => {
@@ -94,7 +95,7 @@ const AdminPassage = () => {
                 count
             });
             const data = await res.data;
-            alert("성공 : " + data.message);
+            alert("일반 지문 생성 성공!");
             setShowPassageModal(false);
         } catch (err) {
             console.error(err);
@@ -110,7 +111,7 @@ const AdminPassage = () => {
         try {
             const res = await axiosInstance.post("/ai/generate-question");
             const data = await res.data;
-            alert("성공 : " + data.message);
+            alert("일반 문제 생성 성공!");
         } catch (err) {
             console.error(err);
             alert("실패 : 문제 생성 중 오류가 발생했습니다.");
@@ -325,15 +326,15 @@ const AdminPassage = () => {
                         <button style={ADMIN_BUTTONS} onClick={handleGenerateTestPassage} disabled={loadingTestPassage}>
                             {loadingTestPassage ? '생성 중...' : '테스트 지문 생성'}
                         </button>
-                        <button style={ADMIN_BUTTONS} onClick={handleGenerateTestQuestion} disabled={loadingTestQuestion}>
+                        {/* <button style={ADMIN_BUTTONS} onClick={handleGenerateTestQuestion} disabled={loadingTestQuestion}>
                             {loadingTestQuestion ? '생성 중...' : '테스트 문제 생성'}
-                        </button>
+                        </button> */}
                         <button style={ADMIN_BUTTONS} onClick={() => setShowPassageModal(true)} disabled={loadingPassage}>
                             {loadingPassage ? '생성 중...' : '일반 지문 생성'}
                         </button>
-                        <button style={ADMIN_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
+                        {/* <button style={ADMIN_BUTTONS} onClick={handleGenerateQuestion} disabled={loadingQuestion}>
                             {loadingQuestion ? '생성 중...' : '일반 문제 생성'}
-                        </button>
+                        </button> */}
                          <button style={ADMIN_BUTTONS} onClick={handleUpdateToChallenge} disabled={loadingChallenge}>
                             {loadingChallenge ? '변환 중...' : '챌린지 문제 변환'}
                         </button>
