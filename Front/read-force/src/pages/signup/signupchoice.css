@@ -1,113 +1,113 @@
 .signup-page {
-  max-width: 340px;
-  margin: 2rem auto;
-  padding: 1.5rem 1.2rem;
-  border-radius: 16px;
+  max-width: 400px;
+  margin: 6vh auto;
+  padding: 2rem 1.5rem;
+  border-radius: 20px;
   background-color: #fff;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  margin-top: 12vh;
 }
 
-.signup-page .signup-title {
+.signup-title {
   text-align: center;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.signup-page .signup-card-list {
+.signup-card-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-.signup-page .signup-card {
+.signup-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
+  padding: 14px 18px;
+  border-radius: 12px;
   border: 1px solid #ddd;
   background-color: #fafafa;
   font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease-in-out;
 }
 
-.signup-page .signup-card:hover {
+.signup-card:hover {
   background-color: #f0f0f0;
+  transform: translateY(-1px);
 }
 
-.signup-page .signup-card img {
-  width: 20px;
-  height: 20px;
+.signup-card img {
+  width: 22px;
+  height: 22px;
   margin-right: 10px;
 }
 
-.signup-page .signup-card span {
+.signup-card span {
   flex: 1;
-  text-align: left;
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #333;
 }
 
-.signup-page .signup-card .arrow {
-  font-size: 18px;
-  color: #888;
-  flex: 0;
+.signup-card .arrow {
+  font-size: 20px;
+  color: #aaa;
 }
 
-.signup-page .kakao {
+/* 플랫폼 색상 */
+.kakao {
   background-color: #fee500;
+  border: none;
 }
-.signup-page .kakao:hover {
+.kakao:hover {
   background-color: #f9db00;
 }
 
-.signup-page .naver {
-  background-color: #03c75a;
-  color: #fff;
-}
-.signup-page .naver:hover {
-  background-color: #02b553;
-}
-
-.signup-page .google {
+.google {
   background-color: #fff;
   border: 1px solid #ccc;
 }
-.signup-page .google:hover {
+.google:hover {
   background-color: #f7f7f7;
 }
 
-.signup-page .email {
+.email {
   background-color: #eee;
 }
-.signup-page .email:hover {
+.email:hover {
   background-color: #ddd;
 }
 
-@media (max-width: 480px) {
+/* 반응형 */
+@media screen and (max-width: 374px) {
   .signup-page {
-    padding: 1.2rem 1rem;
-    margin: 1rem auto;
+    padding: 1.5rem 1rem;
+    margin: 3vh auto;
+    margin-top: 60px;
   }
 
   .signup-title {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .signup-card {
-    font-size: 14px;
-    padding: 0.7rem 0.9rem;
+    white-space: nowrap;       /* 줄 바꿈 방지 */
+    width: 100%;               /* 부모 기준 가득 채우기 */
+    max-width: 100%;           /* 강제로 줄어들지 않게 */
+    box-sizing: border-box;    /* padding 포함 계산 */
   }
 
   .signup-card img {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 
   .signup-card .arrow {
-    font-size: 16px;
+    font-size: 18px;
   }
 }

@@ -12,7 +12,7 @@ const ChallengePage = () => {
 
      <p className="challenge-info-text">
       카테고리별 오늘의 도전은 <strong>단 하루 한 번!</strong><br />
-      <span className="highlight">20문제</span>, <span className="highlight">30분</span>,
+      <span className="highlight">20문제</span>, <span className="highlight">30분</span>
       당신의 실력을 <strong>랭킹</strong>으로 증명하세요.
     </p>
 

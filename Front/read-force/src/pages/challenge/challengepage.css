@@ -1,8 +1,7 @@
-/* ───────── 기본 = 모바일(≤375px) ───────── */
 .challenge-wrapper {
   width: 100%;
   min-height: calc(70vh - 100px);
-  padding: 0 16px;              /* 좌우 여백 */
+  padding: 0 16px;              
   margin: 0 auto 4rem;
   display: flex;
   flex-direction: column;
@@ -13,9 +12,8 @@
   transform: translateY(20px); 
 }
 
-/* 안내 문구 */
 .challenge-info-text {
-  font-size: 1.25rem;           /* 20px 정도 */
+  font-size: 1.25rem;           
   line-height: 1.45;
   font-weight: 600;
   color: #5a5a5a;
@@ -23,17 +21,14 @@
   margin-top: 10px;
 }
 
-/* 강조 색 */
 .highlight { color: #439395; font-weight: 700; }
 
-/* 트로피 애니메이션 */
 .trophy-animation {
-  width: 70vw;                 /* 화면의 70% */
-  max-width: 320px;            /* 너무 커지지 않게 */
+  width: 70vw;                 
+  max-width: 320px;            
   height: auto;
 }
 
-/* 도전 버튼 */
 .challenge-btn {
   padding: 0.75rem 3rem;
   font-size: 1rem;
@@ -47,14 +42,10 @@
 }
 .challenge-btn:hover { opacity: .85; }
 
-
-
-/* ───────── 태블릿 이상(≥768px) ───────── */
 @media (min-width: 768px) {
   .challenge-wrapper { gap: 2.5rem; }
 
-  .challenge-info-text { font-size: 1.625rem; }  /* 26px */
-
+  .challenge-info-text { font-size: 1.625rem; }  
   .trophy-animation {
     width: 60vw;
     max-width: 420px;
@@ -66,19 +57,8 @@
   }
 }
 
-
-/* ───────── 데스크탑 이상(≥1024px) ───────── */
-@media (min-width: 1024px) {
-  .challenge-wrapper { gap: 3rem; }
-
-  .challenge-info-text { font-size: 2rem; }      /* 32px */
-
-  .trophy-animation {
-    width: 480px;             /* 고정 최대 */
-  }
-
-  .challenge-btn {
-    padding: 1rem 5rem;
-    font-size: 1.15rem;
+@media (max-width: 374px) {
+  .challenge-info-text {
+    font-size: 1.24rem;
   }
 }
