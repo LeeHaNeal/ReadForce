@@ -20,7 +20,7 @@ const Main = () => {
       title: (
         <>
           문해<span style={{ color: "#439395" }}>력</span>,<br />
-          세상을 읽는 힘입니다
+          세상을 읽는 <span style={{ color: "#439395" }}>힘</span>입니다
         </>
       ),
       description: "한국·일본·미국 뉴스로 나의 문해력을 테스트 해보세요!",
@@ -31,8 +31,8 @@ const Main = () => {
       image: slide2Image,
       title: (
         <>
-          AI 추천 콘텐츠와 함께<br />
-          문해력을 성장시키세요
+          <span style={{ color: "#264053" }}>AI</span> 추천 콘텐츠와 함께<br />
+          문해<span style={{ color: "#264053" }}>력</span>을 성장시키세요
         </>
       ),
       description: "국내 베스트셀러 1위 //누적 30만부 돌파!!",
