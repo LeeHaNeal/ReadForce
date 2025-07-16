@@ -34,18 +34,24 @@ const MyPage = () => {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      axiosInstance
-        .get("/file/get-profile-image", { responseType: "blob" })
-        .then((res) => {
-          const imageUrl = URL.createObjectURL(res.data);
-          setProfileImageUrl(imageUrl);
-        })
-        .catch(() => {
-          console.warn("프로필 이미지 없음 → 기본 이미지 사용");
-          setProfileImageUrl(defaultProfileImage);
-        });
-    }
+    if (!isLoggedIn) return;
+
+    let imageUrl = null;
+
+    axiosInstance
+      .get("/file/get-profile-image", { responseType: "blob" })
+      .then((res) => {
+        imageUrl = URL.createObjectURL(res.data);
+        setProfileImageUrl(imageUrl);
+      })
+      .catch(() => {
+        console.warn("프로필 이미지 없음 → 기본 이미지 사용");
+        setProfileImageUrl(defaultProfileImage);
+      });
+
+    return () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -186,7 +192,15 @@ const MyPage = () => {
     <div className="mypage-container">
       <div className="top-section">
         <div className="left-top">
-          <img src={profileImageUrl} alt="프로필" className="profile-img" />
+          <img
+            src={profileImageUrl}
+            alt="프로필"
+            className="profile-img"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = defaultProfileImage;
+            }}
+          />
           <h3 className="nickname">{nickname} 님</h3>
         </div>
         <div className="calendar-section">
