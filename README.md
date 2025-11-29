@@ -80,19 +80,20 @@ AI 기반 뉴스·문학 콘텐츠를 분석해 초/중/고급 문해력 문제�
 ---
 
 ## 📂 프로젝트 구조
+```text
 ReadForce/
 ├─ backend/
-│ ├─ src/main/java/com/readforce
-│ ├─ src/main/resources
-│ └─ Dockerfile
+│  ├─ src/main/java/com/readforce
+│  ├─ src/main/resources
+│  └─ Dockerfile
 ├─ frontend/
-│ ├─ src/
-│ └─ package.json
+│  ├─ src/
+│  └─ package.json
 ├─ infra/
-│ ├─ aws-ec2/
-│ └─ s3/
+│  ├─ aws-ec2/
+│  └─ s3/
 └─ README.md
----
+
 
 <div align="center">
 
