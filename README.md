@@ -94,11 +94,13 @@ ReadForce/
 │  └─ s3/
 └─ README.md
 
+</div> ```
+---
 
 <div align="center">
-📊 GitHub Stats
 
+## 📊 GitHub Stats
+![HaNeal's GitHub stats](https://github-readme-stats.vercel.app/api?username=LeeHaNeal&show_icons=true&theme=tokyonight)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=LeeHaNeal&layout=compact&theme=tokyonight)
 
-
-
-</div> ```
+</div>
